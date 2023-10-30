@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LinkUp</string>
+    <string name="Home">Home</string>
+    <string name="Bell">Bell</string>
+    <string name="Message">Message</string>
+    <string name="Heart">Heart</string>
+    <string name="Person">Person</string>
+
+    <!-- Miscellaneous Strings -->
+
+    <string name="login">KIRJAUDU SISÄÄN</string>
+    <string name="title">Otsikko</string>
+    <string name="value">Arvo</string>
+    <string name="setting">Asetukset</string>
+    <string name="logout">Kirjaudu ulos</string>
+    <string name="phone_number">Puhelinnumero</string>
+    <string name="facebook">Facebook</string>
+    <string name="address">Osoite</string>
+    <string name="desc">Kuvaus</string>
+    <string name="setting_screen">Asetusnäyttö</string>
+    <string name="error_toast">Jokin meni pieleen. Sovellusta ei voi avata</string>
+
+    <!-- Profile Page Related String -->
+    <string name="profile">Profiili</string>
+    <string name="about_me">Minusta</string>
+    <string name="contact_details">Yhteystiedot</string>
+    <string name="edit_profile">Muokkaa profiilia</string>
+    <string name="save">Tallenna</string>
+    <string name="contact">Yhteystieto</string>
+    <string name="social_media">Sosiaalinen media</string>
+
+    <!-- Share Related Strings -->
+    <string name="share">Jaa</string>
+    <string name="what_to_share">Mitä haluat jakaa?</string>
+    <string name="share_option">Miten haluat jakaa?</string>
+    <string name="qr_code">QR-koodi</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="nfc_card_assign_option">Tai haluatko antaa kortin tai tagin?</string>
+    <string name="scan_and_add_to_contacts">Skannaa QR-koodi ja lisää minut yhteystietoihisi</string>
+    <string name="hover_nfc_card">Levitä laitteen takaosa NFC-kortin päälle</string>
+    <string name="scan_qr_code">Aseta QR-koodi tähän kehykseen</string>
+
+    <!-- Contact List String -->
+    <string name="my_contacts">Yhteystietoni</string>
+    <string name="empty_contact_list">Yhteystietoluettelo on tyhjä.</string>
+
+    <!-- Receive Related String -->
+    <string name="receive">Vastaanota</string>
+    <string name="receive_option">Miten haluat vastaanottaa?</string>
+    <string name="nfc_card_receive_option">Tai haluatko vastaanottaa kortin tai tagin?</string>
+    <string name="show_qr_code">Näytä minulle QR-koodisi</string>
+    <string name="success_qr_scan">Olet lisätty onnistuneesti yhteystietoluettelooni.</string>
+    <string name="failed_qr_scan">Voi ei! Yhteydenotto epäonnistui</string>
+    <string name="success_nfc_scan">Onneksi olkoon! Yhteystieto on lisätty onnistuneesti.</string>
+    <string name="failed_nfc_scan">Voi ei! QR-koodin skannaus epäonnistui</string>
+    <string name="success_resp">"Onneksi olkoon! Lisäsit onnistuneesti tietosi NFC-kortille."</string>
+    <string name="failed_resp">"Voi ei! Jotain meni pieleen."</string>
+
+    <!-- Create a new Profile -->
+    <string name="create_new_profile">Luo uusi profiili</string>
+    <string name="username">Käyttäjänimi</string>
+    <string name="email">Sähköposti</string>
+    <string name="social_media_links">Sosiaalisen median linkit</string>
+    <!--Settings/logout -->
+    <string name="confirm_logout">Vahvista uloskirjautuminen</string>
+    <string name="are_you_sure">Oletko varma, että haluat kirjautua ulos?</string>
+    <string name="yes">KYLLÄ</string>
+    <string name="no">EI</string>
+</resources>

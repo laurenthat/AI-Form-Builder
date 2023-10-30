@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">LinkUp</string>
+    <string name="Home">Home</string>
+    <string name="Bell">Bell</string>
+    <string name="Message">Message</string>
+    <string name="Heart">Heart</string>
+    <string name="Person">Person</string>
+
+    <!--Miscellaneous Strings -->
+
+    <string name="login">Choose Your Sign-In Method</string>
+    <string name="title">Title</string>
+    <string name="value">Value</string>
+    <string name="setting">Setting</string>
+    <string name="logout">Log out</string>
+    <string name="phone_number">Phone Number</string>
+    <string name= "facebook">Facebook</string>
+    <string name="address">Address</string>
+    <string name="desc">Description</string>
+    <string name="setting_screen">Setting Screen</string>
+    <string name="error_toast">Something went wrong. Cannot open the app</string>
+
+
+    <!--Profile Page Related String -->
+    <string name="profile">Profile</string>
+    <string name="about_me">About Me</string>
+    <string name="contact_details">Contact Details</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="save">Save</string>
+    <string name="contact">Contact</string>
+    <string name="social_media">Social Media</string>
+
+    <!--Share Related Strings -->
+    <string name="share">Share</string>
+    <string name="what_to_share">What would you like to share?</string>
+    <string name="share_option">How would you like to share?</string>
+    <string name="qr_code">QR Code</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="nfc_card_assign_option">Or would you like to assign a NFC card or tag?</string>
+    <string name="scan_and_add_to_contacts">Scan the Qr Code and add me in your Contacts</string>
+    <string name="hover_nfc_card">Hover the back of your device over the NFC-enabled card</string>
+    <string name="scan_qr_code">Place the QR code in this frame</string>
+
+    <!-- Contact List String -->
+    <string name="my_contacts">My Contacts</string>
+    <string name="empty_contact_list">Contact list is Empty.</string>
+
+    <!-- Receive Related String -->
+    <string name="receive">Receive</string>
+    <string name="receive_option">How would you like to receive?</string>
+    <string name="nfc_card_receive_option">Or would you like to read a NFC card or tag?</string>
+    <string name="show_qr_code">Please show me your QR Code</string>
+    <string name="success_qr_scan">You have been successfully added to my contact List.</string>
+    <string name="failed_qr_scan">Oh no! Contact retrieval has failed</string>
+    <string name="success_nfc_scan">Congratulations! Contact has been successfully added.</string>
+    <string name="failed_nfc_scan">Oh no! Scanning of QR code has failed</string>
+    <string name="success_resp">"Congratulations! You successfully added your details on the NFC-enabled card."</string>
+    <string name="failed_resp">"Oh no! Something went wrong."</string>
+
+
+    <!-- Create a new Profile -->
+    <string name="create_new_profile">Create a new Profile</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="social_media_links">Social Media Links</string>
+
+    <!-- Logout/Settings Screen -->
+    <string name="confirm_logout">Confirm Logout</string>
+    <string name="are_you_sure">Are you sure you want to logout?</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
+
+
+</resources>
