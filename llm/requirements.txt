@@ -1,0 +1,6 @@
+torch
+torchvision
+icecream
+matplotlib
+icecream
+ultralytics
