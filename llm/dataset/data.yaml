@@ -1,5 +1,0 @@
-train: ./train/images
-val: ./valid/images
-
-nc: 21
-names: ['button', 'text_field', 'text_area', 'image', 'dropdown_menu', 'checkbox_checked', 'checkbox_unchecked', 'switch_disabled', 'switch_enabled', 'radio_button_checked', 'radio_button_unchecked', 'menu', 'slider', 'card', 'alert', 'chip', 'data_table', 'floating_action_button', 'grid_list', 'label', 'tooltip']
