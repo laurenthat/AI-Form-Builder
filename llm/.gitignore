@@ -28,3 +28,6 @@ dataset/train/images/*
 dataset/train/labels/*
 !dataset/train/labels/.gitkeep
 
+dataset.zip
+*.pt
+*.cache
