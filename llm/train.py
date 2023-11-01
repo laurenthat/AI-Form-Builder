@@ -1,7 +1,9 @@
 import os
 
+import torch
 from ultralytics import YOLO
 
-model = YOLO("yolov8m-seg.pt")
-
-model.train(data=os.path.join(os.getcwd(), 'dataset', "data.yaml"), epochs=1, model="yolov8m-seg.pt", imgsz=224)
+if __name__ == "__main__":
+    print(torch.cuda.is_available())
+    model = YOLO("yolov8n.pt")
+    model.train(data=os.path.join(os.getcwd(), 'dataset', "data.yaml"),epochs=5,model="ai-form-builder.pt", imgsz=224)

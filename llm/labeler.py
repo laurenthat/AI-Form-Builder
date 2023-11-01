@@ -18,30 +18,30 @@ def trim(im):
 
 # shapes = os.listdir('ui-pics')
 # shapes = {e: i for i, e in enumerate(shapes)}
+
 shapes = {
     'button': 0,
     'text_field': 1,
     'text_area': 2,
     'image': 3,
-    'dropdown_menu': 4,
-    'checkbox_checked': 5,
-    'checkbox_unchecked': 6,
-    'switch_disabled': 7,
-    'switch_enabled': 8,
-    'radio_button_checked': 9,
-    'radio_button_unchecked': 10,
-    'menu': 11,
-    'slider': 12,
-    'card': 13,
-    'alert': 14,
-    'chip': 15,
-    'data_table': 16,
-    'floating_action_button': 17,
-    'grid_list': 18,
-    'label': 19,
-    'tooltip': 20
+    'checkbox_checked': 4,
+    'checkbox_unchecked': 5,
+    'switch_disabled': 6,
+    'switch_enabled': 7,
+    'radio_button_checked': 8,
+    'radio_button_unchecked': 9,
+    'slider': 10,
+    'floating_action_button': 11,
+    'label': 12,
+    # 'tooltip': 18
+    # 'data_table': 15,
+    # 'chip': 14,
+    # 'menu': 11,
+    # 'alert': 13,
+    # 'dropdown_menu': 4,
+    # 'grid_list': 19,
+    # 'card': 20,
 }
-
 ic(shapes)
 shape_items = list(shapes.items())
 

@@ -4,3 +4,4 @@ icecream
 matplotlib
 icecream
 ultralytics
+numpy
