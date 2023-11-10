@@ -42,6 +42,7 @@
     <string name="scan_qr_code">Aseta QR-koodi tähän kehykseen</string>
 
     <!-- Contact List String -->
+    <string name="my_forms">" Minun lomakkeet"</string>
     <string name="my_contacts">Yhteystietoni</string>
     <string name="empty_contact_list">Yhteystietoluettelo on tyhjä.</string>
 
@@ -67,4 +68,5 @@
     <string name="are_you_sure">Oletko varma, että haluat kirjautua ulos?</string>
     <string name="yes">KYLLÄ</string>
     <string name="no">EI</string>
+    <string name="home_screen">Koti Sivu</string>
 </resources>

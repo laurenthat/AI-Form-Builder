@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,14 +18,17 @@ import com.sbma.linkup.api.apimodels.ApiUser
 import com.sbma.linkup.api.apimodels.toUser
 import com.sbma.linkup.application.AppViewModelProvider
 import com.sbma.linkup.application.connectivity.InternetConnectionState
+import com.sbma.linkup.datasource.DataStore
 import com.sbma.linkup.intents.login.LoginResponseToken
 import com.sbma.linkup.navigation.bottomnavigation.BottomNavigationBar
 import com.sbma.linkup.presentation.components.NoInternetConnectionBarComponent
 import com.sbma.linkup.presentation.screens.LoadingScreen
 import com.sbma.linkup.presentation.screens.LoginScreen
+import com.sbma.linkup.presentation.screens.WelcomeScreen
 import com.sbma.linkup.user.UserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -37,6 +41,9 @@ fun MainScreen(
 ) {
     val navController = rememberNavController()
     val loggedInUser = userViewModel.getLoggedInUserProfile.collectAsState(initial = null)
+
+    val welcomeScreenSeen = userViewModel.welcomeScreenSeen.collectAsState(initial = null)
+    val composableScope = rememberCoroutineScope()
 
     // show loading screen at first if there is an intent
     val isLoading =
@@ -77,6 +84,14 @@ fun MainScreen(
 
     if (loggedInUser.value == null || isLoading.value) {
         LoadingScreen()
+    } else if (welcomeScreenSeen.value == false) {
+        WelcomeScreen(onClick = {
+            run {
+                composableScope.launch {
+                    userViewModel.setWelcomeScreenSeen()
+                }
+            }
+        })
     } else if (loggedInUser.value!!.isEmpty()) {
         LoginScreen()
     } else {

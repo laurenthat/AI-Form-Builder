@@ -24,15 +24,15 @@ import com.sbma.linkup.presentation.ui.theme.YellowApp
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
-    var selectedItem by rememberSaveable { mutableIntStateOf(2) }
+    var selectedItem by rememberSaveable { mutableIntStateOf(0) }
 
     val items = listOf(
-        BottomNavigationItemsData.Share,
-        BottomNavigationItemsData.MyContacts,
-        BottomNavigationItemsData.Profile,
-        BottomNavigationItemsData.Receive,
+        BottomNavigationItemsData.Home,
+        BottomNavigationItemsData.Forms,
         BottomNavigationItemsData.Settings,
+
     )
+
     AnimatedNavigationBar(
         modifier = Modifier
             .padding(horizontal = 8.dp)

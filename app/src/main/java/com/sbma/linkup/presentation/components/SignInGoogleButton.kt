@@ -21,10 +21,12 @@ import com.sbma.linkup.R
 
 @Composable
 fun SignInGoogleButton(
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(3.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White,
@@ -62,4 +64,5 @@ fun SignInGoogleButton(
 @Composable
 fun PreviewSignInGoogleButton() {
     SignInGoogleButton(onClick = {})
+    SignInGoogleButton(enabled = false, onClick = {})
 }
