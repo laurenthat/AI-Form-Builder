@@ -86,8 +86,7 @@ fun SettingsScreenTopBar() {
         title = {
             Text(
                 stringResource(R.string.setting_screen),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelLarge,
                 fontSize = 20.sp
             )
         },

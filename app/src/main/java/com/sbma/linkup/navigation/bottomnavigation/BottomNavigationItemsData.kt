@@ -11,34 +11,22 @@ sealed class BottomNavigationItemsData(
     var screenRoute: String,
 
     ) {
-    object Share : BottomNavigationItemsData(
-        title = "Share",
-        icon = R.drawable.card_send,
-        screenRoute = "share",
+    object Home : BottomNavigationItemsData(
+        title = "Home",
+        icon = R.drawable.home,
+        screenRoute = "home",
     )
-
-    object MyContacts : BottomNavigationItemsData(
-        title = "My Network",
-        icon = R.drawable.my_network,
-        screenRoute = "connections",
+    object Forms : BottomNavigationItemsData(
+        title = "Forms",
+        icon = R.drawable.forms,
+        screenRoute = "forms",
     )
-
-    object Profile : BottomNavigationItemsData(
-        title = "Profile",
-        icon = R.drawable.person,
-        screenRoute = "profile",
-    )
-
-    object Receive : BottomNavigationItemsData(
-        title = "Receive",
-        icon = R.drawable.card_receive,
-        screenRoute = "receive",
-    )
-
     object Settings : BottomNavigationItemsData(
         title = "Settings",
         icon = R.drawable.settings,
         screenRoute = "settings",
     )
+
 }
+
 

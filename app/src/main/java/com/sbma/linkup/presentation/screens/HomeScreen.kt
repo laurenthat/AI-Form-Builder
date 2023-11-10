@@ -1,6 +1,5 @@
 package com.sbma.linkup.presentation.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,11 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,7 +35,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,12 +47,7 @@ import com.sbma.linkup.application.AppViewModelProvider
 import com.sbma.linkup.card.Card
 import com.sbma.linkup.card.CardViewModel
 import com.sbma.linkup.connection.ConnectionViewModel
-import com.sbma.linkup.presentation.components.CardIcon
-import com.sbma.linkup.presentation.components.UserCardsList
 import com.sbma.linkup.user.User
-import com.sbma.linkup.util.initiatePhoneCall
-import com.sbma.linkup.util.openEmail
-import com.sbma.linkup.util.openSocialMedia
 import java.util.UUID
 
 @Composable
@@ -79,9 +68,8 @@ fun ConnectionUserProfileScreenProvider(
     connection?.let {
         val userCards =
             userCardViewModel.allItemsStream(it.value.id).collectAsState(initial = listOf())
-        UserProfileScreen(
+        HomeScreen(
             it.value,
-            userCards.value,
             canEdit = false,
             onEditClick = null,
             onBackClick = onBackClick,
@@ -106,7 +94,7 @@ fun UserProfileScreenTopBar(
         ),
         title = {
             Text(
-                text = "Profile",
+                stringResource(R.string.home_screen),
                 style = MaterialTheme.typography.labelLarge,
                 fontSize = 20.sp
             )
@@ -148,37 +136,16 @@ fun UserProfileScreenTopBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileScreen(
+fun HomeScreen(
     user: User,
-    userCards: List<Card>,
     canEdit: Boolean,
     onEditClick: (() -> Unit)? = null,
     canGoBack: Boolean,
     onBackClick: (() -> Unit)? = null
 ) {
-    val ctx = LocalContext.current
+
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val aboutMeCard = userCards.find { it.title == "About Me" }
-    val phoneNumberCard = userCards.find { it.title == "Phone" }
-    val emailCard = userCards.find { it.title == "Email" }
-    val addressCard = userCards.find { it.title == "Address" }
-    val titleCard = userCards.find { it.title == "Title" }
-    val facebook = userCards.find { it.title == "Facebook" }
-    val instagram = userCards.find { it.title == "Instagram" }
-    val linkedin = userCards.find { it.title == "LinkedIn" }
-    val twitter = userCards.find { it.title == "Twitter" }
-    val restOfTheCards = userCards
-        .asSequence()
-        .filter { it.title != "About Me" }
-        .filter { it.title != "Phone" }
-        .filter { it.title != "Email" }
-        .filter { it.title != "Address" }
-        .filter { it.title != "Title" }
-        .filter { it.title != "Facebook" }
-        .filter { it.title != "Instagram" }
-        .filter { it.title != "LinkedIn" }
-        .filter { it.title != "Twitter" }
-        .toList()
+
 
     Scaffold(
         topBar = {
@@ -208,120 +175,11 @@ fun UserProfileScreen(
                 contentDescription = "profile photo",
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(RoundedCornerShape(50.dp))
+                    .clip(RoundedCornerShape(100.dp))
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = user.name, fontSize = 25.sp, textAlign = TextAlign.Center)
+            Text(text = "Hello, " + user.name, fontSize = 25.sp, textAlign = TextAlign.Center)
 
-            titleCard?.let {
-                Text(text = it.value, fontSize = 15.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            if (instagram != null || facebook != null || twitter != null || linkedin != null) {
-                Row {
-                    instagram?.let { card ->
-                        CardIcon(card.picture, modifier = Modifier
-                            .size(60.dp)
-                            .padding(5.dp)
-                            .clickable {
-                                openSocialMedia(ctx, "https://www.instagram.com/${card.value}")
-                            })
-                    }
-                    facebook?.let { card ->
-                        CardIcon(card.picture, modifier = Modifier
-                            .size(60.dp)
-                            .padding(5.dp)
-                            .clickable {
-                                openSocialMedia(ctx, "https://www.facebook.com/${card.value}")
-                            })
-                    }
-                    twitter?.let { card ->
-                        CardIcon(card.picture, modifier = Modifier
-                            .size(60.dp)
-                            .padding(5.dp)
-                            .clickable {
-                                openSocialMedia(ctx, "https://www.x.com/${card.value}")
-                            })
-                    }
-                    linkedin?.let { card ->
-                        CardIcon(card.picture, modifier = Modifier
-                            .size(60.dp)
-                            .padding(5.dp)
-                            .clickable {
-                                openSocialMedia(ctx, "https://www.linkedin.com/${card.value}")
-                            })
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-            aboutMeCard?.let {
-                Card(
-                    modifier = Modifier
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.about_me),
-                            fontSize = 20.sp,
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = it.value, fontSize = 16.sp)
-                    }
-
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            if (phoneNumberCard != null || emailCard != null || addressCard != null) {
-                Card(
-                    modifier = Modifier
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.contact_details),
-                            fontSize = 20.sp,
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        phoneNumberCard?.let {
-                            ContactInfoRow(
-                                icon = Icons.Filled.Call,
-                                text = it.value,
-                                modifier = Modifier.clickable {
-                                    initiatePhoneCall(ctx, it.value)
-                                }
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                        emailCard?.let {
-                            ContactInfoRow(
-                                icon = Icons.Filled.Email,
-                                text = it.value,
-                                modifier = Modifier.clickable {
-                                    openEmail(ctx, it.value)
-                                }
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                        addressCard?.let {
-                            ContactInfoRow(
-                                icon = Icons.Filled.LocationOn,
-                                text = it.value
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
-            }
-            UserCardsList(restOfTheCards, withLazyColumn = false)
         }
     }
 
@@ -420,9 +278,8 @@ fun ProfileScreenPreview() {
             ),
         )
     }
-    UserProfileScreen(
+    HomeScreen(
         user.value,
-        cards,
         canEdit = true,
         onEditClick = {},
         canGoBack = false,

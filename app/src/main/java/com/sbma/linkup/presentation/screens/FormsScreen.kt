@@ -61,7 +61,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserNetworkScreenTopBar(
+fun FormsScreenTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     MediumTopAppBar(
@@ -71,9 +71,8 @@ fun UserNetworkScreenTopBar(
         ),
         title = {
             Text(
-                stringResource(R.string.my_contacts),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                stringResource(R.string.my_forms),
+                style = MaterialTheme.typography.labelLarge,
                 fontSize = 20.sp
             )
         },
@@ -122,7 +121,7 @@ fun UserNetworkListItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserNetworkScreen(
+fun FormsScreen(
     state: UserConnectionsScreenState,
     modifier: Modifier = Modifier,
     onConnectionClick: (connection: Connection) -> Unit
@@ -150,7 +149,7 @@ fun UserNetworkScreen(
 
     Scaffold(
         topBar = {
-            UserNetworkScreenTopBar(scrollBehavior = scrollBehavior)
+            FormsScreenTopBar(scrollBehavior = scrollBehavior)
         },
         modifier = Modifier
             .fillMaxSize()
@@ -177,7 +176,7 @@ fun UserNetworkScreen(
                     ),
                 placeholder = {
                     Text(
-                        text = "Search Contacts",
+                        text = "Search Forms",
                         color = MaterialTheme.colorScheme.primary
                     )
                 },
@@ -283,7 +282,7 @@ fun ScreenPreview() {
         )
     }
     LinkUpTheme {
-        UserNetworkScreen(
+        FormsScreen(
             UserConnectionsScreenState(users)
         ) {
             Timber.d(it.toString())

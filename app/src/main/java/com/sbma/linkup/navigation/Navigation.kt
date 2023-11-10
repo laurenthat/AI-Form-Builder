@@ -14,26 +14,21 @@ import com.sbma.linkup.application.AppViewModelProvider
 import com.sbma.linkup.application.connectivity.InternetConnectionState
 import com.sbma.linkup.card.CardViewModel
 import com.sbma.linkup.connection.ConnectionViewModel
-import com.sbma.linkup.presentation.screens.ChooseCardsToShareScreen
-import com.sbma.linkup.presentation.screens.ChooseMethodScreen
-import com.sbma.linkup.presentation.screens.ConnectionUserProfileScreenProvider
 import com.sbma.linkup.presentation.screens.EditProfileScreenProvider
+import com.sbma.linkup.presentation.screens.FormsScreen
+import com.sbma.linkup.presentation.screens.HomeScreen
+import com.sbma.linkup.presentation.screens.LoginScreen
 import com.sbma.linkup.presentation.screens.SettingsScreen
-import com.sbma.linkup.presentation.screens.UserNetworkScreen
-import com.sbma.linkup.presentation.screens.UserProfileScreen
+import com.sbma.linkup.presentation.screens.WelcomeScreen
 import com.sbma.linkup.presentation.screens.bluetooth.BluetoothShareAndReceiveResultScreen
-import com.sbma.linkup.presentation.screens.bluetooth.ReceiveViaBluetoothScreenProvider
 import com.sbma.linkup.presentation.screens.bluetooth.ShareViaBluetoothScreenProvider
-import com.sbma.linkup.presentation.screens.nfc.NfcReceiveScreen
 import com.sbma.linkup.presentation.screens.nfc.NfcScanScreen
-import com.sbma.linkup.presentation.screens.qr.ScanQRCodeCameraScreen
 import com.sbma.linkup.presentation.screens.qr.QrCodeScanViaCameraResultScreen
 import com.sbma.linkup.presentation.screens.qr.ShareQrCodeScreen
 import com.sbma.linkup.presentation.screenstates.UserConnectionsScreenState
 import com.sbma.linkup.user.User
 import com.sbma.linkup.user.UserViewModel
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -62,52 +57,9 @@ fun Navigation(
     NavHost(
         navController,
         modifier = modifier,
-        startDestination = "profile"
+        startDestination = "home"
     ) {
-        /**
-         * tab of the bottom navigation bar
-         */
-        composable("share") {
-            ChooseCardsToShareScreen(
-                userCards.value,
-            ) { cardsToShare ->
-                composableScope.launch {
-                    if (!internetState.value.isConnected()) {
-                        // TODO: Show a Toast or something and let the user know this action requires internet.
-                        return@launch
-                    }
-                    val cardIds = cardsToShare.map { card -> card.id.toString() }
-                    userViewModel.shareCards(cardIds) { shareId ->
-                        navController.navigate("share/${shareId}")
-                    }
-                }
-            }
-        }
-        /**
-         * Simple page with three buttons and three callbacks which we can navigate to the wanted route.
-         */
-        composable(
-            "share/{shareId}",
-            arguments = listOf(navArgument("shareId") { type = NavType.StringType }),
 
-            ) { backStackEntry ->
-            val shareId = backStackEntry.arguments?.getString("shareId")
-            ChooseMethodScreen(
-                onBluetoothClick = {
-                    navController.navigate("share/${shareId}/bluetooth")
-                },
-                onNfcClick = {
-                    navController.navigate("share/${shareId}/nfc")
-                },
-                onQrCodeClick = {
-                    navController.navigate("share/${shareId}/qr")
-                },
-                isReceiving = false,
-                onBackClick = {
-                    navController.popBackStack()
-                }
-            )
-        }
         /**
          * Bluetooth method of sharing user profile.
          * at this point json string should be already saved to datastore and available.
@@ -162,78 +114,11 @@ fun Navigation(
         /**
          * tab of the bottom navigation bar
          */
-        composable("connections") {
-            UserNetworkScreen(state) { connection ->
-                navController.navigate("connections/${connection.id}")
+        composable("forms") {
+            FormsScreen(
+                state) { connection ->
+                navController.navigate("forms/${connection.id}")
             }
-        }
-        /**
-         * When user selected one of their connections it should redirect to the profile screen of the connection user
-         * And show the profile with cards that user has access to.
-         */
-        composable(
-            "connections/{connectionId}",
-            arguments = listOf(navArgument("connectionId") { type = NavType.StringType }),
-
-            ) { backStackEntry ->
-            ConnectionUserProfileScreenProvider(
-                user,
-                backStackEntry.arguments?.getString("connectionId"),
-                onBackClick = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        /**
-         * tab of the bottom navigation bar
-         */
-        composable("receive") {
-            ChooseMethodScreen(
-                onBluetoothClick = {
-                    navController.navigate("receive/bluetooth")
-                },
-                onNfcClick = {
-                    navController.navigate("receive/nfc")
-                },
-                onQrCodeClick = {
-                    navController.navigate("receive/qr")
-                },
-                isReceiving = true,
-                onBackClick = {
-                    navController.popBackStack()
-                }
-
-            )
-        }
-        /**
-         * Bluetooth method of sharing user profile.
-         * at this point json string should be already saved to datastore and available.
-         */
-        composable("receive/bluetooth") {
-            ReceiveViaBluetoothScreenProvider(
-                onSuccess = {
-                    navController.navigate("scan-result/bluetooth/receive/succeeded")
-                },
-                onFailure = {
-                    navController.navigate("scan-result/bluetooth/receive/failed")
-                }
-            )
-        }
-        composable("receive/nfc") {
-            NfcReceiveScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                })
-        }
-        composable("receive/qr") {
-            ScanQRCodeCameraScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onResultScan = {
-                    navController.navigate("scan-result/qr/receive/$it")
-                }
-            )
         }
         /**
          * tab of the bottom navigation bar
@@ -241,14 +126,14 @@ fun Navigation(
         composable("settings") {
             SettingsScreen()
         }
+
         /**
          * tab of the bottom navigation bar
          * Navigates to {UserShareScreenProvider}  when user clicks on Share button.
          */
-        composable("profile") {
-            UserProfileScreen(
+        composable("home") {
+            HomeScreen(
                 user,
-                userCards.value,
                 canEdit = true,
                 onEditClick = { navController.navigate("profile/edit") },
                 canGoBack = false,
@@ -256,10 +141,10 @@ fun Navigation(
             )
         }
         /**
-         *  Edit profile screen
-         *  After user presses save button it will navigate back to profile route.
+         *  Edit forms screen
+         *  After user presses save button it will navigate back to forms route.
          */
-        composable("profile/edit") {
+        composable("forms/edit") {
             EditProfileScreenProvider(
                 user,
                 userCards.value,
@@ -267,7 +152,7 @@ fun Navigation(
                     navController.popBackStack()
                 },
                 onSave = {
-                    navController.navigate("profile")
+                    navController.navigate("forms")
                 })
         }
         composable(

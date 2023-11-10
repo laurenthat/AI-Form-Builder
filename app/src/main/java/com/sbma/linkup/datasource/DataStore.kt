@@ -1,7 +1,9 @@
 package com.sbma.linkup.datasource
 
 import android.content.Context
+import android.text.BoringLayout
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -12,16 +14,25 @@ import java.util.UUID
 
 /**
  * key value database
- * Currently used for userId and accesstoken of logged in user.
+ * Currently used for userId and access token of logged in user.
  */
 class DataStore(private val context: Context) {
+
 
     /**
      * Getter for logged in user id
      */
+
     val getUserId: Flow<UUID?> = context.dataStore.data
         .map { it[USERID_KEY] }
         .map { it?.let { UUID.fromString(it) } }
+
+    /**
+     * Getter for checking if welcome screen is seen by user
+     */
+    val getWelcomeScreenSeen: Flow<Boolean>  = context.dataStore.data
+        .map { it[WELCOMESCREENSEEN_KEY]?.equals("true") ?: false }
+
 
     /**
      * Getter for access token
@@ -47,6 +58,13 @@ class DataStore(private val context: Context) {
      */
     private suspend fun setUserId(value: UUID) {
         context.dataStore.edit { it[USERID_KEY] = value.toString() }
+    }
+
+    /**
+     * Setter for checking if welcome screen is seen by user
+     */
+    suspend fun setWelcomeScreenSeen() {
+        context.dataStore.edit { it[WELCOMESCREENSEEN_KEY] = true.toString() }
     }
 
     /**
@@ -83,11 +101,11 @@ class DataStore(private val context: Context) {
         }
     }
 
-
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("userId")
         val USERID_KEY = stringPreferencesKey("user_id")
         val ACCESSTOKEN_KEY = stringPreferencesKey("access_token")
         val ACCESSTOKEN_EXPIRES_KEY = stringPreferencesKey("access_token_expires")
+        val WELCOMESCREENSEEN_KEY = stringPreferencesKey("welcome_screen_seen")
     }
 }

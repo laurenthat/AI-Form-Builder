@@ -17,7 +17,8 @@
     <string name= "facebook">Facebook</string>
     <string name="address">Address</string>
     <string name="desc">Description</string>
-    <string name="setting_screen">Setting Screen</string>
+    <string name="setting_screen">Settings</string>
+    <string name="home_screen">Home</string>
     <string name="error_toast">Something went wrong. Cannot open the app</string>
 
 
@@ -41,8 +42,8 @@
     <string name="hover_nfc_card">Hover the back of your device over the NFC-enabled card</string>
     <string name="scan_qr_code">Place the QR code in this frame</string>
 
-    <!-- Contact List String -->
-    <string name="my_contacts">My Contacts</string>
+    <!-- Forms List String -->
+    <string name="my_forms">Forms</string>
     <string name="empty_contact_list">Contact list is Empty.</string>
 
     <!-- Receive Related String -->
