@@ -55,6 +55,9 @@ class UserViewModel(
             } ?: listOf()
         }
 
+    val welcomeScreenSeen: Flow<Boolean> =
+        dataStore.getWelcomeScreenSeen
+
     suspend fun syncRoomDatabase() {
         // Example code of how Api works.
         val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -111,25 +114,7 @@ class UserViewModel(
 
     suspend fun deleteLoginData() = dataStore.deleteLoginData()
 
-    suspend fun shareCards(cardIDs: List<String>, onSuccessResponse: (shareId: String) -> Unit) {
-        // Example code of how Api works.
-        viewModelScope.launch {
-            val authorization = dataStore.getAuthorizationHeaderValue.first()
-            authorization?.let {
-                apiService.share(
-                    authorization,
-                    cardIDs
-                )
-                    .onSuccess { response ->
-                        Timber.d("share new Card")
-                        Timber.d(response.toString())
-                        onSuccessResponse(response.id)
-                    }.onFailure {
-                        Timber.d(it)
-                    }
-            }
-        }
-    }
+    suspend fun setWelcomeScreenSeen() = dataStore.setWelcomeScreenSeen()
 
     suspend fun assignTag(id: String, shareId: String) {
         viewModelScope.launch {
