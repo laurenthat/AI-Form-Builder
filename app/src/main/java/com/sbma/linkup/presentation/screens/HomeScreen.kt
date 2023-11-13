@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -90,6 +91,7 @@ import java.util.UUID
 
 
 const val MY_PACKAGE = "com.sbma.linkup"
+
 @Composable
 fun ConnectionUserProfileScreenProvider(
     user: User,
@@ -185,6 +187,7 @@ fun Context.createImageFile(): File {
     )
     return image
 }
+
 private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     return if (Build.VERSION.SDK_INT < 28) {
         MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
@@ -203,7 +206,7 @@ fun HomeScreen(
     canGoBack: Boolean,
     onBackClick: (() -> Unit)? = null,
 
-) {
+    ) {
 
     val context = LocalContext.current
     val file = context.createImageFile()
@@ -213,21 +216,39 @@ fun HomeScreen(
     )
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            if (uri != null) {
-                bitmap = loadBitmap(context, uri)
-            }
+//    val launcher =
+//        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+//            if (uri != null) {
+//                bitmap = loadBitmap(context, uri)
+//            }
+//        }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            // Handle gallery image selection
+            bitmap = loadBitmap(context, uri)
+            galleryImageUri = uri
+            // Call the function to upload the selected image to the API
+            galleryImageUri?.let { uri -> uploadImageToApi(uri, "yourAuthToken") }
         }
+    }
 
     var capturedImageUri by remember {
         mutableStateOf<Uri>(Uri.EMPTY)
     }
 
     val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            capturedImageUri = uri
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+            if (isSuccess) {
+                // Update UI with the captured image
+                capturedImageUri = uri
+
+                // Call the function to upload the captured image to the API
+                capturedImageUri.let {
+                    uploadImageToApi(it, "yourAuthToken")
+                }
+            }
         }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -244,14 +265,6 @@ fun HomeScreen(
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var hasCamPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
 
     Scaffold(
         topBar = {
@@ -327,7 +340,6 @@ fun HomeScreen(
                 }
 
 
-
             }
 
             bitmap?.let { btm ->
@@ -357,37 +369,7 @@ fun HomeScreen(
         }
 
     }
-    fun uploadImageToApi(imageUri: Uri, authToken: String) {
-        val file = File(imageUri.path!!)
-        val apiUrl = "https://draw2form.ericaskari.com/api/upload"
 
-        val client = OkHttpClient()
-
-        val requestBody = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("image", file.name, RequestBody.create("image/*".toMediaTypeOrNull(), file))
-            .addFormDataPart("key", "value")
-            .build()
-
-        val request = Request.Builder()
-            .url(apiUrl)
-            .header("Authorization", "Bearer $authToken")
-            .post(requestBody)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                // Handle success
-                val responseData = response.body?.string()
-                println("Upload successful: $responseData")
-            }
-
-            override fun onFailure(call: Call, e: IOException) {
-                // Handle failure
-                println("Upload failed: ${e.message}")
-            }
-        })
-    }
 
     @Composable
     fun ContactInfoRow(icon: ImageVector, text: String, modifier: Modifier = Modifier) {
@@ -411,6 +393,43 @@ fun HomeScreen(
         }
     }
 }
+
+fun uploadImageToApi(imageUri: Uri, authToken: String) {
+    val file = File(imageUri.path!!)
+    val apiUrl = "https://draw2form.ericaskari.com/api/upload"
+
+    val client = OkHttpClient()
+
+    val requestBody = MultipartBody.Builder()
+        .setType(MultipartBody.FORM)
+        .addFormDataPart(
+            "image",
+            file.name,
+            RequestBody.create("image/*".toMediaTypeOrNull(), file)
+        )
+        .addFormDataPart("key", "value")
+        .build()
+
+    val request = Request.Builder()
+        .url(apiUrl)
+        .header("Authorization", "Bearer $authToken")
+        .post(requestBody)
+        .build()
+
+    client.newCall(request).enqueue(object : Callback {
+        override fun onResponse(call: Call, response: Response) {
+            // Handle success
+            val responseData = response.body?.string()
+            println("Upload successful: $responseData")
+        }
+
+        override fun onFailure(call: Call, e: IOException) {
+            // Handle failure
+            println("Upload failed: ${e.message}")
+        }
+    })
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
