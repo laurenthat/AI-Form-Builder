@@ -84,3 +84,99 @@ data class AssignTagRequest (
     val shareId: String,
     val tagId: String
 )
+
+data class ApiUser(
+    val id: String,
+    val email: String,
+    val name: String,
+    val picture: String?,
+    val forms: List<ApiForm>,
+    val formSubmissions: List<ApiFormSubmission>
+)
+
+data class ApiForm(
+    val id: String,
+    val name: String,
+    val available: Boolean,
+    val owner: ApiUser,
+    val textfields: List<ApiFormTextfield>,
+    val checkboxes: List<ApiFormCheckbox>,
+    val toggleSwitches: List<ApiFormToggleSwitch>,
+    val images: List<ApiFormImage>,
+    val buttons: List<ApiFormButton>,
+    val labels: List<ApiFormLabel>,
+    val formSubmissions: List<ApiFormSubmission>
+)
+
+data class ApiFormSubmission(
+    val id: String,
+    val name: String,
+    val public: Boolean,
+    val owner: ApiUser,
+    val form: ApiForm,
+    val textfieldResponses: List<ApiFormTextfieldResponse>,
+    val checkboxResponses: List<ApiFormCheckboxResponse>,
+    val toggleSwitchResponses: List<ApiFormToggleSwitchResponse>
+)
+
+data class ApiFormTextfield(
+    val id: String,
+    val form: ApiForm,
+    val responses: List<ApiFormTextfieldResponse>
+)
+
+data class ApiFormTextfieldResponse(
+    val id: String,
+    val submission: ApiFormSubmission,
+    val textfield: ApiFormTextfield,
+    val value: String
+)
+
+data class ApiFormCheckbox(
+    val id: String,
+    val form: ApiForm,
+    val order: Int,
+    val responses: List<ApiFormCheckboxResponse>
+)
+
+data class ApiFormCheckboxResponse(
+    val id: String,
+    val submission: ApiFormSubmission,
+    val checkbox: ApiFormCheckbox,
+    val value: String
+)
+
+data class ApiFormToggleSwitch(
+    val id: String,
+    val form: ApiForm,
+    val order: Int,
+    val responses: List<ApiFormToggleSwitchResponse>
+)
+
+data class ApiFormToggleSwitchResponse(
+    val id: String,
+    val submission: ApiFormSubmission,
+    val toggleSwitch: ApiFormToggleSwitch,
+    val value: String
+)
+
+data class ApiFormImage(
+    val id: String,
+    val form: ApiForm,
+    val order: Int,
+    val imageId: String
+)
+
+data class ApiFormButton(
+    val id: String,
+    val form: ApiForm,
+    val order: Int,
+    val type: String
+)
+
+data class ApiFormLabel(
+    val id: String,
+    val form: ApiForm,
+    val order: Int,
+    val value: String
+)

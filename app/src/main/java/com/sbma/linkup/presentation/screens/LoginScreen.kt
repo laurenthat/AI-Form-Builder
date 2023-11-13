@@ -41,7 +41,7 @@ import com.sbma.linkup.presentation.ui.theme.LinkUpTheme
 @Composable
 fun LoginScreen() {
     val context = LocalContext.current
-    val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse("https://sbma.ericaskari.com/auth/google")) }
+    val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse("https://draw2form.ericaskari.com/api/auth/google")) }
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.login_lottie))
 
     val (checkedState, onStateChange) = remember { mutableStateOf(false) }
