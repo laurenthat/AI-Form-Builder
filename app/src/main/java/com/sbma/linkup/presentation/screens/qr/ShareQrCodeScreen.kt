@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import com.sbma.linkup.presentation.screens.qr.components.GenerateQRCode
 
 
-const val MYAPI = "https://sbma.ericaskari.com/android/qr/scan?id="
+const val MYAPI = "https://draw2form.ericaskari.com/android/qr/scan?id="
 
 
 @Composable

@@ -68,7 +68,7 @@
 
                 <data
                     android:scheme="https"
-                    android:host="sbma.ericaskari.com"
+                    android:host="draw2form.ericaskari.com"
                     android:pathPrefix="/android" />
 
                 <!-- note that the leading "/" is required for pathPrefix-->
