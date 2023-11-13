@@ -11,11 +11,10 @@ data class ApiUser(
     val email: String,
     val name: String,
     val picture: String?,
-    val cards: List<ApiCard>?,
-    val connections: List<ApiConnection>?,
-    val reverseConnections: List<ApiConnection>?,
-    val shares: List<ApiShare>?
+    val forms: List<ApiForm>,
+    val formSubmissions: List<ApiFormSubmission>
 )
+
 fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email ,"", picture)
 fun List<ApiUser>.toUserList(): List<User> = this.map { it.toUser() }
 
@@ -85,14 +84,7 @@ data class AssignTagRequest (
     val tagId: String
 )
 
-data class ApiUser(
-    val id: String,
-    val email: String,
-    val name: String,
-    val picture: String?,
-    val forms: List<ApiForm>,
-    val formSubmissions: List<ApiFormSubmission>
-)
+
 
 data class ApiForm(
     val id: String,

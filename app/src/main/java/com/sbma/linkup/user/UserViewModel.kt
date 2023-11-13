@@ -60,7 +60,7 @@ class UserViewModel(
 
     suspend fun syncRoomDatabase() {
         // Example code of how Api works.
-        val authorization = dataStore.getAuthorizationHeaderValue.first()
+/*        val authorization = dataStore.getAuthorizationHeaderValue.first()
         authorization?.let {
             apiService.getProfile(authorization)
                 .onSuccess { apiUser ->
@@ -104,7 +104,7 @@ class UserViewModel(
                     Timber.d(it)
                 }
 
-        }
+        }*/
     }
 
     suspend fun insertItem(user: User) = userRepository.insertItem(user)
