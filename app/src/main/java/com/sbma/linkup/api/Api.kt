@@ -2,18 +2,25 @@ package com.sbma.linkup.api
 
 import com.sbma.linkup.api.apimodels.ApiCard
 import com.sbma.linkup.api.apimodels.ApiConnection
+import com.sbma.linkup.api.apimodels.ApiForm
 import com.sbma.linkup.api.apimodels.ApiShare
 import com.sbma.linkup.api.apimodels.ApiTag
 import com.sbma.linkup.api.apimodels.ApiUser
 import com.sbma.linkup.api.apimodels.AssignTagRequest
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
+import java.io.File
 
 interface ApiService {
 
@@ -61,4 +68,11 @@ interface ApiService {
     @DELETE("/tag/{tagId}")
     @Headers("Content-Type: application/json")
     suspend fun deleteTag(@Header("Authorization") authorization: String, @Path("tagId") tagId: String): Result<Unit>
+
+    @Multipart
+    @POST("upload-image")
+    suspend fun uploadImage(
+        @Header("Authorization") authorization: String,
+        @Part image: MultipartBody.Part
+    ): Result<ApiForm>
 }

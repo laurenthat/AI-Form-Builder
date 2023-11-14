@@ -1,16 +1,11 @@
 package com.sbma.linkup.user
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbma.linkup.api.ApiService
 import com.sbma.linkup.api.apimodels.ApiConnection
 import com.sbma.linkup.api.apimodels.AssignTagRequest
-import com.sbma.linkup.api.apimodels.toCardList
-import com.sbma.linkup.api.apimodels.toConnectionCardList
-import com.sbma.linkup.api.apimodels.toConnectionList
-import com.sbma.linkup.api.apimodels.toUser
-import com.sbma.linkup.api.apimodels.toUserList
-import com.sbma.linkup.card.Card
 import com.sbma.linkup.card.ICardRepository
 import com.sbma.linkup.connection.IConnectionRepository
 import com.sbma.linkup.datasource.DataStore
@@ -21,7 +16,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import timber.log.Timber
+import java.io.File
 import java.util.UUID
 
 class UserViewModel(
@@ -159,6 +156,29 @@ class UserViewModel(
             }
         }
     }
+    suspend fun uploadFormImage(imgFile: File) {
+        viewModelScope.launch {
+
+                val authorization = dataStore.getAuthorizationHeaderValue.first()
+                authorization?.let {
+                    apiService.uploadImage(
+                        authorization,
+                        MultipartBody.Part.createFormData("image", imgFile.name)
+                    )
+                        .onSuccess { response ->
+                            Log.d("DEBUG", "In APi uploadForm image, file upload successful")
+                            Timber.d("uploading Image")
+                            Timber.d(response.toString())
+                        }
+                        .onFailure {
+
+                            Timber.d(it)
+                            Log.d("DEBUG", "In APi uploadForm image, file upload failed: $it")
+                            responseStatus.value = "Oh no! Contact retrieval has failed"
+                        }
+                }
+        }
+    }
 
     suspend fun scanQRCode(id: String, onScanResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -198,6 +218,8 @@ class UserViewModel(
             }
         }
     }
+
+
 
     fun observeNfcStatus(): StateFlow<String?> {
         return responseStatus.asStateFlow()
