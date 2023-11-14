@@ -137,7 +137,8 @@ fun Navigation(
                 canEdit = true,
                 onEditClick = { navController.navigate("profile/edit") },
                 canGoBack = false,
-                onBackClick = null
+                onBackClick = null,
+
             )
         }
         /**
