@@ -8,14 +8,14 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.provider.OpenableColumns
+import android.util.Log
+import android.webkit.MimeTypeMap
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,13 +25,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,16 +63,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.sbma.linkup.R
 import com.sbma.linkup.application.AppViewModelProvider
 import com.sbma.linkup.card.Card
 import com.sbma.linkup.card.CardViewModel
 import com.sbma.linkup.connection.ConnectionViewModel
 import com.sbma.linkup.user.User
+import com.sbma.linkup.user.UserViewModel
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -82,10 +80,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
+import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.Objects
 import java.util.UUID
 
@@ -103,6 +103,7 @@ fun ConnectionUserProfileScreenProvider(
     val userCardViewModel: CardViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val connectionUser =
         userConnectionViewModel.allItemsStream(user.id).collectAsState(initial = null)
+
 
     val connection = (connectionUser.value ?: mapOf()).entries.toList().find { mapEntry ->
         connectionIdParam?.let { mapEntry.key.id == UUID.fromString(it) } ?: false
@@ -197,6 +198,25 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     }
 }
 
+@Composable
+fun UploadImageEffect(
+    capturedImageUri: Uri?,
+    userViewModel: UserViewModel,
+    isUploadButtonActive: Boolean
+) {
+    LaunchedEffect(isUploadButtonActive) {
+        capturedImageUri?.let { uri ->
+            try {
+                userViewModel.uploadFormImage(File(uri.path ?: ""))
+            } catch (e: Exception) {
+
+                Timber.e(e, "Image upload failed.")
+            }
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -208,6 +228,13 @@ fun HomeScreen(
 
     ) {
 
+
+    var processButtonClicked by remember { mutableStateOf(false) }
+
+    var capturedImageFileInfo by remember { mutableStateOf<ImageFileInfo?>(null) }
+    var selectedImageFileInfo by remember { mutableStateOf<ImageFileInfo?>(null) }
+    var showProcessButton by remember { mutableStateOf(false) }
+    val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val context = LocalContext.current
     val file = context.createImageFile()
     val uri = FileProvider.getUriForFile(
@@ -218,21 +245,21 @@ fun HomeScreen(
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
 
-//    val launcher =
-//        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-//            if (uri != null) {
-//                bitmap = loadBitmap(context, uri)
-//            }
-//        }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            // Handle gallery image selection
-            bitmap = loadBitmap(context, uri)
-            galleryImageUri = uri
-            // Call the function to upload the selected image to the API
-            galleryImageUri?.let { uri -> uploadImageToApi(uri, "yourAuthToken") }
+
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) {
+                try {
+                    selectedImageFileInfo = getImageFileInfo(context, uri)
+                    bitmap = loadBitmap(context, uri)
+                    galleryImageUri = uri
+                    Timber.d("Gallery Image $galleryImageUri")
+                    Log.d("DEBUG","File Information: $selectedImageFileInfo")
+                } catch (e: Exception) {
+                    Timber.e(e, "Image loading failed.")
+                }
+            }
         }
-    }
 
     var capturedImageUri by remember {
         mutableStateOf<Uri>(Uri.EMPTY)
@@ -241,12 +268,14 @@ fun HomeScreen(
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
             if (isSuccess) {
-                // Update UI with the captured image
-                capturedImageUri = uri
-
-                // Call the function to upload the captured image to the API
-                capturedImageUri.let {
-                    uploadImageToApi(it, "yourAuthToken")
+                try {
+                    capturedImageUri = uri
+                    selectedImageFileInfo = getImageFileInfo(context, capturedImageUri)
+                    bitmap = loadBitmap(context, capturedImageUri)
+                    showProcessButton = true
+                    Log.d("DEBUG","File Information from camera: $selectedImageFileInfo")
+                } catch (e: Exception) {
+                    Timber.e(e, "Image loading failed.")
                 }
             }
         }
@@ -264,7 +293,6 @@ fun HomeScreen(
 
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     Scaffold(
         topBar = {
@@ -326,20 +354,51 @@ fun HomeScreen(
                             // Request a permission
                             permissionLauncher.launch(Manifest.permission.CAMERA)
                         }
+
+
                     }) {
                         Text(text = "Camera")
                     }
 
                     Button(
-                        onClick = { launcher.launch("image/*") },
+                        onClick = {
+                            launcher.launch("image/*")
+                            showProcessButton = true
+                        }
+
                     ) {
 
                         Text(text = "Gallery")
                     }
 
+
                 }
+                if (showProcessButton) {
+                    Button(
+                        onClick = {
+                            selectedImageFileInfo?.let {
+                                Log.d("DEBUG", "File process clicked")
+                                processButtonClicked = true
 
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        Text("Process")
+                    }
+                }
+                LaunchedEffect(processButtonClicked) {
 
+                    selectedImageFileInfo?.let {
+                        Log.d("DEBUG", "Launch effect called")
+                        userViewModel.uploadFormImage(selectedImageFileInfo!!.file)
+                        Log.d("DEBUG", "File uploaded")
+                    }
+                    // Reset the state after the effect is launched
+                    processButtonClicked = false
+                }
             }
 
             bitmap?.let { btm ->
@@ -348,23 +407,6 @@ fun HomeScreen(
                     contentDescription = null,
                     modifier = Modifier.size(400.dp)
                 )
-            }
-
-            if (capturedImageUri.path?.isNotEmpty() == true) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp, 8.dp)
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(capturedImageUri),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center)
-                    )
-
-                }
             }
         }
 
@@ -392,6 +434,53 @@ fun HomeScreen(
             )
         }
     }
+}
+fun extractFileName(filePath: String): String {
+    return if (filePath.startsWith("/my_images/")) {
+        // Case when the file is captured from the camera
+        filePath.substringAfterLast('/')
+    } else {
+        // Case when the file is uploaded from the gallery
+        filePath.substringAfterLast(':')
+    }
+}
+data class ImageFileInfo(
+    val fileName: String,
+    val fileSize: Long,
+    val file: File
+)
+private fun getImageFileInfo(context: Context, uri: Uri): ImageFileInfo? {
+    try {
+        val contentResolver = context.contentResolver
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+            //val typeIndex = it.getColumnIndex(ContentResolver.MIME_TYPE)
+            val myFile = File(uri.path ?: "")
+
+            if (it.moveToFirst()) {
+                val fileName = it.getString(nameIndex)
+                val fileSize = it.getLong(sizeIndex)
+
+                return ImageFileInfo(fileName, fileSize, myFile)
+            }
+        }
+    } catch (e: Exception) {
+        Timber.e(e, "Error getting image file information.")
+    }
+
+    return null
+}
+
+private fun isSupportedFileFormat(context: Context, uri: Uri): Boolean {
+    val contentResolver = context.contentResolver
+    val mimeTypeMap = MimeTypeMap.getSingleton()
+    val fileExtension = mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
+
+    val supportedFormats = listOf("jpeg", "jpg", "png")
+
+    return fileExtension?.toLowerCase(Locale.ROOT) in supportedFormats
 }
 
 fun uploadImageToApi(imageUri: Uri, authToken: String) {
