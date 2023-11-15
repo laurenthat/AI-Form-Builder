@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LinkUp</string>
+    <string name="app_name">Draw2Form</string>
     <string name="Home">Home</string>
     <string name="Bell">Bell</string>
     <string name="Message">Message</string>
@@ -14,7 +14,7 @@
     <string name="setting">Setting</string>
     <string name="logout">Log out</string>
     <string name="phone_number">Phone Number</string>
-    <string name= "facebook">Facebook</string>
+    <string name="facebook">Facebook</string>
     <string name="address">Address</string>
     <string name="desc">Description</string>
     <string name="setting_screen">Settings</string>

@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.sbma.linkup"
+    namespace = "com.draw2form.ai"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.sbma.linkup"
+        applicationId = "com.draw2form.ai"
         minSdk = 23
         targetSdk = 34
         versionCode = 1
@@ -55,7 +55,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.2")
-    implementation ("androidx.activity:activity:1.4.0")
+    implementation("androidx.activity:activity:1.4.0")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -119,7 +119,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.25.0")
 
     //square http
-    implementation ("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
 
 }
