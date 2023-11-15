@@ -1,5 +1,6 @@
 package com.sbma.linkup.navigation
 
+//import com.sbma.linkup.presentation.screens.FormsScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -15,11 +16,8 @@ import com.sbma.linkup.application.connectivity.InternetConnectionState
 import com.sbma.linkup.card.CardViewModel
 import com.sbma.linkup.connection.ConnectionViewModel
 import com.sbma.linkup.presentation.screens.EditProfileScreenProvider
-import com.sbma.linkup.presentation.screens.FormsScreen
 import com.sbma.linkup.presentation.screens.HomeScreen
-import com.sbma.linkup.presentation.screens.LoginScreen
 import com.sbma.linkup.presentation.screens.SettingsScreen
-import com.sbma.linkup.presentation.screens.WelcomeScreen
 import com.sbma.linkup.presentation.screens.bluetooth.BluetoothShareAndReceiveResultScreen
 import com.sbma.linkup.presentation.screens.bluetooth.ShareViaBluetoothScreenProvider
 import com.sbma.linkup.presentation.screens.nfc.NfcScanScreen
@@ -114,12 +112,12 @@ fun Navigation(
         /**
          * tab of the bottom navigation bar
          */
-        composable("forms") {
-            FormsScreen(
-                state) { connection ->
-                navController.navigate("forms/${connection.id}")
-            }
-        }
+//        composable("forms") {
+//            FormsScreen(
+//                state) { connection ->
+//                navController.navigate("forms/${connection.id}")
+//            }
+//        }
         /**
          * tab of the bottom navigation bar
          */

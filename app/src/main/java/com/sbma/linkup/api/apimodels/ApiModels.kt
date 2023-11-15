@@ -3,6 +3,7 @@ package com.sbma.linkup.api.apimodels
 import com.sbma.linkup.card.Card
 import com.sbma.linkup.connection.Connection
 import com.sbma.linkup.connection.ConnectionCard
+import com.sbma.linkup.presentation.screens.UIElement
 import com.sbma.linkup.user.User
 import java.util.UUID
 
@@ -16,6 +17,8 @@ data class ApiUser(
 )
 
 fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email ,"", picture)
+
+fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email, "", picture)
 fun List<ApiUser>.toUserList(): List<User> = this.map { it.toUser() }
 
 
@@ -29,8 +32,21 @@ data class ApiCard(
     val connectionCards: List<ApiConnectionCard>?,
     val shareCards: List<ApiShareCard>?
 )
-fun ApiCard.toCard(): Card = Card(UUID.fromString(id), UUID.fromString(ownerId), title, value, picture)
-fun Card.toApiCard(): ApiCard = ApiCard(id = id.toString(), ownerId = userId.toString(), title = title, value = value, picture = picture, owner = null, connectionCards = null, shareCards = null)
+
+fun ApiCard.toCard(): Card =
+    Card(UUID.fromString(id), UUID.fromString(ownerId), title, value, picture)
+
+fun Card.toApiCard(): ApiCard = ApiCard(
+    id = id.toString(),
+    ownerId = userId.toString(),
+    title = title,
+    value = value,
+    picture = picture,
+    owner = null,
+    connectionCards = null,
+    shareCards = null
+)
+
 fun List<ApiCard>.toCardList(): List<Card> = this.map { it.toCard() }
 
 data class ApiConnection(
@@ -41,7 +57,10 @@ data class ApiConnection(
     val connectedUser: ApiUser?,
     val connectionCards: List<ApiConnectionCard>?
 )
-fun ApiConnection.toConnection(): Connection = Connection(UUID.fromString(id), UUID.fromString(userId), UUID.fromString(connectedUserId))
+
+fun ApiConnection.toConnection(): Connection =
+    Connection(UUID.fromString(id), UUID.fromString(userId), UUID.fromString(connectedUserId))
+
 fun List<ApiConnection>.toConnectionList(): List<Connection> = this.map { it.toConnection() }
 
 data class ApiConnectionCard(
@@ -52,8 +71,11 @@ data class ApiConnectionCard(
     val connection: ApiConnection?
 )
 
-fun ApiConnectionCard.toConnectionCard(): ConnectionCard = ConnectionCard(UUID.fromString(id), UUID.fromString(cardId), UUID.fromString(connectionId))
-fun List<ApiConnectionCard>.toConnectionCardList(): List<ConnectionCard> = this.map { it.toConnectionCard() }
+fun ApiConnectionCard.toConnectionCard(): ConnectionCard =
+    ConnectionCard(UUID.fromString(id), UUID.fromString(cardId), UUID.fromString(connectionId))
+
+fun List<ApiConnectionCard>.toConnectionCardList(): List<ConnectionCard> =
+    this.map { it.toConnectionCard() }
 
 
 data class ApiShare(
@@ -79,11 +101,19 @@ data class ApiTag(
     val tagId: String
 )
 
-data class AssignTagRequest (
+data class AssignTagRequest(
     val shareId: String,
     val tagId: String
 )
 
+//data class ApiUser(
+//    val id: String,
+//    val email: String,
+//    val name: String,
+//    val picture: String?,
+//    val forms: List<ApiForm>,
+//    val formSubmissions: List<ApiFormSubmission>
+//)
 
 
 data class ApiForm(
@@ -172,3 +202,12 @@ data class ApiFormLabel(
     val order: Int,
     val value: String
 )
+
+data class FormLabel(override val order: Int, val label: String) : UIElement
+data class FormImage(override val order: Int) : UIElement
+data class FormTextfield(override val order: Int, val label: String) : UIElement
+data class FormCheckbox(override val order: Int) : UIElement
+data class FormToggleSwitch(override val order: Int) : UIElement
+data class FormButton(override val order: Int) : UIElement
+
+
