@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LinkUp"
+rootProject.name = "Draw2Form"
 include(":app")
  
