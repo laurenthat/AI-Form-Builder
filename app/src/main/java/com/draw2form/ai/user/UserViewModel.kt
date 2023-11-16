@@ -3,9 +3,9 @@ package com.draw2form.ai.user
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.draw2form.ai.api.ApiService
-import com.draw2form.ai.ApiUploadedFile
+import com.draw2form.ai.api.ApiUploadedFile
+import com.draw2form.ai.api.toUser
 import com.draw2form.ai.datasource.DataStore
-import com.draw2form.ai.toUser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -73,7 +73,10 @@ class UserViewModel(
     suspend fun setWelcomeScreenSeen() = dataStore.setWelcomeScreenSeen()
 
 
-    fun uploadFormImage(imgFile: MultipartBody.Part, onSuccess: (uploadedFile: ApiUploadedFile) -> Unit) {
+    fun uploadFormImage(
+        imgFile: MultipartBody.Part,
+        onSuccess: (uploadedFile: ApiUploadedFile) -> Unit
+    ) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {

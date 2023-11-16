@@ -1,6 +1,5 @@
 package com.draw2form.ai.api
 
-import com.draw2form.ai.ResultCallAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
