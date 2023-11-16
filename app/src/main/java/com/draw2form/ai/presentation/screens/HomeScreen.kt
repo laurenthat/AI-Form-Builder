@@ -59,6 +59,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.draw2form.ai.R
+import com.draw2form.ai.api.ApiUploadedFile
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
@@ -172,7 +173,8 @@ fun HomeScreen(
     canEdit: Boolean,
     onEditClick: (() -> Unit)? = null,
     canGoBack: Boolean,
-    onBackClick: (() -> Unit)? = null
+    onSuccessUpload: ((uploadedFile: ApiUploadedFile) -> Unit)? = null,
+    onBackClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -321,7 +323,9 @@ fun HomeScreen(
                             selectedImageFileInfo?.let {
                                 Timber.d("Launch effect called: $it")
                                 userViewModel.uploadFormImage(it) {
-                                    // TODO: Navigate to State Loading
+                                    onSuccessUpload?.let { method ->
+                                        method(it)
+                                    }
                                 }
                                 Timber.d("File send to Api")
                             }

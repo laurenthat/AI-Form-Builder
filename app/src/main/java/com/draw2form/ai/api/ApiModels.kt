@@ -160,6 +160,12 @@ data class ApiImageEventParsed(
     val file: ApiUploadedFile?,
     val fileId: String
 )
+data class ApiUploadedFileState(
+    val objectRecognition: String,
+    val textRecognition: String,
+    val formGeneration: String,
+)
+
 
 fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email, "", picture)
 fun List<ApiUser>.toUserList(): List<User> = this.map { it.toUser() }
