@@ -1,4 +1,4 @@
-package com.draw2form.ai
+package com.draw2form.ai.api
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

@@ -1,5 +1,7 @@
-package com.draw2form.ai
+package com.draw2form.ai.api
 
+import com.draw2form.ai.api.ApiUploadedFile
+import com.draw2form.ai.api.ApiUser
 import okhttp3.MultipartBody
 import retrofit2.http.GET
 import retrofit2.http.Header

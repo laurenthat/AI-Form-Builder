@@ -1,41 +1,24 @@
 package com.draw2form.ai.user
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.draw2form.ai.ApiService
-import com.draw2form.ai.ApiUploadedFile
+import com.draw2form.ai.api.ApiService
+import com.draw2form.ai.api.ApiUploadedFile
+import com.draw2form.ai.api.toUser
 import com.draw2form.ai.datasource.DataStore
-import com.draw2form.ai.toUser
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.RequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
-import java.io.File
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 class UserViewModel(
     private val userRepository: IUserRepository,
     private val apiService: ApiService,
     private val dataStore: DataStore,
 ) : ViewModel() {
-    private val responseStatus: MutableStateFlow<String?> = MutableStateFlow(null)
-
-
     /**
      * combines two flows together. here it combines userId and list of users and returns the user with that id.
      * we used list of user with one element to distinguish between flow not having data and not having user.
@@ -90,47 +73,23 @@ class UserViewModel(
     suspend fun setWelcomeScreenSeen() = dataStore.setWelcomeScreenSeen()
 
 
-    fun uploadFormImage(imgFile: MultipartBody.Part) {
+    fun uploadFormImage(
+        imgFile: MultipartBody.Part,
+        onSuccess: (uploadedFile: ApiUploadedFile) -> Unit
+    ) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
-                try {
-                    val retrofit = createRetrofitInstance()
-                    val apiService = retrofit.create(ApiService:: class.java)
-
-                    val response = apiService.uploadImage(authorization, imgFile)
-
-                    if (response.isSuccess) {
-                        Timber.d(response.toString())
-                    } else {
-
-                        responseStatus.value = "Oh no! Contact retrieval has failed"
+                apiService.uploadImage(authorization, imgFile)
+                    .onSuccess {
+                        Timber.d(it.toString())
+                        onSuccess(it)
+                    }.onFailure {
+                        Timber.d(it)
                     }
-                } catch (t: Throwable) {
-
-                    responseStatus.value = "Oh no! Contact retrieval has failed: $t"
-                }
             }
         }
     }
-
-    private suspend fun createRetrofitInstance(): Retrofit {
-        return withContext(Dispatchers.IO) {
-            Retrofit.Builder()
-                .baseUrl("https://draw2form.ericaskari.com/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(
-                    OkHttpClient.Builder()
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(30, TimeUnit.SECONDS)
-                        .writeTimeout(30, TimeUnit.SECONDS)
-                        .build()
-                )
-                .build()
-        }
-    }
-
-
 }
 
 
