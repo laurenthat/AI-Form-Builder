@@ -24,7 +24,15 @@ interface ApiService {
         @Part image: MultipartBody.Part
     ): Result<ApiUploadedFile>
 
-    // Profile GET Request
+    // Upload GET Request
+    @GET("/api/upload/{id}/status")
+    @Headers("Content-Type: application/json")
+    suspend fun getUploadState(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String
+    ): Result<ApiUploadedFileState>
+
+    // Upload GET Request
     @GET("/api/upload/{id}")
     @Headers("Content-Type: application/json")
     suspend fun getUploadDetails(
