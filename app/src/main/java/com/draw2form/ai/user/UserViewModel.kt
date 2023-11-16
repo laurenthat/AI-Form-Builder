@@ -4,17 +4,29 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.draw2form.ai.ApiService
+import com.draw2form.ai.ApiUploadedFile
 import com.draw2form.ai.datasource.DataStore
 import com.draw2form.ai.toUser
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 import java.io.File
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class UserViewModel(
     private val userRepository: IUserRepository,
@@ -77,29 +89,47 @@ class UserViewModel(
 
     suspend fun setWelcomeScreenSeen() = dataStore.setWelcomeScreenSeen()
 
-    suspend fun uploadFormImage(imgFile: File) {
-        viewModelScope.launch {
 
+    fun uploadFormImage(imgFile: MultipartBody.Part) {
+        viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
-                apiService.uploadImage(
-                    authorization,
-                    MultipartBody.Part.createFormData("image", imgFile.name)
-                )
-                    .onSuccess { response ->
-                        Log.d("DEBUG", "In APi uploadForm image, file upload successful")
-                        Timber.d("uploading Image")
-                        Timber.d(response.toString())
-                    }
-                    .onFailure {
+                try {
+                    val retrofit = createRetrofitInstance()
+                    val apiService = retrofit.create(ApiService:: class.java)
 
-                        Timber.d(it)
-                        Log.d("DEBUG", "In APi uploadForm image, file upload failed: $it")
+                    val response = apiService.uploadImage(authorization, imgFile)
+
+                    if (response.isSuccess) {
+                        Timber.d(response.toString())
+                    } else {
+
                         responseStatus.value = "Oh no! Contact retrieval has failed"
                     }
+                } catch (t: Throwable) {
+
+                    responseStatus.value = "Oh no! Contact retrieval has failed: $t"
+                }
             }
         }
     }
+
+    private suspend fun createRetrofitInstance(): Retrofit {
+        return withContext(Dispatchers.IO) {
+            Retrofit.Builder()
+                .baseUrl("https://draw2form.ericaskari.com/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(
+                    OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .writeTimeout(30, TimeUnit.SECONDS)
+                        .build()
+                )
+                .build()
+        }
+    }
+
 
 }
 

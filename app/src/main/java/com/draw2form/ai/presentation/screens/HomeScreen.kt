@@ -8,7 +8,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
 import android.widget.Toast
@@ -68,17 +67,12 @@ import com.draw2form.ai.R
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.RequestBody
-import okhttp3.Response
+import okhttp3.RequestBody.Companion.asRequestBody
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -144,16 +138,20 @@ fun UserProfileScreenTopBar(
     )
 }
 
+var imagePath: String = ""
+
 fun Context.createImageFile(): File {
 
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val imageFileName = "JPEG_" + timeStamp + "_"
+    val imageFileName = "draw2form_" + timeStamp + "_"
     val image = File.createTempFile(
         imageFileName,
         ".jpg",
         externalCacheDir
     )
+     imagePath = image.absolutePath
     return image
+
 }
 
 private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
@@ -164,25 +162,6 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
         ImageDecoder.decodeBitmap(source)
     }
 }
-
-@Composable
-fun UploadImageEffect(
-    capturedImageUri: Uri?,
-    userViewModel: UserViewModel,
-    isUploadButtonActive: Boolean
-) {
-    LaunchedEffect(isUploadButtonActive) {
-        capturedImageUri?.let { uri ->
-            try {
-                userViewModel.uploadFormImage(File(uri.path ?: ""))
-            } catch (e: Exception) {
-
-                Timber.e(e, "Image upload failed.")
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -198,10 +177,10 @@ fun HomeScreen(
 
     var processButtonClicked by remember { mutableStateOf(false) }
 
-    var capturedImageFileInfo by remember { mutableStateOf<ImageFileInfo?>(null) }
-    var selectedImageFileInfo by remember { mutableStateOf<ImageFileInfo?>(null) }
+    var selectedImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
     var showProcessButton by remember { mutableStateOf(false) }
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
+
     val context = LocalContext.current
     val file = context.createImageFile()
     val uri = FileProvider.getUriForFile(
@@ -214,12 +193,12 @@ fun HomeScreen(
 
 
     val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            if (uri != null) {
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { galUri: Uri? ->
+            if (galUri != null) {
                 try {
-                    selectedImageFileInfo = getImageFileInfo(context, uri)
-                    bitmap = loadBitmap(context, uri)
-                    galleryImageUri = uri
+                    selectedImageFileInfo = createMultipartBody(galUri, "image")
+                    bitmap = loadBitmap(context, galUri)
+                    galleryImageUri = galUri
                     Timber.d("Gallery Image $galleryImageUri")
                     Log.d("DEBUG", "File Information: $selectedImageFileInfo")
                 } catch (e: Exception) {
@@ -237,7 +216,7 @@ fun HomeScreen(
             if (isSuccess) {
                 try {
                     capturedImageUri = uri
-                    selectedImageFileInfo = getImageFileInfo(context, capturedImageUri)
+                    selectedImageFileInfo = createMultipartBody(capturedImageUri, "image")
                     bitmap = loadBitmap(context, capturedImageUri)
                     showProcessButton = true
                     Log.d("DEBUG", "File Information from camera: $selectedImageFileInfo")
@@ -358,9 +337,9 @@ fun HomeScreen(
                 LaunchedEffect(processButtonClicked) {
 
                     selectedImageFileInfo?.let {
-                        Log.d("DEBUG", "Launch effect called")
-                        userViewModel.uploadFormImage(selectedImageFileInfo!!.file)
-                        Log.d("DEBUG", "File uploaded")
+                        Log.d("DEBUG", "Launch effect called: ${selectedImageFileInfo}")
+                        userViewModel.uploadFormImage(selectedImageFileInfo!!)
+                        Log.d("DEBUG", "File send to Api")
                     }
                     // Reset the state after the effect is launched
                     processButtonClicked = false
@@ -401,45 +380,12 @@ fun HomeScreen(
         }
     }
 }
+fun createMultipartBody(uri: Uri, multipartName: String): MultipartBody.Part {
 
-fun extractFileName(filePath: String): String {
-    return if (filePath.startsWith("/my_images/")) {
-        // Case when the file is captured from the camera
-        filePath.substringAfterLast('/')
-    } else {
-        // Case when the file is uploaded from the gallery
-        filePath.substringAfterLast(':')
-    }
-}
+    val file = File(imagePath ?: "")
 
-data class ImageFileInfo(
-    val fileName: String,
-    val fileSize: Long,
-    val file: File
-)
-
-private fun getImageFileInfo(context: Context, uri: Uri): ImageFileInfo? {
-    try {
-        val contentResolver = context.contentResolver
-        val cursor = contentResolver.query(uri, null, null, null, null)
-        cursor?.use {
-            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
-            //val typeIndex = it.getColumnIndex(ContentResolver.MIME_TYPE)
-            val myFile = File(uri.path ?: "")
-
-            if (it.moveToFirst()) {
-                val fileName = it.getString(nameIndex)
-                val fileSize = it.getLong(sizeIndex)
-
-                return ImageFileInfo(fileName, fileSize, myFile)
-            }
-        }
-    } catch (e: Exception) {
-        Timber.e(e, "Error getting image file information.")
-    }
-
-    return null
+    val requestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+    return MultipartBody.Part.createFormData(name = multipartName, file.name, requestBody)
 }
 
 private fun isSupportedFileFormat(context: Context, uri: Uri): Boolean {
@@ -452,41 +398,6 @@ private fun isSupportedFileFormat(context: Context, uri: Uri): Boolean {
     return fileExtension?.toLowerCase(Locale.ROOT) in supportedFormats
 }
 
-fun uploadImageToApi(imageUri: Uri, authToken: String) {
-    val file = File(imageUri.path!!)
-    val apiUrl = "https://draw2form.ericaskari.com/api/upload"
-
-    val client = OkHttpClient()
-
-    val requestBody = MultipartBody.Builder()
-        .setType(MultipartBody.FORM)
-        .addFormDataPart(
-            "image",
-            file.name,
-            RequestBody.create("image/*".toMediaTypeOrNull(), file)
-        )
-        .addFormDataPart("key", "value")
-        .build()
-
-    val request = Request.Builder()
-        .url(apiUrl)
-        .header("Authorization", "Bearer $authToken")
-        .post(requestBody)
-        .build()
-
-    client.newCall(request).enqueue(object : Callback {
-        override fun onResponse(call: Call, response: Response) {
-            // Handle success
-            val responseData = response.body?.string()
-            println("Upload successful: $responseData")
-        }
-
-        override fun onFailure(call: Call, e: IOException) {
-            // Handle failure
-            println("Upload failed: ${e.message}")
-        }
-    })
-}
 
 @Preview(showBackground = true)
 @Composable
