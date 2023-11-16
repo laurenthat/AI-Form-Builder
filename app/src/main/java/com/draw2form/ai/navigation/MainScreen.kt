@@ -13,9 +13,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.draw2form.ai.ApiUser
-import com.draw2form.ai.LoginResponseToken
-import com.draw2form.ai.toUser
+import com.draw2form.ai.api.ApiUser
+import com.draw2form.ai.api.LoginResponseToken
+import com.draw2form.ai.api.toUser
 import com.google.gson.Gson
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
