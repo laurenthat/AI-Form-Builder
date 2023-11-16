@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -161,24 +162,26 @@ fun HomeScreen(
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { padding ->
-        Column(
+        Row(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(10.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Center
         ) {
+            Text(text = "Hello, " + user.name, fontSize = 25.sp, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.width(10.dp))
             AsyncImage(
                 model = user.picture,
                 contentDescription = "profile photo",
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(85.dp)
                     .clip(RoundedCornerShape(100.dp))
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Hello, " + user.name, fontSize = 25.sp, textAlign = TextAlign.Center)
+        }
+        Column {
 
         }
     }

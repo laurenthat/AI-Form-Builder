@@ -17,9 +17,7 @@ import com.sbma.linkup.connection.ConnectionViewModel
 import com.sbma.linkup.presentation.screens.EditProfileScreenProvider
 import com.sbma.linkup.presentation.screens.FormsScreen
 import com.sbma.linkup.presentation.screens.HomeScreen
-import com.sbma.linkup.presentation.screens.LoginScreen
 import com.sbma.linkup.presentation.screens.SettingsScreen
-import com.sbma.linkup.presentation.screens.WelcomeScreen
 import com.sbma.linkup.presentation.screens.bluetooth.BluetoothShareAndReceiveResultScreen
 import com.sbma.linkup.presentation.screens.bluetooth.ShareViaBluetoothScreenProvider
 import com.sbma.linkup.presentation.screens.nfc.NfcScanScreen
