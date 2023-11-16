@@ -143,5 +143,23 @@ data class LoginResponseToken(
     val expiresAt: String
 )
 
+data class GetUploadFileDetails(
+    val id: String,
+    val owner: ApiUser?,
+    val ownerId: String?,
+    val key: String,
+    val url: String,
+    val events: List<ApiImageEventParsed>?
+)
+
+data class ApiImageEventParsed(
+    val parsedPayload: List<Any>,
+    val id: String,
+    val event: String,
+    val payload: String?,
+    val file: ApiUploadedFile?,
+    val fileId: String
+)
+
 fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email, "", picture)
 fun List<ApiUser>.toUserList(): List<User> = this.map { it.toUser() }

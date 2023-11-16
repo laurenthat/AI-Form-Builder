@@ -2,6 +2,12 @@ package com.draw2form.ai.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.draw2form.ai.api.ApiFormButton
+import com.draw2form.ai.api.ApiFormCheckbox
+import com.draw2form.ai.api.ApiFormImage
+import com.draw2form.ai.api.ApiFormLabel
+import com.draw2form.ai.api.ApiFormTextField
+import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiService
 import com.draw2form.ai.api.ApiUploadedFile
 import com.draw2form.ai.api.toUser
@@ -45,6 +51,58 @@ class UserViewModel(
         // Example code of how Api works.
         val authorization = dataStore.getAuthorizationHeaderValue.first()
         authorization?.let {
+            apiService.getUploadDetails(it, "73013c6f-2a87-40c8-867e-e0892ced8b57").onSuccess {
+                println(it)
+                val formData = it.events?.find {
+                    it.event == "STRUCTURE_GENERATION_COMPLETED"
+                }
+                val parsedFormData = formData?.parsedPayload?.map {
+                    if (it is List<*>) {
+                        val name: String = it[0] as String
+                        val data = it[1]
+
+                        if (data is Map<*, *>) {
+                            val order = (data.get("order") as Double).toInt()
+                            val label = (data.get("label") as? String) ?: ""
+
+                            val uiElement = when (name) {
+                                "FormLabel" -> ApiFormLabel("", null, "", order, label)
+                                "FormImage" -> ApiFormImage("", null, "", order, "")
+                                "FormTextField" -> ApiFormTextField(
+                                    "",
+                                    null,
+                                    "",
+                                    label,
+                                    order,
+                                    null
+                                )
+
+                                "FormCheckbox" -> ApiFormCheckbox("", label, null, "", order, null)
+                                "FormToggleSwitch" -> ApiFormToggleSwitch(
+                                    "",
+                                    label,
+                                    null,
+                                    "",
+                                    order,
+                                    null
+                                )
+
+                                "FormButton" -> ApiFormButton("", label, null, "", order, "")
+                                else -> null
+                            }
+                            return@map uiElement
+                        } else {
+                            return@map null
+                        }
+                    } else {
+                        return@map null
+                    }
+
+                }?.filterNotNull() ?: listOf()
+                println(formData)
+            }.onFailure {
+                println(it)
+            }
             apiService.getProfile(authorization)
                 .onSuccess { apiUser ->
                     // asSequence() is not necessary but improves performance
