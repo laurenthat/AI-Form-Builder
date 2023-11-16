@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,9 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -69,18 +64,50 @@ import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import java.util.Objects
 import java.util.UUID
 
 
 const val MY_PACKAGE = "com.draw2form.ai"
+
+var imagePath: String = ""
+
+fun Context.createImageFile(): File {
+
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+    val imageFileName = "draw2form_" + timeStamp + "_"
+    val image = File.createTempFile(
+        imageFileName,
+        ".jpg",
+        externalCacheDir
+    )
+    imagePath = image.absolutePath
+    return image
+
+}
+
+private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
+    return if (Build.VERSION.SDK_INT < 28) {
+        MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+    } else {
+        val source = ImageDecoder.createSource(context.contentResolver, uri)
+        ImageDecoder.decodeBitmap(source)
+    }
+}
+
+fun createMultipartBody(uri: Uri, multipartName: String): MultipartBody.Part {
+
+    val file = File(imagePath ?: "")
+
+    val requestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+    return MultipartBody.Part.createFormData(name = multipartName, file.name, requestBody)
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -138,31 +165,6 @@ fun UserProfileScreenTopBar(
     )
 }
 
-var imagePath: String = ""
-
-fun Context.createImageFile(): File {
-
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val imageFileName = "draw2form_" + timeStamp + "_"
-    val image = File.createTempFile(
-        imageFileName,
-        ".jpg",
-        externalCacheDir
-    )
-     imagePath = image.absolutePath
-    return image
-
-}
-
-private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
-    return if (Build.VERSION.SDK_INT < 28) {
-        MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-    } else {
-        val source = ImageDecoder.createSource(context.contentResolver, uri)
-        ImageDecoder.decodeBitmap(source)
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -170,27 +172,20 @@ fun HomeScreen(
     canEdit: Boolean,
     onEditClick: (() -> Unit)? = null,
     canGoBack: Boolean,
-    onBackClick: (() -> Unit)? = null,
-
-    ) {
-
-
-    var processButtonClicked by remember { mutableStateOf(false) }
+    onBackClick: (() -> Unit)? = null
+) {
+    val context = LocalContext.current
+    val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
     var selectedImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
     var showProcessButton by remember { mutableStateOf(false) }
-    val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
-
-    val context = LocalContext.current
-    val file = context.createImageFile()
-    val uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        "$MY_PACKAGE.provider", file
-    )
+    val file by remember { mutableStateOf(context.createImageFile())}
+    val uri by remember { mutableStateOf(FileProvider.getUriForFile(Objects.requireNonNull(context), "$MY_PACKAGE.provider", file))}
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
 
+    var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { galUri: Uri? ->
@@ -207,9 +202,6 @@ fun HomeScreen(
             }
         }
 
-    var capturedImageUri by remember {
-        mutableStateOf<Uri>(Uri.EMPTY)
-    }
 
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
@@ -219,7 +211,7 @@ fun HomeScreen(
                     selectedImageFileInfo = createMultipartBody(capturedImageUri, "image")
                     bitmap = loadBitmap(context, capturedImageUri)
                     showProcessButton = true
-                    Log.d("DEBUG", "File Information from camera: $selectedImageFileInfo")
+                    Timber.d("File Information from camera: $selectedImageFileInfo")
                 } catch (e: Exception) {
                     Timber.e(e, "Image loading failed.")
                 }
@@ -322,9 +314,16 @@ fun HomeScreen(
                 if (showProcessButton) {
                     Button(
                         onClick = {
+                            Timber.d("process button clicked")
+                            if (selectedImageFileInfo == null) {
+                                Timber.d("process button clicked but file is null.")
+                            }
                             selectedImageFileInfo?.let {
-                                Log.d("DEBUG", "File process clicked")
-                                processButtonClicked = true
+                                Timber.d("Launch effect called: $it")
+                                userViewModel.uploadFormImage(it) {
+                                    // TODO: Navigate to State Loading
+                                }
+                                Timber.d("File send to Api")
                             }
                         },
                         modifier = Modifier
@@ -333,16 +332,6 @@ fun HomeScreen(
                     ) {
                         Text("Process")
                     }
-                }
-                LaunchedEffect(processButtonClicked) {
-
-                    selectedImageFileInfo?.let {
-                        Log.d("DEBUG", "Launch effect called: ${selectedImageFileInfo}")
-                        userViewModel.uploadFormImage(selectedImageFileInfo!!)
-                        Log.d("DEBUG", "File send to Api")
-                    }
-                    // Reset the state after the effect is launched
-                    processButtonClicked = false
                 }
             }
 
@@ -356,46 +345,6 @@ fun HomeScreen(
         }
 
     }
-
-
-    @Composable
-    fun ContactInfoRow(icon: ImageVector, text: String, modifier: Modifier = Modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = text,
-                fontSize = 16.sp,
-                modifier = Modifier.fillMaxWidth()
-
-            )
-        }
-    }
-}
-fun createMultipartBody(uri: Uri, multipartName: String): MultipartBody.Part {
-
-    val file = File(imagePath ?: "")
-
-    val requestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-    return MultipartBody.Part.createFormData(name = multipartName, file.name, requestBody)
-}
-
-private fun isSupportedFileFormat(context: Context, uri: Uri): Boolean {
-    val contentResolver = context.contentResolver
-    val mimeTypeMap = MimeTypeMap.getSingleton()
-    val fileExtension = mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
-
-    val supportedFormats = listOf("jpeg", "jpg", "png")
-
-    return fileExtension?.toLowerCase(Locale.ROOT) in supportedFormats
 }
 
 

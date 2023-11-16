@@ -1,8 +1,8 @@
 package com.draw2form.ai.application
 
 import android.content.Context
-import com.draw2form.ai.ApiService
-import com.draw2form.ai.RetrofitFactory
+import com.draw2form.ai.api.ApiService
+import com.draw2form.ai.api.RetrofitFactory
 import com.draw2form.ai.datasource.AppDatabase
 import com.draw2form.ai.user.IUserRepository
 import com.draw2form.ai.user.UserRepository
