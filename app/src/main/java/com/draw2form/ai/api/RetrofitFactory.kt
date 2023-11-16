@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitFactory {
     fun makeApiService(): ApiService {
         return Retrofit.Builder()
-            .baseUrl("https://draw2form.ericaskari.com/api/")
+            .baseUrl("https://draw2form.ericaskari.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(ResultCallAdapterFactory())
             .build().create(ApiService::class.java)

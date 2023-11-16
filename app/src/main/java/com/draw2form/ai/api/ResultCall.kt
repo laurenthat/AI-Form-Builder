@@ -7,7 +7,6 @@ import retrofit2.Callback
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.io.IOException
 
 
 /**
@@ -43,11 +42,8 @@ class ResultCall<T>(private val delegate: Call<T>) :
                 }
 
                 override fun onFailure(call: Call<T>, t: Throwable) {
-                    val errorMessage = when (t) {
-                        is IOException -> "No internet connection"
-                        is HttpException -> "Something went wrong!"
-                        else -> t.localizedMessage
-                    }
+                    println(t)
+                    val errorMessage = t.localizedMessage
                     callback.onResponse(
                         this@ResultCall,
                         Response.success(Result.failure(RuntimeException(errorMessage, t)))
