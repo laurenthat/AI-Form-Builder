@@ -68,13 +68,22 @@
 
                 <data
                     android:scheme="https"
-                    android:host="sbma.ericaskari.com"
+                    android:host="draw2form.ericaskari.com"
                     android:pathPrefix="/android" />
 
                 <!-- note that the leading "/" is required for pathPrefix-->
             </intent-filter>
 
         </activity>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/path_provider" />
+        </provider>
     </application>
 
 </manifest>
