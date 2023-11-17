@@ -30,12 +30,13 @@ class UserViewModel(
     private val apiService: ApiService,
     private val dataStore: DataStore,
 ) : ViewModel() {
-    private val _apiUploadedFileState: MutableStateFlow<ApiUploadedFileState?> = MutableStateFlow(null)
+    private val _apiUploadedFileState: MutableStateFlow<ApiUploadedFileState?> =
+        MutableStateFlow(null)
     val apiUploadedFileState: StateFlow<ApiUploadedFileState?> get() = _apiUploadedFileState.asStateFlow()
 
 
-    private val _apiUiElements: MutableStateFlow<List<UIElement>?> = MutableStateFlow(null)
-    val apiUiElements: StateFlow<List<UIElement>?> get() = _apiUiElements.asStateFlow()
+    private val _apiUiElements: MutableStateFlow<List<List<UIElement>>?> = MutableStateFlow(null)
+    val apiUiElements: StateFlow<List<List<UIElement>>?> get() = _apiUiElements.asStateFlow()
 
     /**
      * combines two flows together. here it combines userId and list of users and returns the user with that id.
@@ -98,49 +99,79 @@ class UserViewModel(
                     val formData = it.events?.find {
                         it.event == "STRUCTURE_GENERATION_COMPLETED"
                     }
-                    val parsedFormData: List<UIElement> = formData?.parsedPayload?.map {
-                        if (it is List<*>) {
-                            val name: String = it[0] as String
-                            val data = it[1]
+                    val parsedFormData: List<List<UIElement>> =
+                        formData?.parsedPayload?.map { column ->
+                            if (column is List<*>) {
+                                return@map column.map {
+                                    if (it is List<*>) {
+                                        val name: String = it[0] as String
+                                        val data = it[1]
 
-                            if (data is Map<*, *>) {
-                                val order = (data.get("order") as Double).toInt()
-                                val label = (data.get("label") as? String) ?: ""
+                                        if (data is Map<*, *>) {
+                                            val order = (data.get("order") as? Double)?.toInt() ?: 0
+                                            val label = (data.get("label") as? String) ?: ""
 
-                                val uiElement = when (name) {
-                                    "FormLabel" -> ApiFormLabel("", null, "", order, label)
-                                    "FormImage" -> ApiFormImage("", null, "", order, "")
-                                    "FormTextField" -> ApiFormTextField(
-                                        "",
-                                        null,
-                                        "",
-                                        label,
-                                        order,
-                                        null
-                                    )
+                                            val uiElement = when (name) {
+                                                "FormLabel" -> ApiFormLabel(
+                                                    "",
+                                                    null,
+                                                    "",
+                                                    order,
+                                                    label
+                                                )
 
-                                    "FormCheckbox" -> ApiFormCheckbox("", label, null, "", order, null)
-                                    "FormToggleSwitch" -> ApiFormToggleSwitch(
-                                        "",
-                                        label,
-                                        null,
-                                        "",
-                                        order,
-                                        null
-                                    )
+                                                "FormImage" -> ApiFormImage("", null, "", order, "")
+                                                "FormTextField" -> ApiFormTextField(
+                                                    "",
+                                                    null,
+                                                    "",
+                                                    label,
+                                                    order,
+                                                    null
+                                                )
 
-                                    "FormButton" -> ApiFormButton("", label, null, "", order, "")
-                                    else -> null
-                                }
-                                return@map uiElement
+                                                "FormCheckbox" -> ApiFormCheckbox(
+                                                    "",
+                                                    label,
+                                                    null,
+                                                    "",
+                                                    order,
+                                                    null
+                                                )
+
+                                                "FormToggleSwitch" -> ApiFormToggleSwitch(
+                                                    "",
+                                                    label,
+                                                    null,
+                                                    "",
+                                                    order,
+                                                    null
+                                                )
+
+                                                "FormButton" -> ApiFormButton(
+                                                    "",
+                                                    label,
+                                                    null,
+                                                    "",
+                                                    order,
+                                                    ""
+                                                )
+
+                                                else -> null
+                                            }
+                                            return@map uiElement
+                                        } else {
+                                            return@map null
+                                        }
+                                    } else {
+                                        return@map null
+                                    }
+                                }.filterNotNull()
                             } else {
-                                return@map null
+                                return@map emptyList()
                             }
-                        } else {
-                            return@map null
-                        }
 
-                    }?.filterNotNull() ?: listOf()
+                        }?.filterNotNull() ?: listOf()
 
                     _apiUiElements.value = parsedFormData
                 }.onFailure {
