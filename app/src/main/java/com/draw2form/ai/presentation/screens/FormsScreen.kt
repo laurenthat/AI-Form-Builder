@@ -258,7 +258,7 @@ class MainActivity : ComponentActivity() {
 
                     val jsonArray = JSONArray(jsonString)
                     val uiElements = parseJson(jsonArray)
-                    DynamicUI(uiElements)
+//                    DynamicUI(uiElements)
                 }
 
             }
@@ -297,27 +297,31 @@ interface UIElement {
 }
 
 @Composable
-fun DynamicUI(elements: List<UIElement>) {
+fun DynamicUI(elementColumns: List<List<UIElement>>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        for (element in elements) {
-            when (element) {
-                is ApiFormLabel -> Label(element.label)
-                is ApiFormImage -> FormAsyncImage(
-                    url = "https://placekitten.com/400/300",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(shape = MaterialTheme.shapes.medium),
-                )
+        for (elementColumn in elementColumns) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                for (element in elementColumn) {
+                    when (element) {
+                        is ApiFormLabel -> Label(element.label)
+                        is ApiFormImage -> FormAsyncImage(
+                            url = "https://placekitten.com/400/300",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(shape = MaterialTheme.shapes.medium),
+                        )
 
-                is ApiFormTextField -> TextField(element.label)
-                is ApiFormCheckbox -> Checkbox(element.label)
-                is ApiFormToggleSwitch -> ToggleSwitch(element.label)
-                is ApiFormButton -> DynamicFormButton(element.label)
+                        is ApiFormTextField -> TextField(element.label)
+                        is ApiFormCheckbox -> Checkbox(element.label)
+                        is ApiFormToggleSwitch -> ToggleSwitch(element.label)
+                        is ApiFormButton -> DynamicFormButton(element.label)
+                    }
+                }
             }
         }
     }
@@ -610,5 +614,5 @@ fun PreviewDynamicUI() {
 
     val jsonArray = JSONArray(jsonString)
     val uiElements = parseJson(jsonArray)
-    DynamicUI(uiElements)
+//    DynamicUI(uiElements)
 }

@@ -12,20 +12,20 @@ import retrofit2.http.Path
 interface ApiService {
 
     // Profile GET Request
-    @GET("/api/profile")
+    @GET("api/profile")
     @Headers("Content-Type: application/json")
     suspend fun getProfile(@Header("Authorization") authorization: String): Result<ApiUser>
 
 
     @Multipart
-    @POST("/api/upload")
+    @POST("api/upload")
     suspend fun uploadImage(
         @Header("Authorization") authorization: String,
         @Part image: MultipartBody.Part
     ): Result<ApiUploadedFile>
 
     // Upload GET Request
-    @GET("/api/upload/{id}/status")
+    @GET("api/upload/{id}/status")
     @Headers("Content-Type: application/json")
     suspend fun getUploadState(
         @Header("Authorization") authorization: String,
@@ -33,7 +33,7 @@ interface ApiService {
     ): Result<ApiUploadedFileState>
 
     // Upload GET Request
-    @GET("/api/upload/{id}")
+    @GET("api/upload/{id}")
     @Headers("Content-Type: application/json")
     suspend fun getUploadDetails(
         @Header("Authorization") authorization: String,
