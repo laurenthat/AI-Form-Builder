@@ -93,94 +93,85 @@ class UserViewModel(
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
 
-            authorization?.let {
-                apiService.getUploadDetails(it, id).onSuccess {
-                    println(it)
-                    val formData = it.events?.find {
-                        it.event == "STRUCTURE_GENERATION_COMPLETED"
-                    }
-                    val parsedFormData: List<List<UIElement>> =
-                        formData?.parsedPayload?.map { column ->
-                            if (column is List<*>) {
-                                return@map column.map {
-                                    if (it is List<*>) {
-                                        val name: String = it[0] as String
-                                        val data = it[1]
-
-                                        if (data is Map<*, *>) {
-                                            val order = (data.get("order") as? Double)?.toInt() ?: 0
-                                            val label = (data.get("label") as? String) ?: ""
-
-                                            val uiElement = when (name) {
-                                                "FormLabel" -> ApiFormLabel(
-                                                    "",
-                                                    null,
-                                                    "",
-                                                    order,
-                                                    label
-                                                )
-
-                                                "FormImage" -> ApiFormImage("", null, "", order, "")
-                                                "FormTextField" -> ApiFormTextField(
-                                                    "",
-                                                    null,
-                                                    "",
-                                                    label,
-                                                    order,
-                                                    null
-                                                )
-
-                                                "FormCheckbox" -> ApiFormCheckbox(
-                                                    "",
-                                                    label,
-                                                    null,
-                                                    "",
-                                                    order,
-                                                    null
-                                                )
-
-                                                "FormToggleSwitch" -> ApiFormToggleSwitch(
-                                                    "",
-                                                    label,
-                                                    null,
-                                                    "",
-                                                    order,
-                                                    null
-                                                )
-
-                                                "FormButton" -> ApiFormButton(
-                                                    "",
-                                                    label,
-                                                    null,
-                                                    "",
-                                                    order,
-                                                    ""
-                                                )
-
-                                                else -> null
-                                            }
-                                            return@map uiElement
-                                        } else {
-                                            return@map null
-                                        }
-                                    } else {
-                                        return@map null
-                                    }
-                                }.filterNotNull()
-                            } else {
-                                return@map emptyList()
+            authorization?.let { token ->
+                apiService.getUploadEventPayload<List<List<Any>>>(token, id, "FormComponentsCreated").onSuccess { columns ->
+                    _apiUiElements.value = (columns ?: listOf()).map { column ->
+                        return@map column.map rowMap@{ rows ->
+                            if (rows !is List<*>) {
+                                return@rowMap null
                             }
+                            if (rows.count() < 2) {
+                                return@rowMap null
+                            }
+                            if (rows[0] !is String) {
+                                return@rowMap null
+                            }
+                            if (rows[1] !is Map<*, *>) {
+                                return@rowMap null
+                            }
+                            val type: String = rows[0] as String
+                            val data = rows[1] as Map<*, *>
 
-                        }?.filterNotNull() ?: listOf()
 
-                    _apiUiElements.value = parsedFormData
+                            val order = (data["order"] as? Double)?.toInt() ?: 0
+                            val label = (data["label"] as? String) ?: ""
+
+                            return@rowMap when (type) {
+                                "FormLabel" -> ApiFormLabel(
+                                    "",
+                                    null,
+                                    "",
+                                    order,
+                                    label
+                                )
+
+                                "FormImage" -> ApiFormImage("", null, "", order, "")
+                                "FormTextField" -> ApiFormTextField(
+                                    "",
+                                    null,
+                                    "",
+                                    label,
+                                    order,
+                                    null
+                                )
+
+                                "FormCheckbox" -> ApiFormCheckbox(
+                                    "",
+                                    label,
+                                    null,
+                                    "",
+                                    order,
+                                    null
+                                )
+
+                                "FormToggleSwitch" -> ApiFormToggleSwitch(
+                                    "",
+                                    label,
+                                    null,
+                                    "",
+                                    order,
+                                    null
+                                )
+
+                                "FormButton" -> ApiFormButton(
+                                    "",
+                                    label,
+                                    null,
+                                    "",
+                                    order,
+                                    ""
+                                )
+
+                                else -> null
+                            }
+                        }.filterNotNull()
+                    }
+
                 }.onFailure {
                     println(it)
                 }
                 apiService.getProfile(authorization)
                     .onSuccess { apiUser ->
-                        // asSequence() is not necessary but improves performance
-
                         val user = apiUser.toUser()
 
                         Timber.d("Sync User Profile")

@@ -32,11 +32,26 @@ interface ApiService {
         @Path("id") id: String
     ): Result<ApiUploadedFileState>
 
-    // Upload GET Request
     @GET("api/upload/{id}")
     @Headers("Content-Type: application/json")
     suspend fun getUploadDetails(
         @Header("Authorization") authorization: String,
         @Path("id") id: String
     ): Result<GetUploadFileDetails>
+
+    @GET("api/upload/{id}/event/{eventName}")
+    @Headers("Content-Type: application/json")
+    suspend fun getUploadEvent(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("eventName") eventName: String
+    ): Result<ApiImageEvent?>
+
+    @GET("api/upload/{id}/event/{eventName}/payload")
+    @Headers("Content-Type: application/json")
+    suspend fun <T> getUploadEventPayload(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("eventName") eventName: String
+    ): Result<T?>
 }
