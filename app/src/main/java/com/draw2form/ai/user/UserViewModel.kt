@@ -63,6 +63,23 @@ class UserViewModel(
     suspend fun syncRoomDatabase() {
         // Example code of how Api works.
         val authorization = dataStore.getAuthorizationHeaderValue.first()
+        authorization?.let {
+            apiService.getProfile(it)
+                .onSuccess { apiUser ->
+                    val user = apiUser.toUser()
+
+                    Timber.d("Sync User Profile")
+                    Timber.d("Sync User Cards")
+                    Timber.d("Sync Started.")
+                    userRepository.insertItem(user)
+                    Timber.d("Sync Completed.")
+                }.onFailure {
+
+                    Timber.d("Sync User Profile Failed")
+                    Timber.d(it)
+                }
+        }
+
     }
 
     suspend fun insertItem(user: User) = userRepository.insertItem(user)
@@ -170,20 +187,7 @@ class UserViewModel(
                 }.onFailure {
                     println(it)
                 }
-                apiService.getProfile(authorization)
-                    .onSuccess { apiUser ->
-                        val user = apiUser.toUser()
 
-                        Timber.d("Sync User Profile")
-                        Timber.d("Sync User Cards")
-                        Timber.d("Sync Started.")
-                        userRepository.insertItem(user)
-                        Timber.d("Sync Completed.")
-                    }.onFailure {
-
-                        Timber.d("Sync User Profile Failed")
-                        Timber.d(it)
-                    }
 
             }
         }

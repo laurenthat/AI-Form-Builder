@@ -124,7 +124,7 @@ data class ApiFormLabel(
 data class ApiImageEvent(
     val id: String,
     val event: String,
-    val payload: String?,
+    val payload: Any?,
     val file: ApiUploadedFile?,
     val fileId: String
 )
@@ -149,17 +149,9 @@ data class GetUploadFileDetails(
     val ownerId: String?,
     val key: String,
     val url: String,
-    val events: List<ApiImageEventParsed>?
+    val events: List<ApiImageEvent>?
 )
 
-data class ApiImageEventParsed(
-    val parsedPayload: List<Any>,
-    val id: String,
-    val event: String,
-    val payload: String?,
-    val file: ApiUploadedFile?,
-    val fileId: String
-)
 data class ApiUploadedFileState(
     val objectRecognition: String,
     val textRecognition: String,
