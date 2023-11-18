@@ -8,7 +8,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -76,8 +75,6 @@ import java.util.UUID
 
 const val MY_PACKAGE = "com.draw2form.ai"
 
-var imagePath: String = ""
-
 fun Context.createImageFile(): File {
 
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
@@ -87,7 +84,6 @@ fun Context.createImageFile(): File {
         ".jpg",
         externalCacheDir
     )
-    imagePath = image.absolutePath
     return image
 
 }
@@ -101,12 +97,13 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     }
 }
 
-fun createMultipartBody(uri: Uri, multipartName: String): MultipartBody.Part {
+fun createMultipartBody(imageAbsolutePath: String): MultipartBody.Part {
 
-    val file = File(imagePath ?: "")
+    val file = File(imageAbsolutePath)
+    val mediaType = "multipart/form-data".toMediaTypeOrNull()
 
-    val requestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-    return MultipartBody.Part.createFormData(name = multipartName, file.name, requestBody)
+    val requestBody = file.asRequestBody(mediaType)
+    return MultipartBody.Part.createFormData(name = "image", file.name, requestBody)
 }
 
 
@@ -181,26 +178,27 @@ fun HomeScreen(
 
     var selectedImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
     var showProcessButton by remember { mutableStateOf(false) }
-    val file by remember { mutableStateOf(context.createImageFile())}
-    val uri by remember { mutableStateOf(FileProvider.getUriForFile(Objects.requireNonNull(context), "$MY_PACKAGE.provider", file))}
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
+    var capturedImageAbsolutePath by remember { mutableStateOf<String?>(null) }
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { galUri: Uri? ->
+            println("Gallary: $galUri")
             if (galUri != null) {
-                try {
-                    selectedImageFileInfo = createMultipartBody(galUri, "image")
-                    bitmap = loadBitmap(context, galUri)
-                    galleryImageUri = galUri
-                    Timber.d("Gallery Image $galleryImageUri")
-                    Log.d("DEBUG", "File Information: $selectedImageFileInfo")
-                } catch (e: Exception) {
-                    Timber.e(e, "Image loading failed.")
-                }
+
+//                try {
+//                    selectedImageFileInfo = createMultipartBody(image.absolutePath)
+//                    bitmap = loadBitmap(context, galUri)
+//                    galleryImageUri = galUri
+//                    Timber.d("Gallery Image $galleryImageUri")
+//                    Log.d("DEBUG", "File Information: $selectedImageFileInfo")
+//                } catch (e: Exception) {
+//                    Timber.e(e, "Image loading failed.")
+//                }
             }
         }
 
@@ -208,15 +206,19 @@ fun HomeScreen(
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
             if (isSuccess) {
-                try {
-                    capturedImageUri = uri
-                    selectedImageFileInfo = createMultipartBody(capturedImageUri, "image")
-                    bitmap = loadBitmap(context, capturedImageUri)
-                    showProcessButton = true
-                    Timber.d("File Information from camera: $selectedImageFileInfo")
-                } catch (e: Exception) {
-                    Timber.e(e, "Image loading failed.")
+                capturedImageUri?.let { uri ->
+                    capturedImageAbsolutePath?.let { absPath ->
+                        try {
+                            selectedImageFileInfo = createMultipartBody(absPath)
+                            bitmap = loadBitmap(context, uri)
+                            showProcessButton = true
+                            Timber.d("File Information from camera: $selectedImageFileInfo")
+                        } catch (e: Exception) {
+                            Timber.e(e, "Image loading failed.")
+                        }
+                    }
                 }
+
             }
         }
 
@@ -225,7 +227,7 @@ fun HomeScreen(
     ) {
         if (it) {
             Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(uri)
+//            cameraLauncher.launch(imageUri)
         } else {
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
@@ -289,6 +291,10 @@ fun HomeScreen(
                                 Manifest.permission.CAMERA
                             )
                         if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                            val file = context.createImageFile()
+                            val uri = FileProvider.getUriForFile(Objects.requireNonNull(context), "$MY_PACKAGE.provider", file)
+                            capturedImageAbsolutePath = file.absolutePath
+                            capturedImageUri = uri
                             cameraLauncher.launch(uri)
                         } else {
                             // Request a permission
