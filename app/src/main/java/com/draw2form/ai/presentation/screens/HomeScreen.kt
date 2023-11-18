@@ -60,6 +60,7 @@ import coil.compose.AsyncImage
 import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiUploadedFile
 import com.draw2form.ai.application.AppViewModelProvider
+import com.draw2form.ai.upload.FileUtils
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -176,29 +177,42 @@ fun HomeScreen(
     val context = LocalContext.current
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
-    var selectedImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
     var showProcessButton by remember { mutableStateOf(false) }
 
+    // Preview
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
 
+    // Camera
     var capturedImageAbsolutePath by remember { mutableStateOf<String?>(null) }
+    // Camera
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+    // Camera
+    var capturedImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
+
+
+    // Gallery
+    var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
+    // Gallery
+    var galleryImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
 
     val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { galUri: Uri? ->
-            println("Gallary: $galUri")
-            if (galUri != null) {
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            println("Gallary: $uri")
+            uri?.let {
+                try {
+                    galleryImageUri = it
 
-//                try {
-//                    selectedImageFileInfo = createMultipartBody(image.absolutePath)
-//                    bitmap = loadBitmap(context, galUri)
-//                    galleryImageUri = galUri
-//                    Timber.d("Gallery Image $galleryImageUri")
-//                    Log.d("DEBUG", "File Information: $selectedImageFileInfo")
-//                } catch (e: Exception) {
-//                    Timber.e(e, "Image loading failed.")
-//                }
+                    val file = FileUtils.getFileFromUri(context, uri)
+
+                    val selectedImageFileInfo = createMultipartBody(file.absolutePath)
+
+                    galleryImageFileInfo = selectedImageFileInfo
+
+                    bitmap = loadBitmap(context, uri)
+                    Timber.d("Gallery Image $galleryImageUri")
+                } catch (e: Exception) {
+                    Timber.e(e, "Image loading failed.")
+                }
             }
         }
 
@@ -209,10 +223,10 @@ fun HomeScreen(
                 capturedImageUri?.let { uri ->
                     capturedImageAbsolutePath?.let { absPath ->
                         try {
-                            selectedImageFileInfo = createMultipartBody(absPath)
+                            capturedImageFileInfo = createMultipartBody(absPath)
                             bitmap = loadBitmap(context, uri)
                             showProcessButton = true
-                            Timber.d("File Information from camera: $selectedImageFileInfo")
+                            Timber.d("File Information from camera: $capturedImageFileInfo")
                         } catch (e: Exception) {
                             Timber.e(e, "Image loading failed.")
                         }
@@ -323,10 +337,15 @@ fun HomeScreen(
                     Button(
                         onClick = {
                             Timber.d("process button clicked")
-                            if (selectedImageFileInfo == null) {
-                                Timber.d("process button clicked but file is null.")
+                            if (capturedImageFileInfo == null) {
+                                Timber.d("process button clicked but captured file is null.")
+                            } else if (galleryImageFileInfo == null) {
+                                Timber.d("process button clicked but gallery file is null.")
                             }
-                            selectedImageFileInfo?.let {
+
+                            val multipart = capturedImageFileInfo ?: galleryImageFileInfo
+
+                            multipart?.let {
                                 Timber.d("Launch effect called: $it")
                                 userViewModel.uploadFormImage(it) {
                                     onSuccessUpload?.let { method ->
