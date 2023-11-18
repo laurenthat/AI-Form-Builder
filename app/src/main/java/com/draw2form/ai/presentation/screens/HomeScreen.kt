@@ -241,7 +241,6 @@ fun HomeScreen(
     ) {
         if (it) {
             Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-//            cameraLauncher.launch(imageUri)
         } else {
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
@@ -322,8 +321,20 @@ fun HomeScreen(
 
                     Button(
                         onClick = {
-                            launcher.launch("image/*")
-                            showProcessButton = true
+                            val hasReadExternalStoragePermission =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                )
+
+                            if (hasReadExternalStoragePermission == PackageManager.PERMISSION_GRANTED) {
+                                showProcessButton = true
+                                launcher.launch("image/*")
+
+                            } else {
+                                // Request a permission
+                                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            }
                         }
 
                     ) {
