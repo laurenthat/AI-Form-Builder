@@ -8,7 +8,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -61,6 +60,7 @@ import coil.compose.AsyncImage
 import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiUploadedFile
 import com.draw2form.ai.application.AppViewModelProvider
+import com.draw2form.ai.upload.FileUtils
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -76,8 +76,6 @@ import java.util.UUID
 
 const val MY_PACKAGE = "com.draw2form.ai"
 
-var imagePath: String = ""
-
 fun Context.createImageFile(): File {
 
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
@@ -87,7 +85,6 @@ fun Context.createImageFile(): File {
         ".jpg",
         externalCacheDir
     )
-    imagePath = image.absolutePath
     return image
 
 }
@@ -101,12 +98,13 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     }
 }
 
-fun createMultipartBody(uri: Uri, multipartName: String): MultipartBody.Part {
+fun createMultipartBody(imageAbsolutePath: String): MultipartBody.Part {
 
-    val file = File(imagePath ?: "")
+    val file = File(imageAbsolutePath)
+    val mediaType = "multipart/form-data".toMediaTypeOrNull()
 
-    val requestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-    return MultipartBody.Part.createFormData(name = multipartName, file.name, requestBody)
+    val requestBody = file.asRequestBody(mediaType)
+    return MultipartBody.Part.createFormData(name = "image", file.name, requestBody)
 }
 
 
@@ -179,25 +177,39 @@ fun HomeScreen(
     val context = LocalContext.current
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
-    var selectedImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
     var showProcessButton by remember { mutableStateOf(false) }
-    val file by remember { mutableStateOf(context.createImageFile())}
-    val uri by remember { mutableStateOf(FileProvider.getUriForFile(Objects.requireNonNull(context), "$MY_PACKAGE.provider", file))}
 
+    // Preview
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
+    // Camera
+    var capturedImageAbsolutePath by remember { mutableStateOf<String?>(null) }
+    // Camera
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+    // Camera
+    var capturedImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
+
+
+    // Gallery
+    var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
+    // Gallery
+    var galleryImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
 
     val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { galUri: Uri? ->
-            if (galUri != null) {
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            println("Gallary: $uri")
+            uri?.let {
                 try {
-                    selectedImageFileInfo = createMultipartBody(galUri, "image")
-                    bitmap = loadBitmap(context, galUri)
-                    galleryImageUri = galUri
+                    galleryImageUri = it
+
+                    val file = FileUtils.getFileFromUri(context, uri)
+
+                    val selectedImageFileInfo = createMultipartBody(file.absolutePath)
+
+                    galleryImageFileInfo = selectedImageFileInfo
+
+                    bitmap = loadBitmap(context, uri)
                     Timber.d("Gallery Image $galleryImageUri")
-                    Log.d("DEBUG", "File Information: $selectedImageFileInfo")
                 } catch (e: Exception) {
                     Timber.e(e, "Image loading failed.")
                 }
@@ -208,15 +220,19 @@ fun HomeScreen(
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
             if (isSuccess) {
-                try {
-                    capturedImageUri = uri
-                    selectedImageFileInfo = createMultipartBody(capturedImageUri, "image")
-                    bitmap = loadBitmap(context, capturedImageUri)
-                    showProcessButton = true
-                    Timber.d("File Information from camera: $selectedImageFileInfo")
-                } catch (e: Exception) {
-                    Timber.e(e, "Image loading failed.")
+                capturedImageUri?.let { uri ->
+                    capturedImageAbsolutePath?.let { absPath ->
+                        try {
+                            capturedImageFileInfo = createMultipartBody(absPath)
+                            bitmap = loadBitmap(context, uri)
+                            showProcessButton = true
+                            Timber.d("File Information from camera: $capturedImageFileInfo")
+                        } catch (e: Exception) {
+                            Timber.e(e, "Image loading failed.")
+                        }
+                    }
                 }
+
             }
         }
 
@@ -225,7 +241,6 @@ fun HomeScreen(
     ) {
         if (it) {
             Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(uri)
         } else {
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
@@ -289,6 +304,10 @@ fun HomeScreen(
                                 Manifest.permission.CAMERA
                             )
                         if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                            val file = context.createImageFile()
+                            val uri = FileProvider.getUriForFile(Objects.requireNonNull(context), "$MY_PACKAGE.provider", file)
+                            capturedImageAbsolutePath = file.absolutePath
+                            capturedImageUri = uri
                             cameraLauncher.launch(uri)
                         } else {
                             // Request a permission
@@ -302,8 +321,20 @@ fun HomeScreen(
 
                     Button(
                         onClick = {
-                            launcher.launch("image/*")
-                            showProcessButton = true
+                            val hasReadExternalStoragePermission =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                )
+
+                            if (hasReadExternalStoragePermission == PackageManager.PERMISSION_GRANTED) {
+                                showProcessButton = true
+                                launcher.launch("image/*")
+
+                            } else {
+                                // Request a permission
+                                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            }
                         }
 
                     ) {
@@ -317,10 +348,15 @@ fun HomeScreen(
                     Button(
                         onClick = {
                             Timber.d("process button clicked")
-                            if (selectedImageFileInfo == null) {
-                                Timber.d("process button clicked but file is null.")
+                            if (capturedImageFileInfo == null) {
+                                Timber.d("process button clicked but captured file is null.")
+                            } else if (galleryImageFileInfo == null) {
+                                Timber.d("process button clicked but gallery file is null.")
                             }
-                            selectedImageFileInfo?.let {
+
+                            val multipart = capturedImageFileInfo ?: galleryImageFileInfo
+
+                            multipart?.let {
                                 Timber.d("Launch effect called: $it")
                                 userViewModel.uploadFormImage(it) {
                                     onSuccessUpload?.let { method ->
