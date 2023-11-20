@@ -21,14 +21,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,8 +56,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -164,6 +173,116 @@ fun UserProfileScreenTopBar(
     )
 }
 
+@Composable
+fun ProfileCard(user: User) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(6.dp)
+    ) {
+        Column(modifier = Modifier.padding(15.dp)) {
+            Text(
+                text = "Hello, " + user.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+            Text(
+                text = "Welcome to AI Form Builder",
+                fontSize = 16.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        AsyncImage(
+            model = user.picture,
+            contentDescription = "profile photo",
+            modifier = Modifier
+                .size(60.dp)
+                .clip(RoundedCornerShape(50.dp))
+        )
+    }
+}
+
+@Composable
+fun UploadCard(
+    onCameraClick: () -> Unit,
+    onGalleryClick: () -> Unit,
+    cameraText: String,
+    galleryText: String
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(140.dp),
+        elevation = CardDefaults.cardElevation(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.Top // Align items at the top
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.icon_upload),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(modifier = Modifier.padding(bottom = 16.dp, top = 8.dp)) {
+                    Text(text = "Upload your image", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = onCameraClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(text = cameraText, modifier = Modifier.padding(2.dp))
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = onGalleryClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(text = galleryText, modifier = Modifier.padding(2.dp))
+                }
+            }
+
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -197,7 +316,7 @@ fun HomeScreen(
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            println("Gallary: $uri")
+            println("Gallery: $uri")
             uri?.let {
                 try {
                     galleryImageUri = it
@@ -267,114 +386,95 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(10.dp),
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AsyncImage(
-                model = user.picture,
-                contentDescription = "profile photo",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(100.dp))
+            ProfileCard(user = user)
+            //Spacer(modifier = Modifier.height(10.dp))
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            Text(
+                text = "Your Drafts",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Hello, " + user.name, fontSize = 25.sp, textAlign = TextAlign.Center)
-
-            Spacer(modifier = Modifier.height(30.dp))
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(36.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Button(onClick = {
-                        val permissionCheckResult =
-                            ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.CAMERA
-                            )
-                        if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                            val file = context.createImageFile()
-                            val uri = FileProvider.getUriForFile(Objects.requireNonNull(context), "$MY_PACKAGE.provider", file)
-                            capturedImageAbsolutePath = file.absolutePath
-                            capturedImageUri = uri
-                            cameraLauncher.launch(uri)
-                        } else {
-                            // Request a permission
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
+            DraftCard(myDraft = emptyDraft)
 
 
-                    }) {
-                        Text(text = "Camera")
-                    }
 
-                    Button(
-                        onClick = {
-                            val hasReadExternalStoragePermission =
-                                ContextCompat.checkSelfPermission(
-                                    context,
-                                    Manifest.permission.READ_EXTERNAL_STORAGE
-                                )
-
-                            if (hasReadExternalStoragePermission == PackageManager.PERMISSION_GRANTED) {
-                                showProcessButton = true
-                                launcher.launch("image/*")
-
-                            } else {
-                                // Request a permission
-                                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                            }
-                        }
-
-                    ) {
-
-                        Text(text = "Gallery")
+            UploadCard(
+                onCameraClick = {
+                    val permissionCheckResult =
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.CAMERA
+                        )
+                    if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                        val file = context.createImageFile()
+                        val uri = FileProvider.getUriForFile(
+                            Objects.requireNonNull(context),
+                            "$MY_PACKAGE.provider",
+                            file
+                        )
+                        capturedImageAbsolutePath = file.absolutePath
+                        capturedImageUri = uri
+                        cameraLauncher.launch(uri)
+                    } else {
+                        // Request a permission
+                        permissionLauncher.launch(Manifest.permission.CAMERA)
                     }
 
 
-                }
-                if (showProcessButton) {
-                    Button(
-                        onClick = {
-                            Timber.d("process button clicked")
-                            if (capturedImageFileInfo == null) {
-                                Timber.d("process button clicked but captured file is null.")
-                            } else if (galleryImageFileInfo == null) {
-                                Timber.d("process button clicked but gallery file is null.")
-                            }
+                },
+                onGalleryClick = {
+                    val hasReadExternalStoragePermission =
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
 
-                            val multipart = capturedImageFileInfo ?: galleryImageFileInfo
+                    if (hasReadExternalStoragePermission == PackageManager.PERMISSION_GRANTED) {
+                        showProcessButton = true
+                        launcher.launch("image/*")
 
-                            multipart?.let {
-                                Timber.d("Launch effect called: $it")
-                                userViewModel.uploadFormImage(it) {
-                                    onSuccessUpload?.let { method ->
-                                        method(it)
-                                    }
+                    } else {
+                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    }
+                },
+                cameraText = "Camera",
+                galleryText = "Gallery"
+
+            )
+            if (showProcessButton) {
+                Button(
+                    onClick = {
+                        Timber.d("process button clicked")
+                        if (capturedImageFileInfo == null) {
+                            Timber.d("process button clicked but captured file is null.")
+                        } else if (galleryImageFileInfo == null) {
+                            Timber.d("process button clicked but gallery file is null.")
+                        }
+
+                        val multipart = capturedImageFileInfo ?: galleryImageFileInfo
+
+                        multipart?.let {
+                            Timber.d("Launch effect called: $it")
+                            userViewModel.uploadFormImage(it) {
+                                onSuccessUpload?.let { method ->
+                                    method(it)
                                 }
-                                Timber.d("File send to Api")
                             }
-                        },
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .fillMaxWidth(),
-                    ) {
-                        Text("Process")
-                    }
+                            Timber.d("File send to Api")
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Text("Process")
                 }
             }
-
             bitmap?.let { btm ->
                 Image(
                     bitmap = btm.asImageBitmap(),
@@ -383,10 +483,80 @@ fun HomeScreen(
                 )
             }
         }
-
     }
 }
 
+val emptyDraft = listOf<Draft>()
+
+//Mock data to be replaced by real data
+data class Draft(
+    val title: String,
+)
+
+val sampleDrafts = listOf(
+    Draft(title = "Draft 1"),
+    Draft(title = "Draft 2"),
+    Draft(title = "Draft 3"),
+
+    )
+
+@Composable
+fun DraftCard(myDraft: List<Draft>) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation()
+    ) {
+        if (myDraft.isEmpty()) {
+            // Show Lottie animation for empty draft
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Image(
+                    painter = painterResource(R.drawable.empty_draft),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(90.dp)
+                        .width(100.dp)
+                )
+                Text("No drafts found", fontSize = 16.sp)
+            }
+        } else {
+
+            LazyRow {
+                items(myDraft) { draft ->
+                    DraftItem(draft = draft)
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DraftItem(draft: Draft) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = draft.title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Spacer(modifier = Modifier.width(16.dp))
+        Button(
+            onClick = { /* Should direct to continue editing */ },
+            modifier = Modifier
+                .height(40.dp)
+                .width(100.dp)
+        ) {
+            Text(text = "Edit Draft")
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
