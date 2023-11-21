@@ -11,13 +11,12 @@ data class ApiUser(
     val picture: String?,
     val forms: List<ApiForm>?,
     val formSubmissions: List<ApiFormSubmission>?,
-    val uploads: List<ApiUploadedFile>?
 )
 
 data class ApiForm(
     val id: String,
     val name: String,
-    val available: Boolean,
+    val status: String,
     val owner: ApiUser?,
     val ownerId: String,
     val textFields: List<ApiFormTextField>?,
@@ -26,13 +25,15 @@ data class ApiForm(
     val images: List<ApiFormImage>?,
     val buttons: List<ApiFormButton>?,
     val labels: List<ApiFormLabel>?,
-    val formSubmissions: List<ApiFormSubmission>?
+    val formSubmissions: List<ApiFormSubmission>?,
+    val upload: ApiUploadedFile?
+
 )
 
 data class ApiFormSubmission(
     val id: String,
     val name: String,
-    val public: Boolean,
+    val status: String,
     val owner: ApiUser?,
     val ownerId: String,
     val form: ApiForm?,
@@ -124,15 +125,15 @@ data class ApiFormLabel(
 data class ApiImageEvent(
     val id: String,
     val event: String,
-    val payload: String?,
+    val payload: Any?,
     val file: ApiUploadedFile?,
     val fileId: String
 )
 
 data class ApiUploadedFile(
     val id: String,
-    val owner: ApiUser?,
-    val ownerId: String?,
+    val form: ApiForm?,
+    val formId: String?,
     val key: String,
     val url: String,
     val events: List<ApiImageEvent>?
@@ -149,17 +150,9 @@ data class GetUploadFileDetails(
     val ownerId: String?,
     val key: String,
     val url: String,
-    val events: List<ApiImageEventParsed>?
+    val events: List<ApiImageEvent>?
 )
 
-data class ApiImageEventParsed(
-    val parsedPayload: List<Any>,
-    val id: String,
-    val event: String,
-    val payload: String?,
-    val file: ApiUploadedFile?,
-    val fileId: String
-)
 data class ApiUploadedFileState(
     val objectRecognition: String,
     val textRecognition: String,
