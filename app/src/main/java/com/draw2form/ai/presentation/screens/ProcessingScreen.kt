@@ -104,7 +104,7 @@ fun ViewInterface(onClick: () -> Unit) {
 
 @Composable
 fun ProcessingScreen(state: ApiUploadedFileState, onEditForm: () -> Unit) {
-    val waitComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.please_wait))
+    // val waitComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.please_wait))
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -144,16 +144,7 @@ fun ProcessingScreen(state: ApiUploadedFileState, onEditForm: () -> Unit) {
                     "Image processing might take 5-15 seconds. Please wait patiently.",
                     modifier = Modifier.padding(top = 18.dp)
                 )
-                while (state.formGeneration != "success"
-                    && state.textRecognition != "success"
-                    && state.objectRecognition != "success"
-                ) {
-                    LottieAnimation(
-                        composition = waitComposition,
-                        iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.size(150.dp)
-                    )
-                }
+
             }
         }
     }

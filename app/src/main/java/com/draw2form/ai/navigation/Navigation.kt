@@ -19,6 +19,7 @@ import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
 import com.draw2form.ai.presentation.screens.DynamicUI
 import com.draw2form.ai.presentation.screens.HomeScreen
+import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
 import com.draw2form.ai.user.User
@@ -35,7 +36,7 @@ fun Navigation(
     userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
 
-) {
+    ) {
     NavHost(
         navController,
         modifier = modifier,
@@ -46,7 +47,14 @@ fun Navigation(
          * tab of the bottom navigation bar
          */
         composable("settings") {
-            SettingsScreen()
+            SettingsScreen(
+                onInstButtonClicked = {
+                    navController.navigate("instructions")
+                }
+            )
+        }
+        composable("instructions") {
+            InstructionsScreen()
         }
 
         /**
@@ -74,7 +82,8 @@ fun Navigation(
             var counter by remember { mutableStateOf(0) }
 
             val uploadId = backStackEntry.arguments?.getString("uploadId")
-            val apiUploadedFileState = userViewModel.apiUploadedFileState.collectAsState(initial = null)
+            val apiUploadedFileState =
+                userViewModel.apiUploadedFileState.collectAsState(initial = null)
 
             LaunchedEffect(true) {
                 uploadId?.let {
@@ -98,7 +107,13 @@ fun Navigation(
                 }
             }
 
-            ProcessingScreen(apiUploadedFileState.value ?: ApiUploadedFileState("loading", "loading", "loading")) {
+            ProcessingScreen(
+                apiUploadedFileState.value ?: ApiUploadedFileState(
+                    "loading",
+                    "loading",
+                    "loading"
+                )
+            ) {
                 uploadId?.let {
                     navController.navigate("upload/${it}/edit")
                 }
