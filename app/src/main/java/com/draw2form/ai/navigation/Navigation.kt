@@ -20,6 +20,7 @@ import com.draw2form.ai.application.connectivity.InternetConnectionState
 import com.draw2form.ai.presentation.screens.DynamicUI
 import com.draw2form.ai.presentation.screens.FormsListScreen
 import com.draw2form.ai.presentation.screens.HomeScreen
+import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
 import com.draw2form.ai.user.User
@@ -47,7 +48,14 @@ fun Navigation(
          * tab of the bottom navigation bar
          */
         composable("settings") {
-            SettingsScreen()
+            SettingsScreen(
+                onInstButtonClicked = {
+                    navController.navigate("instructions")
+                }
+            )
+        }
+        composable("instructions") {
+            InstructionsScreen()
         }
 
         composable("forms") {

@@ -3,14 +3,17 @@ package com.draw2form.ai.presentation.screens
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -298,34 +301,45 @@ interface UIElement {
 
 @Composable
 fun DynamicUI(elementColumns: List<List<UIElement>>) {
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        shape = MaterialTheme.shapes.medium
     ) {
-        for (elementColumn in elementColumns) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                for (element in elementColumn) {
-                    when (element) {
-                        is ApiFormLabel -> Label(element.label)
-                        is ApiFormImage -> FormAsyncImage(
-                            url = "https://placekitten.com/400/300",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .clip(shape = MaterialTheme.shapes.medium),
-                        )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            items(elementColumns) { elementColumn ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    for (element in elementColumn) {
+                        when (element) {
+                            is ApiFormLabel -> Label(element.label)
+                            is ApiFormImage -> FormAsyncImage(
+                                url = "https://placekitten.com/400/300",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(shape = MaterialTheme.shapes.medium),
+                            )
 
-                        is ApiFormTextField -> TextField(element.label)
-                        is ApiFormCheckbox -> Checkbox(element.label)
-                        is ApiFormToggleSwitch -> ToggleSwitch(element.label)
-                        is ApiFormButton -> DynamicFormButton(element.label)
+                            is ApiFormTextField -> TextField(element.label)
+                            is ApiFormCheckbox -> Checkbox(element.label)
+                            is ApiFormToggleSwitch -> ToggleSwitch(element.label)
+                            is ApiFormButton -> DynamicFormButton(element.label)
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun Label(label: String) {
