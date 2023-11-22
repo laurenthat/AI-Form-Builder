@@ -18,6 +18,7 @@ import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
 import com.draw2form.ai.presentation.screens.DynamicUI
+import com.draw2form.ai.presentation.screens.FormsListScreen
 import com.draw2form.ai.presentation.screens.HomeScreen
 import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
@@ -55,6 +56,10 @@ fun Navigation(
         }
         composable("instructions") {
             InstructionsScreen()
+        }
+
+        composable("forms") {
+            FormsListScreen()
         }
 
         /**

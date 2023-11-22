@@ -2,6 +2,7 @@ package com.draw2form.ai.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.api.ApiFormButton
 import com.draw2form.ai.api.ApiFormCheckbox
 import com.draw2form.ai.api.ApiFormImage
@@ -36,7 +37,9 @@ class UserViewModel(
 
 
     private val _apiUiElements: MutableStateFlow<List<List<UIElement>>?> = MutableStateFlow(null)
+    private val _apiUserForms: MutableStateFlow<List<ApiForm>> = MutableStateFlow(emptyList())
     val apiUiElements: StateFlow<List<List<UIElement>>?> get() = _apiUiElements.asStateFlow()
+    val apiUserForms: StateFlow<List<ApiForm>> get() = _apiUserForms.asStateFlow()
 
     /**
      * combines two flows together. here it combines userId and list of users and returns the user with that id.
@@ -111,7 +114,11 @@ class UserViewModel(
             val authorization = dataStore.getAuthorizationHeaderValue.first()
 
             authorization?.let { token ->
-                apiService.getUploadEventPayload<List<List<Any>>>(token, id, "FormComponentsCreated").onSuccess { columns ->
+                apiService.getUploadEventPayload<List<List<Any>>>(
+                    token,
+                    id,
+                    "FormComponentsCreated"
+                ).onSuccess { columns ->
                     _apiUiElements.value = (columns ?: listOf()).map { column ->
                         return@map column.map rowMap@{ rows ->
                             if (rows !is List<*>) {
@@ -209,6 +216,22 @@ class UserViewModel(
                     }
             }
         }
+    }
+
+    fun getUserForms() {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.getForms(authorization)
+                    .onSuccess {
+                        _apiUserForms.value = it
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+
     }
 }
 
