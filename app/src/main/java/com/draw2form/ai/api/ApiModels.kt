@@ -159,6 +159,14 @@ data class ApiUploadedFileState(
     val formGeneration: String,
 )
 
+data class ApiFormShare(
+    val id: String,
+    val owner: ApiUser?,
+    val ownerId: String?,
+    val form: ApiForm?,
+    val formId: String,
+)
+
 
 fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email, "", picture)
 fun List<ApiUser>.toUserList(): List<User> = this.map { it.toUser() }

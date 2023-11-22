@@ -46,6 +46,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,6 +70,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.draw2form.ai.R
+import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.api.ApiUploadedFile
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.upload.FileUtils
@@ -314,6 +318,11 @@ fun HomeScreen(
     // Gallery
     var galleryImageFileInfo by remember { mutableStateOf<MultipartBody.Part?>(null) }
 
+    //Draft forms
+    val userForms = userViewModel.apiUserForms.collectAsState(emptyList())
+    val forms = userForms.value
+
+
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             println("Gallery: $uri")
@@ -388,7 +397,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            // horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfileCard(user = user)
             //Spacer(modifier = Modifier.height(10.dp))
@@ -397,12 +406,29 @@ fun HomeScreen(
                 text = "Your Drafts",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
+                modifier = Modifier.padding(top = 10.dp, start = 16.dp, end = 10.dp)
+            )
+
+            if (forms.isEmpty()) {
+                NoDraftCard()
+            } else {
+                CategorizedLazyRow(
+                    forms = forms, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                )
+            }
+
+            LaunchedEffect(true) {
+                userViewModel.getUserForms()
+            }
+
+            Text(
+                text = "Upload New sketch",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
                 modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
             )
-            DraftCard(myDraft = emptyDraft)
-
-
-
             UploadCard(
                 onCameraClick = {
                     val permissionCheckResult =
@@ -469,94 +495,122 @@ fun HomeScreen(
                         }
                     },
                     modifier = Modifier
-                        .padding(top = 8.dp)
+                        .padding(start = 16.dp, top = 8.dp, end = 16.dp)
                         .fillMaxWidth(),
                 ) {
                     Text("Process")
                 }
             }
             bitmap?.let { btm ->
-                Image(
-                    bitmap = btm.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.size(400.dp)
-                )
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Text(
+                        text = "Image Preview",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    Image(
+                        bitmap = btm.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.size(400.dp)
+                    )
+                }
+
             }
         }
     }
 }
 
-val emptyDraft = listOf<Draft>()
-
-//Mock data to be replaced by real data
-data class Draft(
-    val title: String,
-)
-
-val sampleDrafts = listOf(
-    Draft(title = "Draft 1"),
-    Draft(title = "Draft 2"),
-    Draft(title = "Draft 3"),
-
-    )
 
 @Composable
-fun DraftCard(myDraft: List<Draft>) {
+private fun CategorizedLazyRow(
+    forms: List<ApiForm>,
+    modifier: Modifier = Modifier
+) {
+    val sortedForms = forms.sortedBy { it.name }
+
+    LazyRow(
+        modifier = modifier
+    ) {
+        items(sortedForms) { form ->
+            MyFormItem(form)
+        }
+    }
+}
+
+@Composable
+fun MyFormItem(form: ApiForm) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .width(180.dp)
+        //.height(90.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(10.dp, 12.dp, 20.dp, 12.dp)
+            ) {
+
+                Text(
+                    text = form.name,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = form.status, textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            Button(
+                onClick = { /* Should direct to continue editing */ },
+                modifier = Modifier
+                    .height(35.dp)
+                    .width(80.dp)
+                    .padding(end = 0.dp)
+            ) {
+                Text(text = "Open", fontSize = 10.sp, modifier = Modifier.fillMaxSize())
+            }
+        }
+    }
+
+}
+
+
+@Composable
+fun NoDraftCard() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         elevation = CardDefaults.cardElevation()
     ) {
-        if (myDraft.isEmpty()) {
-            // Show Lottie animation for empty draft
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
 
-                Image(
-                    painter = painterResource(R.drawable.empty_draft),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .height(90.dp)
-                        .width(100.dp)
-                )
-                Text("No drafts found", fontSize = 16.sp)
-            }
-        } else {
-
-            LazyRow {
-                items(myDraft) { draft ->
-                    DraftItem(draft = draft)
-
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DraftItem(draft: Draft) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = draft.title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-        Spacer(modifier = Modifier.width(16.dp))
-        Button(
-            onClick = { /* Should direct to continue editing */ },
-            modifier = Modifier
-                .height(40.dp)
-                .width(100.dp)
+        // Show Lottie animation for empty draft
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Edit Draft")
+
+            Image(
+                painter = painterResource(R.drawable.empty_draft),
+                contentDescription = null,
+                modifier = Modifier
+                    .height(90.dp)
+                    .width(100.dp)
+            )
+            Text("No drafts found", fontSize = 16.sp)
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

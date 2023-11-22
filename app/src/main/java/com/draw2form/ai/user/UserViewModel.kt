@@ -233,6 +233,24 @@ class UserViewModel(
         }
 
     }
+
+    suspend fun formShareId(id: UUID) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.formShare(
+                    authorization,
+                    id.toString()
+                )
+                    .onSuccess {
+                        Timber.d(it.toString())
+                    }.onFailure {
+                        println(it)
+                    }
+            }
+        }
+    }
+
 }
 
 
