@@ -18,7 +18,7 @@ sealed class BottomNavigationItemsData(
     )
 
     object Forms : BottomNavigationItemsData(
-        title = "Forms",
+        title = "Forms List",
         icon = R.drawable.forms,
         screenRoute = "forms",
     )

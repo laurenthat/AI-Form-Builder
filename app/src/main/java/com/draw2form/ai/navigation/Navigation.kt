@@ -18,6 +18,7 @@ import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
 import com.draw2form.ai.presentation.screens.DynamicUI
+import com.draw2form.ai.presentation.screens.FormsListScreen
 import com.draw2form.ai.presentation.screens.HomeScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
@@ -35,7 +36,7 @@ fun Navigation(
     userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
 
-) {
+    ) {
     NavHost(
         navController,
         modifier = modifier,
@@ -47,6 +48,10 @@ fun Navigation(
          */
         composable("settings") {
             SettingsScreen()
+        }
+
+        composable("forms") {
+            FormsListScreen()
         }
 
         /**
@@ -74,7 +79,8 @@ fun Navigation(
             var counter by remember { mutableStateOf(0) }
 
             val uploadId = backStackEntry.arguments?.getString("uploadId")
-            val apiUploadedFileState = userViewModel.apiUploadedFileState.collectAsState(initial = null)
+            val apiUploadedFileState =
+                userViewModel.apiUploadedFileState.collectAsState(initial = null)
 
             LaunchedEffect(true) {
                 uploadId?.let {
@@ -98,7 +104,13 @@ fun Navigation(
                 }
             }
 
-            ProcessingScreen(apiUploadedFileState.value ?: ApiUploadedFileState("loading", "loading", "loading")) {
+            ProcessingScreen(
+                apiUploadedFileState.value ?: ApiUploadedFileState(
+                    "loading",
+                    "loading",
+                    "loading"
+                )
+            ) {
                 uploadId?.let {
                     navController.navigate("upload/${it}/edit")
                 }
