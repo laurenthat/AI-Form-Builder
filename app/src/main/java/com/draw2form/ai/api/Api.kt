@@ -100,11 +100,11 @@ interface ApiService {
     ): Result<T?>
 
     //Share via QR Code
-    @POST("api/forms/{shareId}/scan")
+    @POST("api/forms/{formId}/scan")
     @Headers("Content-Type: application/json")
     suspend fun formShare(
         @Header("Authorization") authorization: String,
-        @Path("shareId") shareId: String
+        @Path("formId") formId: String
     ): Result<ApiFormShare>
 
 }
