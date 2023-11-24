@@ -10,7 +10,6 @@ import com.draw2form.ai.api.ApiFormLabel
 import com.draw2form.ai.api.ApiFormTextField
 import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiService
-import com.draw2form.ai.api.ApiUploadedFile
 import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.api.toUser
 import com.draw2form.ai.datasource.DataStore
@@ -94,11 +93,11 @@ class UserViewModel(
 
     suspend fun setWelcomeScreenSeen() = dataStore.setWelcomeScreenSeen()
 
-    fun getUploadedFileState(id: String) {
+    fun getFormStatus(id: String) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
-                apiService.getUploadState(authorization, id)
+                apiService.getFormUploadStatus(authorization, id)
                     .onSuccess {
                         Timber.d("Updating _apiUploadedFileState")
                         _apiUploadedFileState.value = it
@@ -202,12 +201,12 @@ class UserViewModel(
 
     fun uploadFormImage(
         imgFile: MultipartBody.Part,
-        onSuccess: (uploadedFile: ApiUploadedFile) -> Unit
+        onSuccess: (form: ApiForm) -> Unit
     ) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
-                apiService.uploadImage(authorization, imgFile)
+                apiService.createForm(authorization, imgFile)
                     .onSuccess {
                         Timber.d(it.toString())
                         onSuccess(it)
