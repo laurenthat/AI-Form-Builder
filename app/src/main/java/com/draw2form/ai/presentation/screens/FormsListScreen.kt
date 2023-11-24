@@ -1,21 +1,24 @@
 package com.draw2form.ai.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
@@ -171,7 +174,7 @@ fun FormsListScreen(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 items(filteredForms) { form ->
-                    FormItem(form)
+                    FormListItem(form, onFormClick = {})
                 }
             }
         }
@@ -180,36 +183,56 @@ fun FormsListScreen(
 
 
 @Composable
-fun FormItem(form: ApiForm) {
-    Card(
+fun FormListItem(form: ApiForm, onFormClick: () -> Unit) {
+
+    ListItem(
+        modifier = Modifier.clickable(
+            onClick = {
+                onFormClick()
+            }
+        ),
+        headlineContent = { },
+        supportingContent = { },
+        leadingContent = {
+            Column(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {
+                Text(
+                    text = form.name,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(10.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                /*Text(
+                    text = "Date: ${form.date}", textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(10.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )*/
+                Text(
+                    text = form.status, textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(10.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+        }
+    )
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
-            .padding(10.dp)
             .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(16.dp)
-            )
-    ) {
-        Text(
-            text = form.name,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(10.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        /*Text(
-            text = "Date: ${form.date}", textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(10.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )*/
-        Text(
-            text = form.status, textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(10.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
+            .width(1.dp),
+    )
+
 
 }
 
