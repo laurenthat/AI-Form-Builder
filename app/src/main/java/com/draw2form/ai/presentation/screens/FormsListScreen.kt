@@ -80,7 +80,8 @@ fun FormsListScreenTopBar(
 @Composable
 fun FormsListScreen(
     modifier: Modifier = Modifier,
-    userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onFormClick: (ApiForm) -> Unit
 ) {
 
     val userForms = userViewModel.apiUserForms.collectAsState(emptyList())
@@ -174,7 +175,7 @@ fun FormsListScreen(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 items(filteredForms) { form ->
-                    FormListItem(form, onFormClick = {})
+                    FormListItem(form, onFormClick = { onFormClick(form) })
                 }
             }
         }
@@ -240,7 +241,7 @@ fun FormListItem(form: ApiForm, onFormClick: () -> Unit) {
 @Composable
 fun FormsListScreenPreview() {
     LinkUpTheme {
-        FormsListScreen()
+        FormsListScreen() {}
     }
 }
 

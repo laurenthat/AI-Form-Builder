@@ -294,7 +294,7 @@ fun HomeScreen(
     canEdit: Boolean,
     onEditClick: (() -> Unit)? = null,
     canGoBack: Boolean,
-    onSuccessUpload: ((uploadedFile: ApiUploadedFile) -> Unit)? = null,
+    onSuccessUpload: ((form: ApiForm) -> Unit)? = null,
     onBackClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current

@@ -17,12 +17,12 @@ import androidx.navigation.navArgument
 import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
-import com.draw2form.ai.presentation.screens.DynamicUI
 import com.draw2form.ai.presentation.screens.FormsListScreen
 import com.draw2form.ai.presentation.screens.HomeScreen
 import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
+import com.draw2form.ai.presentation.screens.editform.FormEditScreen
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
 import kotlinx.coroutines.delay
@@ -59,9 +59,26 @@ fun Navigation(
         }
 
         composable("forms") {
-            FormsListScreen()
+            FormsListScreen {
+                navController.navigate("forms/${it.id}/edit")
+            }
         }
 
+        composable(
+            "forms/{formId}/edit",
+            arguments = listOf(navArgument("formId") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val formId = backStackEntry.arguments?.getString("formId")
+            val apiUiElements = userViewModel.apiUiElements.collectAsState(initial = null)
+
+            LaunchedEffect(true) {
+                formId?.let {
+                    userViewModel.getUploadedFileDetails(it)
+                }
+            }
+            FormEditScreen(apiUiElements.value ?: emptyList(), onMove = { a, b ->
+            })
+        }
         /**
          * tab of the bottom navigation bar
          * Navigates to {UserShareScreenProvider}  when user clicks on Share button.
@@ -73,29 +90,29 @@ fun Navigation(
                 onEditClick = { navController.navigate("profile/edit") },
                 canGoBack = false,
                 onSuccessUpload = {
-                    navController.navigate("upload/${it.id}/loading")
+                    navController.navigate("forms/${it.id}/loading")
                 },
                 onBackClick = null,
 
                 )
         }
         composable(
-            "upload/{uploadId}/loading",
-            arguments = listOf(navArgument("uploadId") { type = NavType.StringType }),
+            "forms/{formId}/loading",
+            arguments = listOf(navArgument("formId") { type = NavType.StringType }),
 
             ) { backStackEntry ->
             var counter by remember { mutableStateOf(0) }
 
-            val uploadId = backStackEntry.arguments?.getString("uploadId")
+            val formId = backStackEntry.arguments?.getString("formId")
             val apiUploadedFileState =
                 userViewModel.apiUploadedFileState.collectAsState(initial = null)
 
             LaunchedEffect(true) {
-                uploadId?.let {
+                formId?.let {
                     while (true) {
                         // Update the counter every 1 second (1000 milliseconds)
                         delay(1000)
-                        userViewModel.getUploadedFileState(it)
+                        userViewModel.getFormStatus(it)
 
                         counter++
                         if (
@@ -119,29 +136,12 @@ fun Navigation(
                     "loading"
                 )
             ) {
-                uploadId?.let {
-                    navController.navigate("upload/${it}/edit")
+                formId?.let {
+                    navController.navigate("forms/${it}/edit")
                 }
             }
         }
 
 
-
-        composable(
-            "upload/{uploadId}/edit",
-            arguments = listOf(navArgument("uploadId") { type = NavType.StringType }),
-
-            ) { backStackEntry ->
-            val uploadId = backStackEntry.arguments?.getString("uploadId")
-            val apiUiElements = userViewModel.apiUiElements.collectAsState(initial = null)
-
-            LaunchedEffect(true) {
-                uploadId?.let {
-                    userViewModel.getUploadedFileDetails(it)
-                }
-            }
-
-            DynamicUI(apiUiElements.value ?: listOf())
-        }
     }
 }
