@@ -26,7 +26,10 @@ data class ApiForm(
     val buttons: List<ApiFormButton>?,
     val labels: List<ApiFormLabel>?,
     val formSubmissions: List<ApiFormSubmission>?,
-    val upload: ApiUploadedFile?
+    val upload: ApiUploadedFile?,
+    val createdAt: String,
+    val updatedAt: String
+
 
 )
 

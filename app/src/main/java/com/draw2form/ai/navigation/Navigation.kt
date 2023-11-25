@@ -59,7 +59,9 @@ fun Navigation(
         }
 
         composable("forms") {
-            FormsListScreen()
+            FormsListScreen {
+                navController.navigate("forms/${it.id}/edit")
+            }
         }
 
         composable(
@@ -74,7 +76,7 @@ fun Navigation(
                     userViewModel.getUploadedFileDetails(it)
                 }
             }
-            FormEditScreen(apiUiElements.value?.flatten() ?: emptyList(), onMove = { a, b ->
+            FormEditScreen(apiUiElements.value ?: emptyList(), onMove = { a, b ->
             })
         }
         /**

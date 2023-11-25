@@ -3,12 +3,6 @@ package com.draw2form.ai.user
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.draw2form.ai.api.ApiForm
-import com.draw2form.ai.api.ApiFormButton
-import com.draw2form.ai.api.ApiFormCheckbox
-import com.draw2form.ai.api.ApiFormImage
-import com.draw2form.ai.api.ApiFormLabel
-import com.draw2form.ai.api.ApiFormTextField
-import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiService
 import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.api.toUser
@@ -21,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant.Companion.parse
 import okhttp3.MultipartBody
 import timber.log.Timber
 import java.util.UUID
@@ -33,12 +28,12 @@ class UserViewModel(
     private val _apiUploadedFileState: MutableStateFlow<ApiUploadedFileState?> =
         MutableStateFlow(null)
     val apiUploadedFileState: StateFlow<ApiUploadedFileState?> get() = _apiUploadedFileState.asStateFlow()
-
-
-    private val _apiUiElements: MutableStateFlow<List<List<UIElement>>?> = MutableStateFlow(null)
     private val _apiUserForms: MutableStateFlow<List<ApiForm>> = MutableStateFlow(emptyList())
-    val apiUiElements: StateFlow<List<List<UIElement>>?> get() = _apiUiElements.asStateFlow()
     val apiUserForms: StateFlow<List<ApiForm>> get() = _apiUserForms.asStateFlow()
+
+
+    private val _apiUiElements: MutableStateFlow<List<UIElement>?> = MutableStateFlow(null)
+    val apiUiElements: StateFlow<List<UIElement>?> get() = _apiUiElements.asStateFlow()
 
     /**
      * combines two flows together. here it combines userId and list of users and returns the user with that id.
@@ -113,88 +108,31 @@ class UserViewModel(
             val authorization = dataStore.getAuthorizationHeaderValue.first()
 
             authorization?.let { token ->
-                apiService.getUploadEventPayload<List<List<Any>>>(
+                apiService.getFormDetails(
                     token,
                     id,
-                    "FormComponentsCreated"
-                ).onSuccess { columns ->
-                    _apiUiElements.value = (columns ?: listOf()).map { column ->
-                        return@map column.map rowMap@{ rows ->
-                            if (rows !is List<*>) {
-                                return@rowMap null
-                            }
-                            if (rows.count() < 2) {
-                                return@rowMap null
-                            }
-                            if (rows[0] !is String) {
-                                return@rowMap null
-                            }
-                            if (rows[1] !is Map<*, *>) {
-                                return@rowMap null
-                            }
-                            val type: String = rows[0] as String
-                            val data = rows[1] as Map<*, *>
-
-
-                            val order = (data["order"] as? Double)?.toInt() ?: 0
-                            val label = (data["label"] as? String) ?: ""
-
-                            return@rowMap when (type) {
-                                "FormLabel" -> ApiFormLabel(
-                                    "",
-                                    null,
-                                    "",
-                                    order,
-                                    label
-                                )
-
-                                "FormImage" -> ApiFormImage("", null, "", order, "")
-                                "FormTextField" -> ApiFormTextField(
-                                    "",
-                                    null,
-                                    "",
-                                    label,
-                                    order,
-                                    null
-                                )
-
-                                "FormCheckbox" -> ApiFormCheckbox(
-                                    "",
-                                    label,
-                                    null,
-                                    "",
-                                    order,
-                                    null
-                                )
-
-                                "FormToggleSwitch" -> ApiFormToggleSwitch(
-                                    "",
-                                    label,
-                                    null,
-                                    "",
-                                    order,
-                                    null
-                                )
-
-                                "FormButton" -> ApiFormButton(
-                                    "",
-                                    label,
-                                    null,
-                                    "",
-                                    order,
-                                    ""
-                                )
-
-                                else -> null
-                            }
-                        }.filterNotNull()
+                ).onSuccess { form ->
+                    val checkboxes = form.checkboxes ?: listOf()
+                    val textFields = form.textFields ?: listOf()
+                    val toggleSwitches = form.toggleSwitches ?: listOf()
+                    val buttons = form.buttons ?: listOf()
+                    val labels = form.labels ?: listOf()
+                    val images = form.images ?: listOf()
+                    var uiElements = mutableListOf<UIElement>()
+                    uiElements.addAll(checkboxes)
+                    uiElements.addAll(textFields)
+                    uiElements.addAll(toggleSwitches)
+                    uiElements.addAll(buttons)
+                    uiElements.addAll(labels)
+                    uiElements.addAll(images)
+                    uiElements.sortBy {
+                        it.order
                     }
+                    _apiUiElements.value = uiElements
 
                 }.onFailure {
                     println(it)
                 }
-
-
             }
         }
     }
@@ -223,14 +161,14 @@ class UserViewModel(
             authorization?.let {
                 apiService.getForms(authorization)
                     .onSuccess {
-                        _apiUserForms.value = it
+                        _apiUserForms.value =
+                            it.sortedBy { parse(it.createdAt).epochSeconds }.reversed()
                     }
                     .onFailure {
                         Timber.d(it)
                     }
             }
         }
-
     }
 
     suspend fun formShareId(id: UUID) {
