@@ -27,10 +27,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.draw2form.ai.presentation.screens.UIElement
-import com.draw2form.ai.presentation.screens.parseJson
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 
 @Composable
 fun FormEditScreen(
@@ -68,7 +66,7 @@ fun FormEditScreen(
                 )
             }
             .fillMaxSize()
-            .padding(top = 10.dp, start = 10.dp, end = 10.dp),
+            .padding(top = 5.dp, start = 5.dp, end = 5.dp),
         state = dragDropListState.lazyListState
     ) {
         itemsIndexed(items) { index, item ->
@@ -78,17 +76,21 @@ fun FormEditScreen(
                         val offsetOrNull = dragDropListState.elementDisplacement.takeIf {
                             index == dragDropListState.currentIndexOfDraggedItem
                         }
-                        Modifier.graphicsLayer {
-                            translationY = offsetOrNull ?: 0f
-                        }
+                        val scale = if (offsetOrNull != null) 1.1f else 1f
+                        Modifier
+                            .graphicsLayer {
+                                translationY = offsetOrNull ?: 0f
+                                scaleX = scale
+                                scaleY = scale
+                            }
                     }
                     .background(Color.White, shape = RoundedCornerShape(8.dp))
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(5.dp)
             ) {
                 DynamicUI(element = item)
             }
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(1.dp))
         }
     }
 }

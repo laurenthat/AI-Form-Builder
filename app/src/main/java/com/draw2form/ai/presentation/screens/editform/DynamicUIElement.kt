@@ -1,14 +1,12 @@
 package com.draw2form.ai.presentation.screens.editform
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import com.draw2form.ai.api.ApiFormButton
 import com.draw2form.ai.api.ApiFormCheckbox
 import com.draw2form.ai.api.ApiFormImage
@@ -30,10 +28,10 @@ fun DynamicUI(element: UIElement) {
         when (element) {
             is ApiFormLabel -> Label(element.label)
             is ApiFormImage -> FormAsyncImage(
-                url = "https://placekitten.com/400/300",
+                url = "https://placekitten.com/1000/500?image=12",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
+                    .fillMaxSize()
+//                    .height(300.dp)
                     .clip(shape = MaterialTheme.shapes.medium),
             )
 
