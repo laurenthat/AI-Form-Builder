@@ -23,10 +23,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,6 +41,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.draw2form.ai.R
+import com.draw2form.ai.api.ApiFormButton
+import com.draw2form.ai.api.ApiFormCheckbox
+import com.draw2form.ai.api.ApiFormImage
+import com.draw2form.ai.api.ApiFormLabel
+import com.draw2form.ai.api.ApiFormTextField
+import com.draw2form.ai.api.ApiFormToggleSwitch
+import com.draw2form.ai.presentation.screens.Checkbox
+import com.draw2form.ai.presentation.screens.DynamicFormButton
+import com.draw2form.ai.presentation.screens.FormAsyncImage
+import com.draw2form.ai.presentation.screens.Label
+import com.draw2form.ai.presentation.screens.TextField
+import com.draw2form.ai.presentation.screens.ToggleSwitch
 import com.draw2form.ai.presentation.screens.UIElement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -55,8 +69,8 @@ fun FormEditScreen(
     var overScrollJob by remember { mutableStateOf<Job?>(null) }
     val dragDropListState = rememberDragDropListState(onMove = onMove)
     val sheetState = rememberModalBottomSheetState()
-    var isSheetOpen by rememberSaveable {
-        mutableStateOf(false)
+    var editSheetOpen by rememberSaveable {
+        mutableStateOf<UIElement?>(null)
     }
 
     LazyColumn(
@@ -118,7 +132,7 @@ fun FormEditScreen(
                     )
                     Column(modifier = Modifier.fillMaxHeight()) {
                         IconButton(
-                            onClick = { isSheetOpen = true },
+                            onClick = { editSheetOpen = item },
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
@@ -141,14 +155,74 @@ fun FormEditScreen(
             Spacer(modifier = Modifier.height(1.dp))
         }
     }
-    if (isSheetOpen) {
+    editSheetOpen?.let {
         ModalBottomSheet(
             sheetState = sheetState,
-            onDismissRequest = { isSheetOpen = false }) {
+            onDismissRequest = { editSheetOpen = null }) {
+            EditElementBottomSheet(it)
         }
     }
 }
 
+@Composable
+fun EditElementBottomSheet(element: UIElement) {
+    Column {
+        when (element) {
+            is ApiFormLabel -> Column {
+                var newElementState by rememberSaveable(saver = stateSaver()) {
+                    mutableStateOf<ApiFormLabel>(element.copy())
+                }
+                Label(newElementState.label)
+                TextField(label = "Label", value = newElementState.label, onChange = {
+                    var label = newElementState.copy(
+                        label = it
+                    )
+                    newElementState = label
+
+                })
+//                label = label.copy(label = it)
+
+            }
+
+            is ApiFormImage -> FormAsyncImage(
+                url = "https://placekitten.com/1000/500?image=12",
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+
+            is ApiFormTextField -> Column {
+//                TextField(label = "Label", value = element.label)
+
+            }
+
+            is ApiFormCheckbox -> Column {
+                Checkbox(element.label)
+//                TextField(label = "Label", value = element.label)
+
+            }
+
+            is ApiFormToggleSwitch -> Column {
+                ToggleSwitch(element.label)
+//                TextField(label = "Label", value = element.label)
+
+            }
+
+            is ApiFormButton -> Column {
+                DynamicFormButton(element.label)
+//                TextField(label = "Label", value = element.label)
+
+            }
+        }
+    }
+}
+
+fun <T> stateSaver() = Saver<MutableState<T>, Any>(
+    save = { state -> state.value ?: "null" },
+    restore = { value ->
+        @Suppress("UNCHECKED_CAST")
+        mutableStateOf((if (value == "null") null else value) as T)
+    }
+)
 
 @Preview(showBackground = true)
 @Composable

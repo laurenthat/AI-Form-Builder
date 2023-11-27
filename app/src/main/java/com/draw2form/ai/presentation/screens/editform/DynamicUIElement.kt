@@ -31,7 +31,7 @@ fun DynamicUI(element: UIElement) {
                     .fillMaxSize()
             )
 
-            is ApiFormTextField -> TextField(element.label)
+            is ApiFormTextField -> TextField(element.label, "", {})
             is ApiFormCheckbox -> Checkbox(element.label)
             is ApiFormToggleSwitch -> ToggleSwitch(element.label)
             is ApiFormButton -> DynamicFormButton(element.label)
