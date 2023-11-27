@@ -105,7 +105,7 @@ data class ApiFormImage(
     val form: ApiForm?,
     val formId: String,
     override val order: Int,
-    val imageId: String
+    val url: String?
 ) : UIElement
 
 data class ApiFormButton(
