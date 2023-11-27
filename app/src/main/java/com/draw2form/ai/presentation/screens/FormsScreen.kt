@@ -108,7 +108,7 @@ fun Checkbox(label: String) {
         Checkbox(
             checked = remember { mutableStateOf(true).value },
             onCheckedChange = { /*TODO*/ },
-            modifier = Modifier.padding(8.dp)
+//            modifier = Modifier.padding(8.dp)
         )
     }
 
@@ -123,11 +123,10 @@ fun ToggleSwitch(label: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, modifier = Modifier.weight(1f))
+        Text(label)
         Switch(
             checked = remember { mutableStateOf(true).value },
             onCheckedChange = { /*TODO*/ },
-            modifier = Modifier.padding(8.dp),
         )
     }
 }
