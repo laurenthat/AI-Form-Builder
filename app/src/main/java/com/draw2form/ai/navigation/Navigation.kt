@@ -22,6 +22,7 @@ import com.draw2form.ai.presentation.screens.HomeScreen
 import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
+import com.draw2form.ai.presentation.screens.ShareFormScreen
 import com.draw2form.ai.presentation.screens.editform.FormEditScreen
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
@@ -63,6 +64,17 @@ fun Navigation(
                 navController.navigate("forms/${it.id}/edit")
             }
         }
+        composable(
+            "forms/{formId}/publish",
+            arguments = listOf(navArgument("formId") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val formId = backStackEntry.arguments?.getString("formId")
+            if (formId != null) {
+                ShareFormScreen(formId, onBackClick = {
+                    navController.popBackStack()
+                })
+            }
+        }
 
         composable(
             "forms/{formId}/edit",
@@ -77,6 +89,8 @@ fun Navigation(
                 }
             }
             FormEditScreen(apiUiElements.value ?: emptyList(), onMove = { a, b ->
+            }, onPublish = {
+                navController.navigate("forms/${formId}/publish")
             })
         }
         /**

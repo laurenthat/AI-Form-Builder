@@ -171,13 +171,13 @@ class UserViewModel(
         }
     }
 
-    suspend fun formShareId(id: UUID) {
+    suspend fun formShareId(id: String) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
                 apiService.formShare(
                     authorization,
-                    id.toString()
+                    id
                 )
                     .onSuccess {
                         Timber.d(it.toString())
