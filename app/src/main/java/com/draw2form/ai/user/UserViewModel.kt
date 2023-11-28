@@ -317,6 +317,35 @@ class UserViewModel(
 
     }
 
+    fun swapUIComponents(list: List<UIComponent>, first: Int, second: Int) {
+        val newList = list.toMutableList()
+        newList[first] = newList[first].updateOrder(second)
+        newList[second] = newList[second].updateOrder(first)
+        newList.sortBy {
+            it.order()
+        }
+        _apiUiElements.value = newList
+
+        listOf(newList[first], newList[second]).forEach {
+            it.label?.let { formLabel ->
+                updateFormLabel(formLabel = formLabel)
+            }
+            it.textField?.let { textField ->
+                updateFormTextField(textField = textField)
+            }
+            it.checkbox?.let { checkbox ->
+                updateFormCheckbox(checkbox = checkbox)
+            }
+            it.toggleSwitch?.let { toggleSwitch ->
+                updateFormToggleSwitch(toggleSwitch = toggleSwitch)
+            }
+            it.button?.let { button ->
+                updateFormButton(button = button)
+            }
+        }
+
+    }
+
 }
 
 
