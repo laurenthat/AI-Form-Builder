@@ -1,8 +1,8 @@
 package com.draw2form.ai.api
 
 import okhttp3.MultipartBody
-import retrofit2.http.DELETE
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
@@ -69,7 +69,43 @@ interface ApiService {
         @Path("id") id: String,
         @Path("formId") formId: String,
         @Body newFormLabel: ApiFormLabel
-        ): Result<ApiFormLabel>
+    ): Result<ApiFormLabel>
+
+    @PATCH("/api/forms/{formId}/fields/text-field/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateFormTextField(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+        @Body newFormTextField: ApiFormTextField
+    ): Result<ApiFormTextField>
+
+    @PATCH("/api/forms/{formId}/fields/checkbox/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateFormCheckbox(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+        @Body newFormCheckbox: ApiFormCheckbox
+    ): Result<ApiFormCheckbox>
+
+    @PATCH("/api/forms/{formId}/fields/toggle-switch/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateFormToggleSwitch(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+        @Body newFormToggleSwitch: ApiFormToggleSwitch
+    ): Result<ApiFormToggleSwitch>
+
+    @PATCH("/api/forms/{formId}/fields/button/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateFormButton(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+        @Body newFormButton: ApiFormButton
+    ): Result<ApiFormButton>
 
 
     @Multipart

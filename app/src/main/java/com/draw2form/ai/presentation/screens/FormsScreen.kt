@@ -67,8 +67,17 @@ data class UIComponent(
     val toggleSwitch: ApiFormToggleSwitch? = null,
     val button: ApiFormButton? = null,
     val image: ApiFormImage? = null,
-)
-
+) {
+    fun order(): Int {
+        return textField?.order
+            ?: label?.order
+            ?: checkbox?.order
+            ?: toggleSwitch?.order
+            ?: button?.order
+            ?: image?.order
+            ?: 0
+    }
+}
 
 @Composable
 fun Label(label: String) {

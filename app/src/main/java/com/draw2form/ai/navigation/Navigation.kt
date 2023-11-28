@@ -98,6 +98,18 @@ fun Navigation(
                     it.label?.let { formLabel ->
                         userViewModel.updateFormLabel(formLabel = formLabel)
                     }
+                    it.textField?.let { textField ->
+                        userViewModel.updateFormTextField(textField = textField)
+                    }
+                    it.checkbox?.let { checkbox ->
+                        userViewModel.updateFormCheckbox(checkbox = checkbox)
+                    }
+                    it.toggleSwitch?.let { toggleSwitch ->
+                        userViewModel.updateFormToggleSwitch(toggleSwitch = toggleSwitch)
+                    }
+                    it.button?.let { button ->
+                        userViewModel.updateFormButton(button = button)
+                    }
                 }
             )
         }

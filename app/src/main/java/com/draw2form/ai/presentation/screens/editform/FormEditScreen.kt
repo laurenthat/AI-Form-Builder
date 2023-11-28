@@ -87,79 +87,79 @@ fun FormEditScreen(
                             if (overScrollJob?.isActive == true)
                                 return@detectDragGesturesAfterLongPress
 
-                        dragDropListState
-                            .checkForOverScroll()
-                            .takeIf { it != 0f }
-                            ?.let {
-                                overScrollJob = scope.launch {
-                                    dragDropListState.lazyListState.scrollBy(it)
-                                }
-                            } ?: kotlin.run { overScrollJob?.cancel() }
-                    },
-                    onDragStart = { offset -> dragDropListState.onDragStart(offset) },
-                    onDragEnd = { dragDropListState.onDragInterrupted() },
-                    onDragCancel = { dragDropListState.onDragInterrupted() }
-                )
-            }
-            .fillMaxSize()
-            .padding(top = 5.dp, start = 5.dp, end = 5.dp),
-        state = dragDropListState.lazyListState
-    ) {
-        itemsIndexed(items, key = { index, item ->
-            println(item.toString())
-            item.toString()
-        }) { index, item ->
-            Row(
-                modifier = Modifier
-                    .composed {
-                        val offsetOrNull = dragDropListState.elementDisplacement.takeIf {
-                            index == dragDropListState.currentIndexOfDraggedItem
-                        }
-                        val scale = if (offsetOrNull != null) 1.1f else 1f
-                        Modifier
-                            .graphicsLayer {
-                                translationY = offsetOrNull ?: 0f
-                                scaleX = scale
-                                scaleY = scale
-                            }
-                    }
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .fillMaxWidth()
-                    .padding(5.dp)
-            ) {
-                Row {
-                    Icon(
-                        painter = painterResource(id = R.drawable.drag_indicator),
-                        contentDescription = null,
-                        tint = Color.LightGray,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .padding(0.dp)
+                            dragDropListState
+                                .checkForOverScroll()
+                                .takeIf { it != 0f }
+                                ?.let {
+                                    overScrollJob = scope.launch {
+                                        dragDropListState.lazyListState.scrollBy(it)
+                                    }
+                                } ?: kotlin.run { overScrollJob?.cancel() }
+                        },
+                        onDragStart = { offset -> dragDropListState.onDragStart(offset) },
+                        onDragEnd = { dragDropListState.onDragInterrupted() },
+                        onDragCancel = { dragDropListState.onDragInterrupted() }
                     )
-                    Column(modifier = Modifier.fillMaxHeight()) {
-                        IconButton(
-                            onClick = { editSheetOpen = item },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = "Edit",
-                                tint = Color.LightGray
-
-                            )
-                        }
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete",
-                                tint = Color.Red
-                            )
-                        }
-                    }
-                    DynamicUI(element = item)
                 }
+                .fillMaxSize()
+                .padding(top = 5.dp, start = 5.dp, end = 5.dp),
+            state = dragDropListState.lazyListState
+        ) {
+            itemsIndexed(items, key = { index, item ->
+                println(item.toString())
+                item.toString()
+            }) { index, item ->
+                Row(
+                    modifier = Modifier
+                        .composed {
+                            val offsetOrNull = dragDropListState.elementDisplacement.takeIf {
+                                index == dragDropListState.currentIndexOfDraggedItem
+                            }
+                            val scale = if (offsetOrNull != null) 1.1f else 1f
+                            Modifier
+                                .graphicsLayer {
+                                    translationY = offsetOrNull ?: 0f
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
+                        }
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    Row {
+                        Icon(
+                            painter = painterResource(id = R.drawable.drag_indicator),
+                            contentDescription = null,
+                            tint = Color.LightGray,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(0.dp)
+                        )
+                        Column(modifier = Modifier.fillMaxHeight()) {
+                            IconButton(
+                                onClick = { editSheetOpen = item },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Edit",
+                                    tint = Color.LightGray
+
+                                )
+                            }
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Delete",
+                                    tint = Color.Red
+                                )
+                            }
+                        }
+                        DynamicUI(element = item)
+                    }
+                }
+                Spacer(modifier = Modifier.height(1.dp))
             }
-            Spacer(modifier = Modifier.height(1.dp))
-        }
         }
     }
     editSheetOpen?.let {
@@ -186,10 +186,12 @@ fun EditElementBottomSheet(
     uiComponent: UIComponent,
     onChange: (updatedUIComponent: UIComponent) -> Unit
 ) {
+    //
     Column {
         uiComponent.label?.let { labelComponent ->
             Column {
                 Label(labelComponent.label)
+                Spacer(modifier = Modifier.height(8.dp))
                 TextField(label = "Label", value = labelComponent.label, onChange = {
                     var updatedUIComponent = uiComponent.copy(
                         label = labelComponent.copy(label = it)
@@ -197,42 +199,66 @@ fun EditElementBottomSheet(
                     onChange(updatedUIComponent)
 
                 })
-//                label = label.copy(label = it)
-
+                Spacer(modifier = Modifier.height(100.dp))
             }
         }
-//        when (element) {
-//            is ApiFormLabel ->
-//
-//            is ApiFormImage -> FormAsyncImage(
-//                url = "https://placekitten.com/1000/500?image=12",
-//                modifier = Modifier
-//                    .fillMaxSize()
-//            )
-//
-//            is ApiFormTextField -> Column {
-////                TextField(label = "Label", value = element.label)
-//
-//            }
-//
-//            is ApiFormCheckbox -> Column {
-//                Checkbox(element.label)
-////                TextField(label = "Label", value = element.label)
-//
-//            }
-//
-//            is ApiFormToggleSwitch -> Column {
-//                ToggleSwitch(element.label)
-////                TextField(label = "Label", value = element.label)
-//
-//            }
-//
-//            is ApiFormButton -> Column {
-//                DynamicFormButton(element.label)
-////                TextField(label = "Label", value = element.label)
-//
-//            }
-//        }
+
+        uiComponent.textField?.let { textFieldComponent ->
+            Column {
+                Label(textFieldComponent.label)
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(label = "Label", value = textFieldComponent.label, onChange = {
+                    var updatedUIComponent = uiComponent.copy(
+                        textField = textFieldComponent.copy(label = it)
+                    )
+                    onChange(updatedUIComponent)
+                })
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+
+        uiComponent.checkbox?.let { checkboxComponent ->
+            Column {
+                Label(checkboxComponent.label)
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(label = "Label", value = checkboxComponent.label, onChange = {
+                    var updatedUIComponent = uiComponent.copy(
+                        checkbox = checkboxComponent.copy(label = it)
+                    )
+                    onChange(updatedUIComponent)
+                })
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+
+        uiComponent.toggleSwitch?.let { toggleSwitchComponent ->
+            Column {
+                Label(toggleSwitchComponent.label)
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(label = "Label", value = toggleSwitchComponent.label, onChange = {
+                    var updatedUIComponent = uiComponent.copy(
+                        toggleSwitch = toggleSwitchComponent.copy(label = it)
+                    )
+                    onChange(updatedUIComponent)
+                })
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+
+        uiComponent.button?.let { buttonComponent ->
+            Column {
+                Label(buttonComponent.label)
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(label = "Label", value = buttonComponent.label, onChange = {
+                    var updatedUIComponent = uiComponent.copy(
+                        button = buttonComponent.copy(label = it)
+                    )
+                    onChange(updatedUIComponent)
+                })
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+
     }
 }
 
