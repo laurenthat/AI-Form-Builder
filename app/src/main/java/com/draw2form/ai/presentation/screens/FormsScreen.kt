@@ -60,6 +60,15 @@ interface UIElement {
     val order: Int
 }
 
+data class UIComponent(
+    val textField: ApiFormTextField? = null,
+    val label: ApiFormLabel? = null,
+    val checkbox: ApiFormCheckbox? = null,
+    val toggleSwitch: ApiFormToggleSwitch? = null,
+    val button: ApiFormButton? = null,
+    val image: ApiFormImage? = null,
+)
+
 
 @Composable
 fun Label(label: String) {
@@ -83,10 +92,12 @@ fun FormAsyncImage(url: String, modifier: Modifier) {
 }
 
 @Composable
-fun TextField(label: String) {
+fun TextField(label: String, value: String, onChange: (String) -> Unit) {
     OutlinedTextField(
-        value = remember { mutableStateOf("") }.value,
-        onValueChange = { /*TODO*/ },
+        value = value,
+        onValueChange = {
+            onChange(it)
+        },
         label = { Text(label) },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
         modifier = Modifier

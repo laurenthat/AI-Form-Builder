@@ -85,13 +85,21 @@ fun Navigation(
 
             LaunchedEffect(true) {
                 formId?.let {
-                    userViewModel.getUploadedFileDetails(it)
+                    userViewModel.getFormDetails(it)
                 }
             }
-            FormEditScreen(apiUiElements.value ?: emptyList(), onMove = { a, b ->
-            }, onPublish = {
-                navController.navigate("forms/${formId}/publish")
-            })
+            FormEditScreen(apiUiElements.value ?: emptyList(),
+                onMove = { a, b ->
+                },
+                onPublish = {
+                    navController.navigate("forms/${formId}/publish")
+                },
+                onUIComponentUpdate = {
+                    it.label?.let { formLabel ->
+                        userViewModel.updateFormLabel(formLabel = formLabel)
+                    }
+                }
+            )
         }
         /**
          * tab of the bottom navigation bar
