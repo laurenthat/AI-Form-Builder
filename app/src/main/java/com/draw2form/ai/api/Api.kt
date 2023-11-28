@@ -147,6 +147,7 @@ interface ApiService {
         @Path("eventName") eventName: String
     ): Result<T?>
 
+
     //Share via QR Code
     @POST("api/forms/{formId}/publish")
     @Headers("Content-Type: application/json")
