@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,7 +41,7 @@ fun MainScreen(
 ) {
     val navController = rememberNavController()
     val loggedInUser = userViewModel.getLoggedInUserProfile.collectAsState(initial = null)
-
+    val scannedForm = userViewModel.scannedForm.collectAsState(initial = null)
     val welcomeScreenSeen = userViewModel.welcomeScreenSeen.collectAsState(initial = null)
     val composableScope = rememberCoroutineScope()
 
@@ -78,9 +79,10 @@ fun MainScreen(
                     val formTokenQuery = data.getQueryParameter("id")
                     Timber.d(" Form Id from the url: $formTokenQuery")
                     if (formTokenQuery != null) {
-                        userViewModel.formShareId(formTokenQuery)
+                        userViewModel.getForm(formTokenQuery)
+
                     }
-                   
+
                 }
 
                 isLoading.value = false
@@ -90,6 +92,10 @@ fun MainScreen(
 
     if (loggedInUser.value == null || isLoading.value) {
         LoadingScreen()
+        
+    } else if (scannedForm.value != null) {
+        Text("Form filling component: ${scannedForm.value}")
+
     } else if (welcomeScreenSeen.value == false) {
         WelcomeScreen(onClick = {
             run {

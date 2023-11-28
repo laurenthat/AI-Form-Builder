@@ -147,13 +147,14 @@ interface ApiService {
         @Path("eventName") eventName: String
     ): Result<T?>
 
+
     //Share via QR Code
     @POST("api/forms/{formId}/publish")
     @Headers("Content-Type: application/json")
     suspend fun formShare(
         @Header("Authorization") authorization: String,
         @Path("formId") formId: String
-    ): Result<ApiFormShare>
+    ): Result<ApiForm>
 
     // Delete form by id
     @DELETE("api/forms/{id}")

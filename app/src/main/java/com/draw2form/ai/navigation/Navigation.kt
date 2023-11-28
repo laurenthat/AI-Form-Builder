@@ -41,6 +41,8 @@ fun Navigation(
     modifier: Modifier = Modifier,
 
     ) {
+    val composableScope = rememberCoroutineScope()
+
     val scope = rememberCoroutineScope()
 
     NavHost(
@@ -99,7 +101,15 @@ fun Navigation(
                     }
                 },
                 onPublish = {
-                    navController.navigate("forms/${formId}/publish")
+                    composableScope.launch {
+                        if (formId != null) {
+                            userViewModel.publishForm(formId) {
+                                navController.navigate("forms/${formId}/publish")
+
+                            }
+                        }
+                    }
+
                 },
                 onUIComponentUpdate = {
                     it.label?.let { formLabel ->
