@@ -30,7 +30,7 @@ class UserViewModel(
     val apiUploadedFileState: StateFlow<ApiUploadedFileState?> get() = _apiUploadedFileState.asStateFlow()
     private val _apiUserForms: MutableStateFlow<List<ApiForm>> = MutableStateFlow(emptyList())
     val apiUserForms: StateFlow<List<ApiForm>> get() = _apiUserForms.asStateFlow()
-
+    val scannedForm: MutableStateFlow<ApiForm?> = MutableStateFlow(null)
 
     private val _apiUiElements: MutableStateFlow<List<UIElement>?> = MutableStateFlow(null)
     val apiUiElements: StateFlow<List<UIElement>?> get() = _apiUiElements.asStateFlow()
@@ -171,7 +171,7 @@ class UserViewModel(
         }
     }
 
-    suspend fun formShareId(id: String) {
+    suspend fun publishForm(id: String, onSuccess: (form: ApiForm) -> Unit) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
@@ -180,6 +180,26 @@ class UserViewModel(
                     id
                 )
                     .onSuccess {
+                        onSuccess(it)
+                        Timber.d(it.toString())
+                    }.onFailure {
+                        println(it)
+                    }
+            }
+        }
+    }
+
+    suspend fun getForm(id: String) {
+        viewModelScope.launch {
+
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.getFormDetails(
+                    authorization,
+                    id
+                )
+                    .onSuccess {
+                        scannedForm.value = it
                         Timber.d(it.toString())
                     }.onFailure {
                         println(it)

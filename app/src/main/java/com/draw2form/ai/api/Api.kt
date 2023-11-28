@@ -105,6 +105,6 @@ interface ApiService {
     suspend fun formShare(
         @Header("Authorization") authorization: String,
         @Path("formId") formId: String
-    ): Result<ApiFormShare>
+    ): Result<ApiForm>
 
 }

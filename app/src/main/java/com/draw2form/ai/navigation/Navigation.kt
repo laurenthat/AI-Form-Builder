@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -28,6 +29,7 @@ import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -39,6 +41,8 @@ fun Navigation(
     modifier: Modifier = Modifier,
 
     ) {
+    val composableScope = rememberCoroutineScope()
+
     NavHost(
         navController,
         modifier = modifier,
@@ -89,9 +93,18 @@ fun Navigation(
                 }
             }
             FormEditScreen(apiUiElements.value ?: emptyList(), onMove = { a, b ->
-            }, onPublish = {
-                navController.navigate("forms/${formId}/publish")
-            })
+            },
+                onPublish = {
+                    composableScope.launch {
+                        if (formId != null) {
+                            userViewModel.publishForm(formId) {
+                                navController.navigate("forms/${formId}/publish")
+
+                            }
+                        }
+                    }
+
+                })
         }
         /**
          * tab of the bottom navigation bar
