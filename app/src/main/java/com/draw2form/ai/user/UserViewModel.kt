@@ -3,7 +3,11 @@ package com.draw2form.ai.user
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.draw2form.ai.api.ApiForm
+import com.draw2form.ai.api.ApiFormButton
+import com.draw2form.ai.api.ApiFormCheckbox
 import com.draw2form.ai.api.ApiFormLabel
+import com.draw2form.ai.api.ApiFormTextField
+import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiService
 import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.api.toUser
@@ -127,9 +131,9 @@ class UserViewModel(
                     uiElements.addAll(labels.map { UIComponent(label = it) })
                     uiElements.addAll(images.map { UIComponent(image = it) })
                     println(uiElements)
-//                    uiElements.sortBy {
-////                        it.order
-//                    }
+                    uiElements.sortBy {
+                        it.order()
+                    }
                     _apiUiElements.value = uiElements
 
                 }.onFailure {
@@ -192,7 +196,6 @@ class UserViewModel(
             }
         }
     }
-
     suspend fun publishForm(id: String, onSuccess: (form: ApiForm) -> Unit) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -222,6 +225,104 @@ class UserViewModel(
                 )
                     .onSuccess {
                         scannedForm.value = it
+                        Timber.d(it.toString())
+                    }.onFailure {
+                        println(it)
+                    }
+            }
+        }
+    }
+
+    fun updateFormTextField(textField: ApiFormTextField) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.updateFormTextField(
+                    authorization,
+                    formId = textField.formId,
+                    id = textField.id,
+                    newFormTextField = textField
+                )
+                    .onSuccess {
+                        getFormDetails(textField.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+    fun updateFormCheckbox(checkbox: ApiFormCheckbox) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.updateFormCheckbox(
+                    authorization,
+                    formId = checkbox.formId,
+                    id = checkbox.id,
+                    newFormCheckbox = checkbox
+                )
+                    .onSuccess {
+                        getFormDetails(checkbox.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+    fun updateFormToggleSwitch(toggleSwitch: ApiFormToggleSwitch) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.updateFormToggleSwitch(
+                    authorization,
+                    formId = toggleSwitch.formId,
+                    id = toggleSwitch.id,
+                    newFormToggleSwitch = toggleSwitch
+                )
+                    .onSuccess {
+                        getFormDetails(toggleSwitch.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+    fun updateFormButton(button: ApiFormButton) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.updateFormButton(
+                    authorization,
+                    formId = button.formId,
+                    id = button.id,
+                    newFormButton = button
+                )
+                    .onSuccess {
+                        getFormDetails(button.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+
+    suspend fun formShareId(id: String) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.formShare(
+                    authorization,
+                    id
+                )
+                    .onSuccess {
                         Timber.d(it.toString())
                     }.onFailure {
                         println(it)
