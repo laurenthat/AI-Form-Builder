@@ -70,6 +70,7 @@ fun Navigation(
                 navController.navigate("forms/${it.id}/edit")
             }
         }
+
         composable(
             "forms/{formId}/publish",
             arguments = listOf(navArgument("formId") { type = NavType.StringType }),

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,6 +22,7 @@ import com.draw2form.ai.navigation.bottomnavigation.BottomNavigationBar
 import com.draw2form.ai.presentation.components.NoInternetConnectionBarComponent
 import com.draw2form.ai.presentation.screens.LoadingScreen
 import com.draw2form.ai.presentation.screens.LoginScreen
+import com.draw2form.ai.presentation.screens.PublishedFormScreen
 import com.draw2form.ai.presentation.screens.WelcomeScreen
 import com.draw2form.ai.user.UserViewModel
 import com.google.gson.Gson
@@ -92,9 +92,10 @@ fun MainScreen(
 
     if (loggedInUser.value == null || isLoading.value) {
         LoadingScreen()
-        
+
     } else if (scannedForm.value != null) {
-        Text("Form filling component: ${scannedForm.value}")
+        PublishedFormScreen(scannedFormState = scannedForm.value!!)
+
 
     } else if (welcomeScreenSeen.value == false) {
         WelcomeScreen(onClick = {
