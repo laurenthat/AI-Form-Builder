@@ -193,13 +193,13 @@ class UserViewModel(
         }
     }
 
-    suspend fun formShareId(id: UUID) {
+    suspend fun formShareId(id: String) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
                 apiService.formShare(
                     authorization,
-                    id.toString()
+                    id
                 )
                     .onSuccess {
                         Timber.d(it.toString())
@@ -208,6 +208,28 @@ class UserViewModel(
                     }
             }
         }
+    }
+
+    fun deleteFormItem(form: ApiForm) {
+        val formsList = _apiUserForms.value
+        val formsCopy = formsList.toMutableList()
+        formsCopy.remove(form)
+        _apiUserForms.value = formsCopy
+
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteForm(authorization, form.id)
+                    .onSuccess { response ->
+                        Timber.d("Deleted form item")
+                        Timber.d(response.toString())
+                    }.onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+
     }
 
 }

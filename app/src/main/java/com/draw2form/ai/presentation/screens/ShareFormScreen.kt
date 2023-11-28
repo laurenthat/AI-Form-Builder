@@ -33,12 +33,12 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.draw2form.ai.R
 import com.draw2form.ai.presentation.components.rememberQrBitmapPainter
 
-const val MYAPI = "https:draw2form.ericaskari.ai/api/forms/qr/scan?id="
+const val MYAPI = "https://draw2form.ericaskari.com/android/forms/publish?id="
 
 @Composable
 fun ShareFormScreen(shareId: String, onBackClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        GenerateQRCode(data = MYAPI + shareId, onBackClick)
+        GenerateQRCode(MYAPI + shareId, onBackClick)
     }
 }
 

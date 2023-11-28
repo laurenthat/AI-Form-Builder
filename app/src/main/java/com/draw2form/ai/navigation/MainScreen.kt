@@ -16,7 +16,6 @@ import androidx.navigation.compose.rememberNavController
 import com.draw2form.ai.api.ApiUser
 import com.draw2form.ai.api.LoginResponseToken
 import com.draw2form.ai.api.toUser
-import com.google.gson.Gson
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
 import com.draw2form.ai.navigation.bottomnavigation.BottomNavigationBar
@@ -25,6 +24,7 @@ import com.draw2form.ai.presentation.screens.LoadingScreen
 import com.draw2form.ai.presentation.screens.LoginScreen
 import com.draw2form.ai.presentation.screens.WelcomeScreen
 import com.draw2form.ai.user.UserViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -74,6 +74,13 @@ fun MainScreen(
                         userId = user.id
                     )
                     delay(1000)
+                } else if (path == "/android/forms/publish") {
+                    val formTokenQuery = data.getQueryParameter("id")
+                    Timber.d(" Form Id from the url: $formTokenQuery")
+                    if (formTokenQuery != null) {
+                        userViewModel.formShareId(formTokenQuery)
+                    }
+                   
                 }
 
                 isLoading.value = false

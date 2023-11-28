@@ -1,6 +1,7 @@
 package com.draw2form.ai.api
 
 import okhttp3.MultipartBody
+import retrofit2.http.DELETE
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -111,11 +112,19 @@ interface ApiService {
     ): Result<T?>
 
     //Share via QR Code
-    @POST("api/forms/{formId}/scan")
+    @POST("api/forms/{formId}/publish")
     @Headers("Content-Type: application/json")
     suspend fun formShare(
         @Header("Authorization") authorization: String,
         @Path("formId") formId: String
     ): Result<ApiFormShare>
+
+    // Delete form by id
+    @DELETE("api/forms/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun deleteForm(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String
+    ): Result<ApiForm>
 
 }

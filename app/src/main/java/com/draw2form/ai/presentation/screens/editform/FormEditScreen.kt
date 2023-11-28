@@ -17,10 +17,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -52,6 +54,7 @@ import kotlinx.coroutines.launch
 fun FormEditScreen(
     items: List<UIComponent>,
     onMove: (Int, Int) -> Unit,
+    onPublish: () -> Unit,
     modifier: Modifier = Modifier,
     onUIComponentUpdate: (UIComponent) -> Unit
 ) {
@@ -62,17 +65,27 @@ fun FormEditScreen(
     var editSheetOpen by rememberSaveable {
         mutableStateOf<UIComponent?>(null)
     }
+    Column(modifier = Modifier.padding(16.dp)) {
 
-    LazyColumn(
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectDragGesturesAfterLongPress(
-                    onDrag = { change, offset ->
-                        change.consume()
-                        dragDropListState.onDrag(offset = offset)
+        Button(
+            onClick = onPublish,
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .align(Alignment.End)
+        ) {
+            Text("Publish")
+        }
 
-                        if (overScrollJob?.isActive == true)
-                            return@detectDragGesturesAfterLongPress
+        LazyColumn(
+            modifier = modifier
+                .pointerInput(Unit) {
+                    detectDragGesturesAfterLongPress(
+                        onDrag = { change, offset ->
+                            change.consume()
+                            dragDropListState.onDrag(offset = offset)
+
+                            if (overScrollJob?.isActive == true)
+                                return@detectDragGesturesAfterLongPress
 
                         dragDropListState
                             .checkForOverScroll()
@@ -146,6 +159,7 @@ fun FormEditScreen(
                 }
             }
             Spacer(modifier = Modifier.height(1.dp))
+        }
         }
     }
     editSheetOpen?.let {

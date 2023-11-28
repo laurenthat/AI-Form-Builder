@@ -170,6 +170,10 @@ data class ApiFormShare(
     val formId: String,
 )
 
+data class ApiFormId(
+    val formId: String?
+)
+
 
 fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email, "", picture)
 fun List<ApiUser>.toUserList(): List<User> = this.map { it.toUser() }
