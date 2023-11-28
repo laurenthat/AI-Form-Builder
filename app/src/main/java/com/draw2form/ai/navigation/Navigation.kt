@@ -43,6 +43,8 @@ fun Navigation(
     ) {
     val composableScope = rememberCoroutineScope()
 
+    val scope = rememberCoroutineScope()
+
     NavHost(
         navController,
         modifier = modifier,
@@ -94,7 +96,10 @@ fun Navigation(
             }
             FormEditScreen(apiUiElements.value ?: emptyList(),
                 onMove = { a, b ->
-            },
+                    scope.launch {
+                        userViewModel.swapUIComponents(apiUiElements.value ?: emptyList(), a, b)
+                    }
+                },
                 onPublish = {
                     composableScope.launch {
                         if (formId != null) {

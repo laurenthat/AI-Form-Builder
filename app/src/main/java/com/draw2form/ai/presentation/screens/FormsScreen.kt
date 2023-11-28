@@ -77,6 +77,45 @@ data class UIComponent(
             ?: image?.order
             ?: 0
     }
+    fun updateOrder(order: Int): UIComponent {
+        this.textField?.let {
+            return this.copy(
+                textField = this.textField.copy(order = order)
+            )
+        }
+        this.label?.let {
+            return this.copy(
+                label = this.label.copy(order = order)
+            )
+        }
+        this.checkbox?.let {
+            return this.copy(
+                checkbox = this.checkbox.copy(order = order)
+            )
+        }
+        this.toggleSwitch?.let {
+            return this.copy(
+                toggleSwitch = this.toggleSwitch.copy(order = order)
+            )
+        }
+        this.toggleSwitch?.let {
+            return this.copy(
+                toggleSwitch = this.toggleSwitch.copy(order = order)
+            )
+        }
+        this.button?.let {
+            return this.copy(
+                button = this.button.copy(order = order)
+            )
+        }
+        this.image?.let {
+            return this.copy(
+                image = this.image.copy(order = order)
+            )
+        }
+        throw Exception("Empty UIComponent not allowed")
+
+    }
 }
 
 @Composable
