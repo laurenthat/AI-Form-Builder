@@ -1,10 +1,12 @@
 package com.draw2form.ai.api
 
 import okhttp3.MultipartBody
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -58,6 +60,15 @@ interface ApiService {
     @GET("api/forms")
     @Headers("Content-Type: application/json")
     suspend fun getForms(@Header("Authorization") authorization: String): Result<List<ApiForm>>
+
+    @PATCH("/api/forms/{formId}/fields/label/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateFormLabel(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+        @Body newFormLabel: ApiFormLabel
+        ): Result<ApiFormLabel>
 
 
     @Multipart

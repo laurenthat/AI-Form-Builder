@@ -60,6 +60,15 @@ interface UIElement {
     val order: Int
 }
 
+data class UIComponent(
+    val textField: ApiFormTextField? = null,
+    val label: ApiFormLabel? = null,
+    val checkbox: ApiFormCheckbox? = null,
+    val toggleSwitch: ApiFormToggleSwitch? = null,
+    val button: ApiFormButton? = null,
+    val image: ApiFormImage? = null,
+)
+
 
 @Composable
 fun Label(label: String) {

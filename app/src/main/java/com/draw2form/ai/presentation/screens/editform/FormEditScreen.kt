@@ -41,36 +41,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.draw2form.ai.R
-import com.draw2form.ai.api.ApiFormButton
-import com.draw2form.ai.api.ApiFormCheckbox
-import com.draw2form.ai.api.ApiFormImage
-import com.draw2form.ai.api.ApiFormLabel
-import com.draw2form.ai.api.ApiFormTextField
-import com.draw2form.ai.api.ApiFormToggleSwitch
-import com.draw2form.ai.presentation.screens.Checkbox
-import com.draw2form.ai.presentation.screens.DynamicFormButton
-import com.draw2form.ai.presentation.screens.FormAsyncImage
 import com.draw2form.ai.presentation.screens.Label
 import com.draw2form.ai.presentation.screens.TextField
-import com.draw2form.ai.presentation.screens.ToggleSwitch
-import com.draw2form.ai.presentation.screens.UIElement
+import com.draw2form.ai.presentation.screens.UIComponent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormEditScreen(
-    items: List<UIElement>,
+    items: List<UIComponent>,
     onMove: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
-//    onClick: (text: String, picture: String) -> Unit
+    onUIComponentUpdate: (UIComponent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var overScrollJob by remember { mutableStateOf<Job?>(null) }
     val dragDropListState = rememberDragDropListState(onMove = onMove)
     val sheetState = rememberModalBottomSheetState()
     var editSheetOpen by rememberSaveable {
-        mutableStateOf<UIElement?>(null)
+        mutableStateOf<UIComponent?>(null)
     }
 
     LazyColumn(
@@ -102,7 +92,10 @@ fun FormEditScreen(
             .padding(top = 5.dp, start = 5.dp, end = 5.dp),
         state = dragDropListState.lazyListState
     ) {
-        itemsIndexed(items) { index, item ->
+        itemsIndexed(items, key = { index, item ->
+            println(item.toString())
+            item.toString()
+        }) { index, item ->
             Row(
                 modifier = Modifier
                     .composed {
@@ -156,63 +149,76 @@ fun FormEditScreen(
         }
     }
     editSheetOpen?.let {
+        var bottomSheetUIComponent by remember() {
+            mutableStateOf<UIComponent>(it.copy())
+        }
         ModalBottomSheet(
             sheetState = sheetState,
-            onDismissRequest = { editSheetOpen = null }) {
-            EditElementBottomSheet(it)
+            onDismissRequest = {
+                onUIComponentUpdate(bottomSheetUIComponent)
+                editSheetOpen = null
+            }
+        ) {
+            EditElementBottomSheet(bottomSheetUIComponent, onChange = {
+                bottomSheetUIComponent = it
+            })
+
         }
     }
 }
 
 @Composable
-fun EditElementBottomSheet(element: UIElement) {
+fun EditElementBottomSheet(
+    uiComponent: UIComponent,
+    onChange: (updatedUIComponent: UIComponent) -> Unit
+) {
     Column {
-        when (element) {
-            is ApiFormLabel -> Column {
-                var newElementState by rememberSaveable(saver = stateSaver()) {
-                    mutableStateOf<ApiFormLabel>(element.copy())
-                }
-                Label(newElementState.label)
-                TextField(label = "Label", value = newElementState.label, onChange = {
-                    var label = newElementState.copy(
-                        label = it
+        uiComponent.label?.let { labelComponent ->
+            Column {
+                Label(labelComponent.label)
+                TextField(label = "Label", value = labelComponent.label, onChange = {
+                    var updatedUIComponent = uiComponent.copy(
+                        label = labelComponent.copy(label = it)
                     )
-                    newElementState = label
+                    onChange(updatedUIComponent)
 
                 })
 //                label = label.copy(label = it)
 
             }
-
-            is ApiFormImage -> FormAsyncImage(
-                url = "https://placekitten.com/1000/500?image=12",
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-
-            is ApiFormTextField -> Column {
-//                TextField(label = "Label", value = element.label)
-
-            }
-
-            is ApiFormCheckbox -> Column {
-                Checkbox(element.label)
-//                TextField(label = "Label", value = element.label)
-
-            }
-
-            is ApiFormToggleSwitch -> Column {
-                ToggleSwitch(element.label)
-//                TextField(label = "Label", value = element.label)
-
-            }
-
-            is ApiFormButton -> Column {
-                DynamicFormButton(element.label)
-//                TextField(label = "Label", value = element.label)
-
-            }
         }
+//        when (element) {
+//            is ApiFormLabel ->
+//
+//            is ApiFormImage -> FormAsyncImage(
+//                url = "https://placekitten.com/1000/500?image=12",
+//                modifier = Modifier
+//                    .fillMaxSize()
+//            )
+//
+//            is ApiFormTextField -> Column {
+////                TextField(label = "Label", value = element.label)
+//
+//            }
+//
+//            is ApiFormCheckbox -> Column {
+//                Checkbox(element.label)
+////                TextField(label = "Label", value = element.label)
+//
+//            }
+//
+//            is ApiFormToggleSwitch -> Column {
+//                ToggleSwitch(element.label)
+////                TextField(label = "Label", value = element.label)
+//
+//            }
+//
+//            is ApiFormButton -> Column {
+//                DynamicFormButton(element.label)
+////                TextField(label = "Label", value = element.label)
+//
+//            }
+//        }
     }
 }
 
