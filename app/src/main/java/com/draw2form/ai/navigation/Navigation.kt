@@ -89,10 +89,11 @@ fun Navigation(
 
             LaunchedEffect(true) {
                 formId?.let {
-                    userViewModel.getUploadedFileDetails(it)
+                    userViewModel.getFormDetails(it)
                 }
             }
-            FormEditScreen(apiUiElements.value ?: emptyList(), onMove = { a, b ->
+            FormEditScreen(apiUiElements.value ?: emptyList(),
+                onMove = { a, b ->
             },
                 onPublish = {
                     composableScope.launch {
@@ -104,7 +105,13 @@ fun Navigation(
                         }
                     }
 
-                })
+                },
+                onUIComponentUpdate = {
+                    it.label?.let { formLabel ->
+                        userViewModel.updateFormLabel(formLabel = formLabel)
+                    }
+                }
+            )
         }
         /**
          * tab of the bottom navigation bar

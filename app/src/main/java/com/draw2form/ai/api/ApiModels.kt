@@ -122,7 +122,7 @@ data class ApiFormLabel(
     val form: ApiForm?,
     val formId: String,
     override val order: Int,
-    val label: String
+    var label: String
 ) : UIElement
 
 data class ApiImageEvent(
