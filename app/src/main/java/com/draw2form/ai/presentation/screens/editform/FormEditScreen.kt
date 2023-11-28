@@ -17,10 +17,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,6 +50,7 @@ import kotlinx.coroutines.launch
 fun FormEditScreen(
     items: List<UIElement>,
     onMove: (Int, Int) -> Unit,
+    onPublish: () -> Unit,
     modifier: Modifier = Modifier,
 //    onClick: (text: String, picture: String) -> Unit
 ) {
@@ -58,88 +61,101 @@ fun FormEditScreen(
     var isSheetOpen by rememberSaveable {
         mutableStateOf(false)
     }
+    Column(modifier = Modifier.padding(16.dp)) {
 
-    LazyColumn(
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectDragGesturesAfterLongPress(
-                    onDrag = { change, offset ->
-                        change.consume()
-                        dragDropListState.onDrag(offset = offset)
-
-                        if (overScrollJob?.isActive == true)
-                            return@detectDragGesturesAfterLongPress
-
-                        dragDropListState
-                            .checkForOverScroll()
-                            .takeIf { it != 0f }
-                            ?.let {
-                                overScrollJob = scope.launch {
-                                    dragDropListState.lazyListState.scrollBy(it)
-                                }
-                            } ?: kotlin.run { overScrollJob?.cancel() }
-                    },
-                    onDragStart = { offset -> dragDropListState.onDragStart(offset) },
-                    onDragEnd = { dragDropListState.onDragInterrupted() },
-                    onDragCancel = { dragDropListState.onDragInterrupted() }
-                )
-            }
-            .fillMaxSize()
-            .padding(top = 5.dp, start = 5.dp, end = 5.dp),
-        state = dragDropListState.lazyListState
-    ) {
-        itemsIndexed(items) { index, item ->
-            Row(
-                modifier = Modifier
-                    .composed {
-                        val offsetOrNull = dragDropListState.elementDisplacement.takeIf {
-                            index == dragDropListState.currentIndexOfDraggedItem
-                        }
-                        val scale = if (offsetOrNull != null) 1.1f else 1f
-                        Modifier
-                            .graphicsLayer {
-                                translationY = offsetOrNull ?: 0f
-                                scaleX = scale
-                                scaleY = scale
-                            }
-                    }
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .fillMaxWidth()
-                    .padding(5.dp)
-            ) {
-                Row {
-                    Icon(
-                        painter = painterResource(id = R.drawable.drag_indicator),
-                        contentDescription = null,
-                        tint = Color.LightGray,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .padding(0.dp)
-                    )
-                    Column(modifier = Modifier.fillMaxHeight()) {
-                        IconButton(
-                            onClick = { isSheetOpen = true },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = "Edit",
-                                tint = Color.LightGray
-
-                            )
-                        }
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete",
-                                tint = Color.Red
-                            )
-                        }
-                    }
-                    DynamicUI(element = item)
-                }
-            }
-            Spacer(modifier = Modifier.height(1.dp))
+        Button(
+            onClick = onPublish,
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .align(Alignment.End)
+        ) {
+            Text("Publish")
         }
+
+        LazyColumn(
+            modifier = modifier
+                .pointerInput(Unit) {
+                    detectDragGesturesAfterLongPress(
+                        onDrag = { change, offset ->
+                            change.consume()
+                            dragDropListState.onDrag(offset = offset)
+
+                            if (overScrollJob?.isActive == true)
+                                return@detectDragGesturesAfterLongPress
+
+                            dragDropListState
+                                .checkForOverScroll()
+                                .takeIf { it != 0f }
+                                ?.let {
+                                    overScrollJob = scope.launch {
+                                        dragDropListState.lazyListState.scrollBy(it)
+                                    }
+                                } ?: kotlin.run { overScrollJob?.cancel() }
+                        },
+                        onDragStart = { offset -> dragDropListState.onDragStart(offset) },
+                        onDragEnd = { dragDropListState.onDragInterrupted() },
+                        onDragCancel = { dragDropListState.onDragInterrupted() }
+                    )
+                }
+                .fillMaxSize()
+                .padding(top = 5.dp, start = 5.dp, end = 5.dp),
+            state = dragDropListState.lazyListState
+        ) {
+            itemsIndexed(items) { index, item ->
+                Row(
+                    modifier = Modifier
+                        .composed {
+                            val offsetOrNull = dragDropListState.elementDisplacement.takeIf {
+                                index == dragDropListState.currentIndexOfDraggedItem
+                            }
+                            val scale = if (offsetOrNull != null) 1.1f else 1f
+                            Modifier
+                                .graphicsLayer {
+                                    translationY = offsetOrNull ?: 0f
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
+                        }
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    Row {
+                        Icon(
+                            painter = painterResource(id = R.drawable.drag_indicator),
+                            contentDescription = null,
+                            tint = Color.LightGray,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(0.dp)
+                        )
+                        Column(modifier = Modifier.fillMaxHeight()) {
+                            IconButton(
+                                onClick = { isSheetOpen = true },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Edit",
+                                    tint = Color.LightGray
+
+                                )
+                            }
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Delete",
+                                    tint = Color.Red
+                                )
+                            }
+                        }
+                        DynamicUI(element = item)
+                    }
+                }
+                Spacer(modifier = Modifier.height(1.dp))
+            }
+
+        }
+
     }
     if (isSheetOpen) {
         ModalBottomSheet(
