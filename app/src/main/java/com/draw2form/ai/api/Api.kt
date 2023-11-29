@@ -71,6 +71,14 @@ interface ApiService {
         @Body newFormLabel: ApiFormLabel
     ): Result<ApiFormLabel>
 
+    @DELETE("/api/forms/{formId}/fields/label/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun deleteFormLabel(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+    ): Result<ApiFormLabel>
+
     @PATCH("/api/forms/{formId}/fields/text-field/{id}")
     @Headers("Content-Type: application/json")
     suspend fun updateFormTextField(
@@ -79,6 +87,14 @@ interface ApiService {
         @Path("formId") formId: String,
         @Body newFormTextField: ApiFormTextField
     ): Result<ApiFormTextField>
+
+    @DELETE("/api/forms/{formId}/fields/text-field/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun deleteFormTextField(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+    ): Result<ApiFormLabel>
 
     @PATCH("/api/forms/{formId}/fields/checkbox/{id}")
     @Headers("Content-Type: application/json")
@@ -89,6 +105,14 @@ interface ApiService {
         @Body newFormCheckbox: ApiFormCheckbox
     ): Result<ApiFormCheckbox>
 
+    @DELETE("/api/forms/{formId}/fields/checkbox/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun deleteFormCheckbox(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+    ): Result<ApiFormLabel>
+
     @PATCH("/api/forms/{formId}/fields/toggle-switch/{id}")
     @Headers("Content-Type: application/json")
     suspend fun updateFormToggleSwitch(
@@ -97,6 +121,14 @@ interface ApiService {
         @Path("formId") formId: String,
         @Body newFormToggleSwitch: ApiFormToggleSwitch
     ): Result<ApiFormToggleSwitch>
+
+    @DELETE("/api/forms/{formId}/fields/toggle-switch/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun deleteFormToggleSwitch(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+    ): Result<ApiFormLabel>
 
     @PATCH("/api/forms/{formId}/fields/button/{id}")
     @Headers("Content-Type: application/json")
@@ -107,6 +139,14 @@ interface ApiService {
         @Body newFormButton: ApiFormButton
     ): Result<ApiFormButton>
 
+    @DELETE("/api/forms/{formId}/fields/button/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun deleteFormButton(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+    ): Result<ApiFormLabel>
+    
 
     @Multipart
     @POST("api/forms")
