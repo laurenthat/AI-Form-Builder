@@ -57,6 +57,7 @@ fun FormEditScreen(
     onPublish: () -> Unit,
     modifier: Modifier = Modifier,
     onUIComponentUpdate: (UIComponent) -> Unit
+
 ) {
     val scope = rememberCoroutineScope()
     var overScrollJob by remember { mutableStateOf<Job?>(null) }
@@ -147,7 +148,8 @@ fun FormEditScreen(
 
                                 )
                             }
-                            IconButton(onClick = { /*TODO*/ }) {
+                            IconButton(onClick = {
+                            }) {
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
                                     contentDescription = "Delete",

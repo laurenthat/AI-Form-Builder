@@ -323,7 +323,6 @@ class UserViewModel(
         }
     }
 
-
     suspend fun formShareId(id: String) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -336,6 +335,25 @@ class UserViewModel(
                         Timber.d(it.toString())
                     }.onFailure {
                         println(it)
+                    }
+            }
+        }
+    }
+
+    fun deleteFormLabel(formLabel: ApiFormLabel) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteFormLabel(
+                    authorization,
+                    formId = formLabel.formId,
+                    id = formLabel.id,
+                )
+                    .onSuccess {
+                        getFormDetails(formLabel.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
                     }
             }
         }
