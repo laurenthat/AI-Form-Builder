@@ -1,6 +1,7 @@
 package com.draw2form.ai.application
 
 import android.app.Application
+import android.os.Build
 import com.draw2form.ai.application.connectivity.AppConnectivityManager
 import com.draw2form.ai.application.connectivity.InternetConnectionState
 import com.draw2form.ai.datasource.DataStore
@@ -40,6 +41,9 @@ class MyApplication : Application() {
 
         Timber.plant(Timber.DebugTree())
 
+        Timber.d("Build.VERSION.SDK_INT: ${Build.VERSION.SDK_INT}")
+
+        
         dataStore = DataStore(this)
 
         appConnectivityManager = AppConnectivityManager(this) {
