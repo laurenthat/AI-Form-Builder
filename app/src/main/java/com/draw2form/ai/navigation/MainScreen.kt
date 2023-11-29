@@ -44,6 +44,7 @@ fun MainScreen(
     val scannedForm = userViewModel.scannedForm.collectAsState(initial = null)
     val welcomeScreenSeen = userViewModel.welcomeScreenSeen.collectAsState(initial = null)
     val composableScope = rememberCoroutineScope()
+    val apiFormSubmission = userViewModel.apiFormSubmission.collectAsState(initial = null)
 
     // show loading screen at first if there is an intent
     val isLoading =
@@ -94,7 +95,10 @@ fun MainScreen(
         LoadingScreen()
 
     } else if (scannedForm.value != null) {
-        PublishedFormScreen(scannedFormState = scannedForm.value!!)
+
+        Timber.d("Scanned Form: ${scannedForm.value}")
+        //PublishedFormScreen(scannedForm.value!!, userViewModel)
+        PublishedFormScreen(scannedForm.value!!)
 
 
     } else if (welcomeScreenSeen.value == false) {

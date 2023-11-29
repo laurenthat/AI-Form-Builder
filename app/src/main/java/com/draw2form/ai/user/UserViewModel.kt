@@ -1,11 +1,13 @@
 package com.draw2form.ai.user
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.api.ApiFormButton
 import com.draw2form.ai.api.ApiFormCheckbox
 import com.draw2form.ai.api.ApiFormLabel
+import com.draw2form.ai.api.ApiFormSubmission
 import com.draw2form.ai.api.ApiFormTextField
 import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiService
@@ -39,6 +41,13 @@ class UserViewModel(
 
     private val _apiUiElements: MutableStateFlow<List<UIComponent>?> = MutableStateFlow(null)
     val apiUiElements: StateFlow<List<UIComponent>?> get() = _apiUiElements.asStateFlow()
+
+    private val _formFieldValues = mutableStateMapOf<String, Any>()
+    val formFieldValues: Map<String, Any> get() = _formFieldValues.toMap()
+
+    private val _apiFormSubmission = MutableStateFlow<ApiFormSubmission?>(null)
+    val apiFormSubmission: StateFlow<ApiFormSubmission?> = _apiFormSubmission
+
 
     /**
      * combines two flows together. here it combines userId and list of users and returns the user with that id.
@@ -196,6 +205,7 @@ class UserViewModel(
             }
         }
     }
+
     suspend fun publishForm(id: String, onSuccess: (form: ApiForm) -> Unit) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -380,6 +390,45 @@ class UserViewModel(
             }
         }
 
+    }
+
+    fun updateFormFieldValue(id: String, value: Any) {
+        _formFieldValues[id] = value
+
+        // Assuming that you have access to the necessary data within the UserViewModel
+        when (value) {
+            is String -> {
+                val textFieldResponse =
+                    _apiFormSubmission.value?.textFieldResponses?.find { it.textFieldId == id }
+                textFieldResponse?.value = value
+            }
+
+            is Boolean -> {
+                val checkboxResponse =
+                    _apiFormSubmission.value?.checkboxResponse?.find { it.checkboxId == id }
+                if (checkboxResponse != null) {
+                    checkboxResponse.value = value.toString()
+                } else {
+                    val toggleSwitchResponse =
+                        _apiFormSubmission.value?.toggleSwitchResponses?.find { it.toggleSwitchId == id }
+                    toggleSwitchResponse?.value = value.toString()
+                }
+            }
+        }
+    }
+
+
+    fun getFormFieldValue(id: String): Any? {
+        return _formFieldValues[id]
+    }
+
+    private fun submitForm(formSubmission: ApiFormSubmission) {
+        Timber.d("Form submitted with values: $_formFieldValues")
+        Timber.d("Form submission details: $formSubmission")
+    }
+
+    fun handleButtonClick() {
+        Timber.d("Submit Button clicked")
     }
 
 }
