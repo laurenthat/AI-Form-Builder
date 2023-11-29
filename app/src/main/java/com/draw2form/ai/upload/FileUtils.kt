@@ -5,10 +5,10 @@ import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import timber.log.Timber
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -31,12 +31,16 @@ object FileUtils {
      */
     @Throws(Exception::class)
     fun getFileFromUri(context: Context, uri: Uri): File {
+        Timber.d("getFileFromUri")
+
         var path: String? = null
 
         if (DocumentsContract.isDocumentUri(context, uri)) { // TODO: 2015. 11. 17. KITKAT
             println("isDocumentUri")
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
+                Timber.d("isExternalStorageDocument(uri)")
+
                 val docId = DocumentsContract.getDocumentId(uri)
                 val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 val type = split[0]
@@ -46,11 +50,10 @@ object FileUtils {
 
                 // TODO handle non-primary volumes
             } else if (isDownloadsDocument(uri)) { // DownloadsProvider
-                println("isDownloadsDocument")
-                println(Build.VERSION.SDK_INT)
+                Timber.d("isDownloadsDocument(uri)")
 
                 val id = DocumentsContract.getDocumentId(uri)
-                println(id)
+                Timber.d("DocumentsContract.getDocumentId(uri): $id")
 
                 if (id != null && id.startsWith("msf:")) {
                     val file = File(context.cacheDir, uri.lastPathSegment)
@@ -66,11 +69,11 @@ object FileUtils {
                                 }
                                 output.flush()
                                 path = file.path
-                                println("Path Savede: $path")
+                                Timber.d("Path Savede: $path")
                             }
                         }
                     } catch (ex: IOException) {
-                        println(ex)
+                        Timber.d(ex)
                         ex.printStackTrace()
                     }
                 } else {
@@ -82,7 +85,7 @@ object FileUtils {
                 }
 
             } else if (isMediaDocument(uri)) { // MediaProvider
-                println("isMediaDocument")
+                Timber.d("isMediaDocument")
 
                 val docId = DocumentsContract.getDocumentId(uri)
                 val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -101,7 +104,7 @@ object FileUtils {
                 )
                 path = getDataColumn(context, contentUri, selection, selectionArgs)
             } else if (isGoogleDrive(uri)) { // Google Drive
-                println("isGoogleDrive")
+                Timber.d("isGoogleDrive")
 
                 val TAG = "isGoogleDrive"
                 path = TAG
@@ -115,10 +118,10 @@ object FileUtils {
                      * */return saveFileIntoExternalStorageByUri(context, uri)
             } // MediaStore (and general)
         } else if ("content".equals(uri.scheme, ignoreCase = true)) {
-            println("\"content\".equals(uri.scheme")
+            Timber.d("\"content\".equals(uri.scheme")
             path = getDataColumn(context, uri, null, null)
         } else if ("file".equals(uri.scheme, ignoreCase = true)) {
-            println("\"file\".equals(uri.scheme")
+            Timber.d("\"file\".equals(uri.scheme")
             path = uri.path
         }
         return File(path)
@@ -143,9 +146,12 @@ object FileUtils {
      * @return The value of the _data column, which is typically a file path.
      */
     private fun getDataColumn(
-        context: Context, uri: Uri?, selection: String?,
+        context: Context,
+        uri: Uri?,
+        selection: String?,
         selectionArgs: Array<String>?
     ): String? {
+        Timber.d("getDataColumn: uri: ${uri} selection: ${selection} selectionArgs: ${selectionArgs}")
         var cursor: Cursor? = null
         val column = MediaStore.Images.Media.DATA
         val projection = arrayOf(

@@ -71,7 +71,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiForm
-import com.draw2form.ai.api.ApiUploadedFile
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.upload.FileUtils
 import com.draw2form.ai.user.User
@@ -454,18 +453,52 @@ fun HomeScreen(
 
                 },
                 onGalleryClick = {
-                    val hasReadExternalStoragePermission =
-                        ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        )
+                    Timber.d("onGalleryClick")
+                    val hasReadExternalStoragePermission = when (Build.VERSION.SDK_INT) {
+                        in 1..Build.VERSION_CODES.S_V2 -> {
+                            Timber.d("Checking Manifest.permission.READ_EXTERNAL_STORAGE Permission in Android 11 And Lower")
+
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                            )
+                        }
+                        // Android 12 And Higher
+                        else -> {
+                            Timber.d("Checking Manifest.permission.READ_MEDIA_IMAGES Permission in Android 12 And Higher")
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.READ_MEDIA_IMAGES
+                            )
+                        }
+                    }
+                    Timber.d("onGalleryClick hasReadExternalStoragePermission: $hasReadExternalStoragePermission")
+
+//                    val hasReadExternalStoragePermission =
+//
+//                        ContextCompat.checkSelfPermission(
+//                            context,
+//                            Manifest.permission.READ_EXTERNAL_STORAGE
+//                        )
 
                     if (hasReadExternalStoragePermission == PackageManager.PERMISSION_GRANTED) {
                         showProcessButton = true
                         launcher.launch("image/*")
 
                     } else {
-                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        when (Build.VERSION.SDK_INT) {
+                            in 1..Build.VERSION_CODES.S_V2 -> {
+                                Timber.d("Requesting Permission Manifest.permission.READ_EXTERNAL_STORAGE Permission in Android 11 And Lower")
+                                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+
+                            }
+                            // Android 12 And Higher
+                            else -> {
+                                Timber.d("Requesting Permission Manifest.permission.READ_MEDIA_IMAGES Permission in Android 12 And Higher")
+                                permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+
+                            }
+                        }
                     }
                 },
                 cameraText = "Camera",
