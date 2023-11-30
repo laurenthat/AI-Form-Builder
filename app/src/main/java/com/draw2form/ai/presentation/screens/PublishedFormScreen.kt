@@ -9,12 +9,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -54,87 +57,89 @@ fun FormInteractionUI(
     element: UIComponent,
     onInteraction: (UIComponent) -> Unit
 ) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        colors = CardColors(Color.White, Color.Black, Color.Transparent, Color.Transparent),
 
+        ) {
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        element.label?.let {
-            LabelComponent(it.label)
-        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            element.label?.let {
+                LabelComponent(it.label)
+            }
 
-        element.image?.let {
-            FormAsyncImageComponent(
-                url = "https://placekitten.com/1000/500?image=12",
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+            element.image?.let {
+                FormAsyncImageComponent(
+                    url = "https://placekitten.com/1000/500?image=12",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
-        element.textField?.let { apiField ->
-            TextFieldComponent(
-                label = apiField.label,
-                value = element.textFieldResponse?.value ?: "",
-                onValueChange = { text ->
-                    Timber.d("Form interaction textField: $text")
-                    onInteraction(
-                        element.copy(
-                            textFieldResponse = element.textFieldResponse?.copy(
-                                value = text
+            element.textField?.let { apiField ->
+                TextFieldComponent(
+                    label = apiField.label,
+                    value = element.textFieldResponse?.value ?: "",
+                    onValueChange = { text ->
+                        Timber.d("Form interaction textField: $text")
+                        onInteraction(
+                            element.copy(
+                                textFieldResponse = element.textFieldResponse?.copy(
+                                    value = text
+                                )
                             )
                         )
-                    )
-                }
-            )
-        }
+                    }
+                )
+            }
 
-        element.checkbox?.let {
-            CheckboxComponent(
-                label = it.label,
-                isChecked = false,
-                onCheckedChange = { isChecked ->
-                    Timber.d("FormInteractionUI Checkbox Interaction: $isChecked")
+            element.checkbox?.let {
+                CheckboxComponent(
+                    label = it.label,
+                    isChecked = element.checkboxResponse?.value ?: true,
+                    onCheckedChange = { isChecked ->
+                        Timber.d("FormInteractionUI Checkbox Interaction: $isChecked")
 
-                    onInteraction(
-                        element.copy(
-                            checkboxResponse = element.checkboxResponse?.copy(
-                                value = isChecked
+                        onInteraction(
+                            element.copy(
+                                checkboxResponse = element.checkboxResponse?.copy(
+                                    value = isChecked
+                                )
                             )
                         )
-                    )
-                }
-            )
-        }
+                    }
+                )
+            }
 
-        element.toggleSwitch?.let {
-            ToggleSwitchComponent(
-                label = it.label,
-                isChecked = false,
-                onCheckedChange = { isChecked ->
-                    Timber.d("FormInteractionUI ToggleSwitch Interaction: $isChecked")
+            element.toggleSwitch?.let {
+                ToggleSwitchComponent(
+                    label = it.label,
+                    isChecked = element.toggleSwitchResponse?.value ?: true,
+                    onCheckedChange = { isChecked ->
+                        Timber.d("FormInteractionUI ToggleSwitch Interaction: $isChecked")
 
-                    onInteraction(
-                        element.copy(
-                            toggleSwitchResponse = element.toggleSwitchResponse?.copy(
-                                value = isChecked
+                        onInteraction(
+                            element.copy(
+                                toggleSwitchResponse = element.toggleSwitchResponse?.copy(
+                                    value = isChecked
+                                )
                             )
                         )
-                    )
-                }
-            )
-        }
+                    }
+                )
+            }
 
-        element.button?.let {
-            DynamicFormButtonComponent(
-                label = it.label,
-                onClick = {
-                    onInteraction(
-                        element.copy(
-
-                        )
-                    )
-                }
-            )
+            element.button?.let {
+                DynamicFormButtonComponent(
+                    label = it.label,
+                    onClick = {
+                        Timber.d("${it.label} button clicked")
+                    }
+                )
+            }
         }
     }
-
 }
 
 @Composable
@@ -223,18 +228,4 @@ fun DynamicFormButtonComponent(label: String, onClick: () -> Unit) {
     }
 }
 
-
-sealed class FormInteractions {
-    data class TextFieldInteraction(val newText: String) : FormInteractions()
-    data class CheckboxInteraction(val isChecked: Boolean) : FormInteractions()
-    data class ToggleSwitchInteraction(val isSwitched: Boolean) : FormInteractions()
-    object ButtonClickInteraction : FormInteractions()
-}
-
-data class FormState(
-    val textFieldState: String = "",
-    val checkboxState: Boolean = false,
-    val toggleSwitchState: Boolean = false,
-    val buttonClicked: Boolean = false
-)
 
