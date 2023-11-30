@@ -23,10 +23,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.draw2form.ai.api.ApiFormButton
 import com.draw2form.ai.api.ApiFormCheckbox
+import com.draw2form.ai.api.ApiFormCheckboxResponse
 import com.draw2form.ai.api.ApiFormImage
 import com.draw2form.ai.api.ApiFormLabel
 import com.draw2form.ai.api.ApiFormTextField
+import com.draw2form.ai.api.ApiFormTextFieldResponse
 import com.draw2form.ai.api.ApiFormToggleSwitch
+import com.draw2form.ai.api.ApiFormToggleSwitchResponse
 import org.json.JSONArray
 
 
@@ -62,9 +65,12 @@ interface UIElement {
 
 data class UIComponent(
     val textField: ApiFormTextField? = null,
+    val textFieldResponse: ApiFormTextFieldResponse? = null,
     val label: ApiFormLabel? = null,
     val checkbox: ApiFormCheckbox? = null,
+    val checkboxResponse: ApiFormCheckboxResponse? = null,
     val toggleSwitch: ApiFormToggleSwitch? = null,
+    val toggleSwitchResponse: ApiFormToggleSwitchResponse? = null,
     val button: ApiFormButton? = null,
     val image: ApiFormImage? = null,
 ) {
@@ -77,6 +83,8 @@ data class UIComponent(
             ?: image?.order
             ?: 0
     }
+
+
     fun updateOrder(order: Int): UIComponent {
         this.textField?.let {
             return this.copy(
@@ -116,6 +124,8 @@ data class UIComponent(
         throw Exception("Empty UIComponent not allowed")
 
     }
+
+
 }
 
 @Composable
