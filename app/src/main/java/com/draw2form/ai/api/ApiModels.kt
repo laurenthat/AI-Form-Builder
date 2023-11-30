@@ -29,8 +29,6 @@ data class ApiForm(
     val upload: ApiUploadedFile?,
     val createdAt: String,
     val updatedAt: String
-
-
 )
 
 data class ApiFormSubmission(
@@ -61,7 +59,7 @@ data class ApiFormTextFieldResponse(
     val submissionId: String,
     val textField: ApiFormTextField?,
     val textFieldId: String,
-    val value: String
+    var value: String
 )
 
 data class ApiFormCheckbox(
@@ -79,7 +77,7 @@ data class ApiFormCheckboxResponse(
     val submissionId: String,
     val checkbox: ApiFormCheckbox?,
     val checkboxId: String,
-    val value: String
+    var value: Boolean
 )
 
 data class ApiFormToggleSwitch(
@@ -97,7 +95,7 @@ data class ApiFormToggleSwitchResponse(
     val submissionId: String,
     val toggleSwitch: ApiFormToggleSwitch?,
     val toggleSwitchId: String,
-    val value: String
+    var value: Boolean
 )
 
 data class ApiFormImage(
