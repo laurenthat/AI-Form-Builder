@@ -145,8 +145,11 @@ fun Navigation(
                     navController.navigate("forms/${it.id}/loading")
                 },
                 onBackClick = null,
+                onFormClick = {
+                    navController.navigate("forms/${it.id}/edit")
+                }
 
-                )
+            )
         }
         composable(
             "forms/{formId}/loading",

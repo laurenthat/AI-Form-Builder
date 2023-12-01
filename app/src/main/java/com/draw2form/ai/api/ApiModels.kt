@@ -77,7 +77,7 @@ data class ApiFormCheckboxResponse(
     val submissionId: String,
     val checkbox: ApiFormCheckbox?,
     val checkboxId: String,
-    var value: Boolean
+    val value: Boolean
 )
 
 data class ApiFormToggleSwitch(
@@ -95,7 +95,7 @@ data class ApiFormToggleSwitchResponse(
     val submissionId: String,
     val toggleSwitch: ApiFormToggleSwitch?,
     val toggleSwitchId: String,
-    var value: Boolean
+    val value: Boolean
 )
 
 data class ApiFormImage(
@@ -120,7 +120,7 @@ data class ApiFormLabel(
     val form: ApiForm?,
     val formId: String,
     override val order: Int,
-    var label: String
+    val label: String
 ) : UIElement
 
 data class ApiImageEvent(
