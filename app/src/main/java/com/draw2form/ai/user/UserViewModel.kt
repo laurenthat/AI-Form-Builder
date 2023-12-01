@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.api.ApiFormButton
 import com.draw2form.ai.api.ApiFormCheckbox
+import com.draw2form.ai.api.ApiFormImage
 import com.draw2form.ai.api.ApiFormLabel
 import com.draw2form.ai.api.ApiFormTextField
 import com.draw2form.ai.api.ApiFormToggleSwitch
@@ -402,6 +403,145 @@ class UserViewModel(
 
     }
 
+    fun addUiComponents(newUIComponent: UIComponent) {
+
+        val uiComponentsCopy = _apiUiElements.value?.toMutableList() ?: mutableListOf()
+        uiComponentsCopy.add(newUIComponent)
+        _apiUiElements.value = uiComponentsCopy
+
+    }
+
+
+    fun postFormTextField(textField: ApiFormTextField) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.postTextField(
+                    authorization,
+                    formId = textField.formId,
+                    newFormTextField = textField
+                )
+                    .onSuccess {
+                        addUiComponents(newUIComponent = UIComponent(textField = it))
+                        Timber.d("Added new form text field")
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+    }
+
+    fun postFormButton(button: ApiFormButton) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.postFormButton(
+                    authorization,
+                    formId = button.formId,
+                    newFormButton = button
+
+                )
+                    .onSuccess {
+                        addUiComponents(newUIComponent = UIComponent(button = it))
+                        Timber.d("Added new form button")
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+    }
+
+    fun postFormCheckbox(checkbox: ApiFormCheckbox) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.postFormCheckBox(
+                    authorization,
+                    formId = checkbox.formId,
+                    newFormCheckbox = checkbox
+
+                )
+                    .onSuccess {
+                        addUiComponents(newUIComponent = UIComponent(checkbox = it))
+                        Timber.d("Added new form checkbox")
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+    }
+
+    fun postFormToggleSwitch(toggleSwitch: ApiFormToggleSwitch) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.postFormToggleSwitch(
+                    authorization,
+                    formId = toggleSwitch.formId,
+                    newFormToggleSwitch = toggleSwitch
+
+                )
+                    .onSuccess {
+                        addUiComponents(newUIComponent = UIComponent(toggleSwitch = it))
+                        Timber.d("Added new form toggle switch")
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+    }
+
+    fun postFormImage(image: ApiFormImage) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.postFormImage(
+                    authorization,
+                    formId = image.formId,
+                    newFormImage = image
+
+                )
+                    .onSuccess {
+                        addUiComponents(newUIComponent = UIComponent(image = it))
+                        Timber.d("Added new form image")
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+    }
+
+    fun postFormLabel(label: ApiFormLabel) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.postFormLabel(
+                    authorization,
+                    formId = label.formId,
+                    newFormLabel = label
+
+                )
+                    .onSuccess {
+                        addUiComponents(newUIComponent = UIComponent(label = it))
+                        Timber.d("Added new form label")
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+    }
 }
 
 

@@ -128,6 +128,59 @@ fun Navigation(
                     it.button?.let { button ->
                         userViewModel.updateFormButton(button = button)
                     }
+                },
+                onAddUIComponent = { uiComponent ->
+                    uiComponent.label?.let { formLabel ->
+                        userViewModel.postFormLabel(
+                            label = formLabel.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.textField?.let { formTextField ->
+                        userViewModel.postFormTextField(
+                            textField = formTextField.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.checkbox?.let { formCheckbox ->
+                        userViewModel.postFormCheckbox(
+                            checkbox = formCheckbox.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.toggleSwitch?.let { formToggleSwitch ->
+                        userViewModel.postFormToggleSwitch(
+                            toggleSwitch = formToggleSwitch.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.button?.let { formButton ->
+                        userViewModel.postFormButton(
+                            button = formButton.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+
+                    }
+
+                    uiComponent.image?.let { formImage ->
+                        userViewModel.postFormImage(
+                            image = formImage.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
