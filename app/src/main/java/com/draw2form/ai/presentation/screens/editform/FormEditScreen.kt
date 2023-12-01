@@ -114,8 +114,10 @@ fun FormEditScreen(
     onPublish: () -> Unit,
     modifier: Modifier = Modifier,
     onUIComponentUpdate: (UIComponent) -> Unit,
+    onUIComponentDelete: (UIComponent) -> Unit,
     onAddUIComponent: (UIComponent) -> Unit,
     onBackClick: () -> Unit,
+
 ) {
     val scope = rememberCoroutineScope()
     var overScrollJob by remember { mutableStateOf<Job?>(null) }
@@ -236,6 +238,7 @@ fun FormEditScreen(
                                     )
                                 }
                                 IconButton(onClick = {
+                                    onUIComponentDelete(item)
                                 }) {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,
@@ -254,8 +257,6 @@ fun FormEditScreen(
 
 
     }
-
-
 }
 
 @Composable
@@ -346,7 +347,6 @@ fun <T> stateSaver() = Saver<MutableState<T>, Any>(
         mutableStateOf((if (value == "null") null else value) as T)
     }
 )
-
 
 @Preview(showBackground = true)
 @Composable

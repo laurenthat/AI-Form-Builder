@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.api.ApiFormButton
 import com.draw2form.ai.api.ApiFormCheckbox
+import com.draw2form.ai.api.ApiFormCheckboxResponse
 import com.draw2form.ai.api.ApiFormImage
 import com.draw2form.ai.api.ApiFormLabel
 import com.draw2form.ai.api.ApiFormTextField
+import com.draw2form.ai.api.ApiFormTextFieldResponse
 import com.draw2form.ai.api.ApiFormToggleSwitch
+import com.draw2form.ai.api.ApiFormToggleSwitchResponse
 import com.draw2form.ai.api.ApiService
 import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.api.toUser
@@ -36,10 +39,18 @@ class UserViewModel(
     val apiUploadedFileState: StateFlow<ApiUploadedFileState?> get() = _apiUploadedFileState.asStateFlow()
     private val _apiUserForms: MutableStateFlow<List<ApiForm>> = MutableStateFlow(emptyList())
     val apiUserForms: StateFlow<List<ApiForm>> get() = _apiUserForms.asStateFlow()
-    val scannedForm: MutableStateFlow<ApiForm?> = MutableStateFlow(null)
+
+    val scannedForm: MutableStateFlow<List<UIComponent>?> = MutableStateFlow(null)
+
 
     private val _apiUiElements: MutableStateFlow<List<UIComponent>?> = MutableStateFlow(null)
     val apiUiElements: StateFlow<List<UIComponent>?> get() = _apiUiElements.asStateFlow()
+
+
+    fun onScannedFormUpdated(updatedList: List<UIComponent>) {
+        scannedForm.value = updatedList
+    }
+
 
     /**
      * combines two flows together. here it combines userId and list of users and returns the user with that id.
@@ -84,6 +95,43 @@ class UserViewModel(
         }
 
     }
+
+    private fun convertApiFormToUIComponents(apiForm: ApiForm): List<UIComponent> {
+        val checkboxes = apiForm.checkboxes ?: listOf()
+        val textFields = apiForm.textFields ?: listOf()
+        val toggleSwitches = apiForm.toggleSwitches ?: listOf()
+        val buttons = apiForm.buttons ?: listOf()
+        val labels = apiForm.labels ?: listOf()
+        val images = apiForm.images ?: listOf()
+
+        val uiElements = mutableListOf<UIComponent>()
+
+        uiElements.addAll(checkboxes.map {
+            UIComponent(
+                checkbox = it,
+                checkboxResponse = ApiFormCheckboxResponse("", null, "", null, it.id, true)
+            )
+        })
+        uiElements.addAll(textFields.map {
+            UIComponent(
+                textField = it,
+                textFieldResponse = ApiFormTextFieldResponse("", null, "", null, it.id, "")
+            )
+        })
+        uiElements.addAll(toggleSwitches.map {
+            UIComponent(
+                toggleSwitch = it,
+                toggleSwitchResponse = ApiFormToggleSwitchResponse("", null, "", null, it.id, true)
+            )
+        })
+        uiElements.addAll(buttons.map { UIComponent(button = it) })
+        uiElements.addAll(labels.map { UIComponent(label = it) })
+        uiElements.addAll(images.map { UIComponent(image = it) })
+        uiElements.sortBy { it.order() }
+
+        return uiElements
+    }
+
 
     suspend fun insertItem(user: User) = userRepository.insertItem(user)
 
@@ -198,6 +246,24 @@ class UserViewModel(
         }
     }
 
+    fun deleteFormLabel(formLabel: ApiFormLabel) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteFormLabel(
+                    authorization,
+                    formId = formLabel.formId,
+                    id = formLabel.id,
+                )
+                    .onSuccess {
+                        getFormDetails(formLabel.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
 
     suspend fun publishForm(id: String, onSuccess: (form: ApiForm) -> Unit) {
         viewModelScope.launch {
@@ -227,7 +293,7 @@ class UserViewModel(
                     id
                 )
                     .onSuccess {
-                        scannedForm.value = it
+                        scannedForm.value = convertApiFormToUIComponents(it)
                         Timber.d(it.toString())
                     }.onFailure {
                         println(it)
@@ -245,6 +311,25 @@ class UserViewModel(
                     formId = textField.formId,
                     id = textField.id,
                     newFormTextField = textField
+                )
+                    .onSuccess {
+                        getFormDetails(textField.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+    fun deleteFormTextField(textField: ApiFormTextField) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteFormTextField(
+                    authorization,
+                    formId = textField.formId,
+                    id = textField.id,
                 )
                     .onSuccess {
                         getFormDetails(textField.formId)
@@ -276,6 +361,25 @@ class UserViewModel(
         }
     }
 
+    fun deleteFormCheckbox(checkbox: ApiFormCheckbox) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteFormCheckbox(
+                    authorization,
+                    formId = checkbox.formId,
+                    id = checkbox.id,
+                )
+                    .onSuccess {
+                        getFormDetails(checkbox.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
     fun updateFormToggleSwitch(toggleSwitch: ApiFormToggleSwitch) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -285,6 +389,25 @@ class UserViewModel(
                     formId = toggleSwitch.formId,
                     id = toggleSwitch.id,
                     newFormToggleSwitch = toggleSwitch
+                )
+                    .onSuccess {
+                        getFormDetails(toggleSwitch.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+    fun deleteFormToggleSwitch(toggleSwitch: ApiFormToggleSwitch) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteFormToggleSwitch(
+                    authorization,
+                    formId = toggleSwitch.formId,
+                    id = toggleSwitch.id,
                 )
                     .onSuccess {
                         getFormDetails(toggleSwitch.formId)
@@ -316,6 +439,45 @@ class UserViewModel(
         }
     }
 
+    fun deleteFormButton(button: ApiFormButton) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteFormButton(
+                    authorization,
+                    formId = button.formId,
+                    id = button.id,
+                )
+                    .onSuccess {
+                        getFormDetails(button.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+    fun deleteFormImage(image: ApiFormImage) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.deleteFormImage(
+                    authorization,
+                    formId = image.formId,
+                    id = image.id,
+                )
+                    .onSuccess {
+                        getFormDetails(image.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+        }
+    }
+
+
     suspend fun formShareId(id: String) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -333,24 +495,6 @@ class UserViewModel(
         }
     }
 
-    fun deleteFormLabel(formLabel: ApiFormLabel) {
-        viewModelScope.launch {
-            val authorization = dataStore.getAuthorizationHeaderValue.first()
-            authorization?.let {
-                apiService.deleteFormLabel(
-                    authorization,
-                    formId = formLabel.formId,
-                    id = formLabel.id,
-                )
-                    .onSuccess {
-                        getFormDetails(formLabel.formId)
-                    }
-                    .onFailure {
-                        Timber.d(it)
-                    }
-            }
-        }
-    }
 
     fun deleteFormItem(form: ApiForm) {
         val formsList = _apiUserForms.value

@@ -72,6 +72,8 @@ import coil.compose.AsyncImage
 import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.application.AppViewModelProvider
+import com.draw2form.ai.presentation.ui.theme.ErrorColor
+import com.draw2form.ai.presentation.ui.theme.SuccessColor
 import com.draw2form.ai.upload.FileUtils
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
@@ -295,6 +297,7 @@ fun HomeScreen(
     canGoBack: Boolean,
     onSuccessUpload: ((form: ApiForm) -> Unit)? = null,
     onBackClick: (() -> Unit)? = null,
+    onFormClick: (ApiForm) -> Unit
 ) {
     val context = LocalContext.current
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -396,8 +399,8 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
-            // horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+          
+            ) {
             ProfileCard(user = user)
             //Spacer(modifier = Modifier.height(10.dp))
             HorizontalDivider(modifier = Modifier.fillMaxWidth())
@@ -414,7 +417,7 @@ fun HomeScreen(
                 CategorizedLazyRow(
                     forms = forms, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp)
+                        .padding(4.dp), onFormClick
                 )
             }
 
@@ -561,7 +564,8 @@ fun HomeScreen(
 @Composable
 private fun CategorizedLazyRow(
     forms: List<ApiForm>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFormClick: (ApiForm) -> Unit,
 ) {
     val sortedForms = forms.sortedBy { it.name }
 
@@ -569,19 +573,22 @@ private fun CategorizedLazyRow(
         modifier = modifier
     ) {
         items(sortedForms) { form ->
-            MyFormItem(form)
+            MyFormItem(form, onFormClick = {
+                onFormClick(form)
+            })
         }
     }
 }
 
 @Composable
-fun MyFormItem(form: ApiForm) {
+fun MyFormItem(form: ApiForm, onFormClick: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .width(180.dp)
-        //.height(90.dp)
+            .fillMaxWidth()
+
     ) {
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -594,20 +601,39 @@ fun MyFormItem(form: ApiForm) {
                 Text(
                     text = form.name,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                Text(
-                    text = form.status, textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Status: ",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(end = 10.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = form.status,
+                        color = when (form.status.uppercase()) {
+                            "PUBLISHED" -> SuccessColor
+                            else -> ErrorColor
+                        },
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
 
             Button(
-                onClick = { /* Should direct to continue editing */ },
+                onClick = { onFormClick() },
                 modifier = Modifier
                     .height(35.dp)
-                    .width(80.dp)
-                    .padding(end = 0.dp)
+                    .width(90.dp)
+                    .padding(end = 10.dp)
             ) {
                 Text(text = "Open", fontSize = 10.sp, modifier = Modifier.fillMaxSize())
             }
@@ -666,6 +692,7 @@ fun ProfileScreenPreview() {
         onEditClick = {},
         canGoBack = false,
         onBackClick = null,
+        onFormClick = {}
     )
 }
 

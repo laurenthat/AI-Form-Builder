@@ -94,7 +94,10 @@ fun MainScreen(
         LoadingScreen()
 
     } else if (scannedForm.value != null) {
-        PublishedFormScreen(scannedFormState = scannedForm.value!!)
+        PublishedFormScreen(scannedFormState = scannedForm.value!!,
+            onInteraction = { updatedList ->
+                userViewModel.onScannedFormUpdated(updatedList)
+            })
 
 
     } else if (welcomeScreenSeen.value == false) {
