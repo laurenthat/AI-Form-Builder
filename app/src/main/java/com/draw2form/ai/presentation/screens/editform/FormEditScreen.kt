@@ -56,7 +56,8 @@ fun FormEditScreen(
     onMove: (Int, Int) -> Unit,
     onPublish: () -> Unit,
     modifier: Modifier = Modifier,
-    onUIComponentUpdate: (UIComponent) -> Unit
+    onUIComponentUpdate: (UIComponent) -> Unit,
+    onUIComponentDelete: (UIComponent) -> Unit
 
 ) {
     val scope = rememberCoroutineScope()
@@ -149,6 +150,7 @@ fun FormEditScreen(
                                 )
                             }
                             IconButton(onClick = {
+                                onUIComponentDelete(item)
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
