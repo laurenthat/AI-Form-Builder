@@ -207,8 +207,7 @@ fun Navigation(
                         userViewModel.postFormImage(
                             image = formImage.copy(
                                 formId = formId ?: ""
-                            ),
-                            imgFile = null
+                            )
                         )
                     }
                 },
