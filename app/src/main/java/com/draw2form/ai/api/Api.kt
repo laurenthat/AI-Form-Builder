@@ -212,4 +212,61 @@ interface ApiService {
         @Path("id") id: String
     ): Result<ApiForm>
 
+    // Create new form components
+    @POST("/api/forms/{formId}/fields/label")
+    @Headers("Content-Type: application/json")
+    suspend fun postFormLabel(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+        @Body newFormLabel: ApiFormLabel
+    ): Result<ApiFormLabel>
+
+    @POST("/api/forms/{formId}/fields/checkbox")
+    @Headers("Content-Type: application/json")
+    suspend fun postFormCheckBox(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+        @Body newFormCheckbox: ApiFormCheckbox
+    ): Result<ApiFormCheckbox>
+
+    @POST("/api/forms/{formId}/fields/toggle-switch")
+    @Headers("Content-Type: application/json")
+    suspend fun postFormToggleSwitch(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+        @Body newFormToggleSwitch: ApiFormToggleSwitch
+    ): Result<ApiFormToggleSwitch>
+
+    @POST("/api/forms/{formId}/fields/button")
+    @Headers("Content-Type: application/json")
+    suspend fun postFormButton(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+        @Body newFormButton: ApiFormButton
+    ): Result<ApiFormButton>
+
+    @POST("/api/forms/{formId}/fields/image")
+    @Headers("Content-Type: application/json")
+    suspend fun postFormImageWithoutImage(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+    ): Result<ApiFormImage>
+
+    @Multipart
+    @POST("/api/forms/{formId}/fields/image")
+    suspend fun postFormImage(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+        @Part image: MultipartBody.Part?
+    ): Result<ApiFormImage>
+
+
+    @POST("api/forms/{formId}/fields/text-field")
+    @Headers("Content-Type: application/json")
+    suspend fun postTextField(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+        @Body newFormTextField: ApiFormTextField
+    ): Result<ApiFormTextField>
+
 }
