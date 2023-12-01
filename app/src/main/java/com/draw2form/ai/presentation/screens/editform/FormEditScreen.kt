@@ -118,7 +118,7 @@ fun FormEditScreen(
     onAddUIComponent: (UIComponent) -> Unit,
     onBackClick: () -> Unit,
 
-) {
+    ) {
     val scope = rememberCoroutineScope()
     var overScrollJob by remember { mutableStateOf<Job?>(null) }
     val dragDropListState = rememberDragDropListState(onMove = onMove)
@@ -133,7 +133,7 @@ fun FormEditScreen(
             FormEditScreenTopBar(
                 scrollBehavior = scrollBehavior,
                 onBackClick = onBackClick,
-                onPublish = {}
+                onPublish = { onPublish() }
             )
         },
         bottomBar = {
