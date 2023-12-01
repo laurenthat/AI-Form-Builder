@@ -237,12 +237,12 @@ interface ApiService {
         @Body newFormButton: ApiFormButton
     ): Result<ApiFormButton>
 
+    @Multipart
     @POST("/api/forms/{formId}/fields/image")
-    @Headers("Content-Type: application/json")
     suspend fun postFormImage(
         @Header("Authorization") authorization: String,
         @Path("formId") formId: String,
-        @Body newFormImage: ApiFormImage
+        @Part image: MultipartBody.Part?
     ): Result<ApiFormImage>
 
 

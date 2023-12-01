@@ -499,15 +499,14 @@ class UserViewModel(
         }
     }
 
-    fun postFormImage(image: ApiFormImage) {
+    fun postFormImage(imgFile: MultipartBody.Part?, image: ApiFormImage) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
             authorization?.let {
                 apiService.postFormImage(
                     authorization,
                     formId = image.formId,
-                    newFormImage = image
-
+                    imgFile,
                 )
                     .onSuccess {
                         addUiComponents(newUIComponent = UIComponent(image = it))
