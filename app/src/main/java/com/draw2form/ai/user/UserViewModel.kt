@@ -13,6 +13,7 @@ import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiFormToggleSwitchResponse
 import com.draw2form.ai.api.ApiService
 import com.draw2form.ai.api.ApiUploadedFileState
+import com.draw2form.ai.api.NewFormSubmissionRequestBody
 import com.draw2form.ai.api.toUser
 import com.draw2form.ai.datasource.DataStore
 import com.draw2form.ai.presentation.screens.UIComponent
@@ -282,6 +283,26 @@ class UserViewModel(
         }
     }
 
+    fun submitForm(formId: String, formBody: NewFormSubmissionRequestBody) {
+        viewModelScope.launch {
+
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.submitFormApi(
+                    authorization,
+                    formId,
+                    formBody,
+                )
+                    .onSuccess {
+                        Timber.d(it.toString())
+                    }.onFailure {
+                        println(it)
+                    }
+            }
+        }
+
+    }
+
     fun updateFormTextField(textField: ApiFormTextField) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -448,6 +469,7 @@ class UserViewModel(
         }
 
     }
+
 
 }
 

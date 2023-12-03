@@ -172,6 +172,27 @@ data class ApiFormId(
     val formId: String?
 )
 
+data class NewFormSubmissionTextFieldResponse(
+    val id: String,
+    var value: String
+)
+
+data class NewFormSubmissionCheckboxResponse(
+    val id: String,
+    var value: Boolean
+)
+
+data class NewFormSubmissionToggleSwitchResponse(
+    val id: String,
+    var value: Boolean
+)
+
+data class NewFormSubmissionRequestBody(
+    val textFieldResponses: List<NewFormSubmissionTextFieldResponse>,
+    val checkboxResponse: List<NewFormSubmissionCheckboxResponse>,
+    val toggleSwitchResponses: List<NewFormSubmissionToggleSwitchResponse>
+)
+
 
 fun ApiUser.toUser(): User = User(UUID.fromString(id), name, email, "", picture)
 fun List<ApiUser>.toUserList(): List<User> = this.map { it.toUser() }

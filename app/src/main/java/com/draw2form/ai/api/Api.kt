@@ -146,7 +146,7 @@ interface ApiService {
         @Path("id") id: String,
         @Path("formId") formId: String,
     ): Result<ApiFormLabel>
-    
+
 
     @Multipart
     @POST("api/forms")
@@ -203,5 +203,14 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Path("id") id: String
     ): Result<ApiForm>
+
+    @POST("/api/forms/{formId}/submit")
+    @Headers("Content-Type: application/json")
+    suspend fun submitFormApi(
+        @Header("Authorization") authorization: String?,
+        @Path("formId") formId: String,
+        @Body request: NewFormSubmissionRequestBody
+    ): Result<Boolean>
+
 
 }
