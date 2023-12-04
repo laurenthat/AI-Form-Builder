@@ -14,7 +14,7 @@ import com.draw2form.ai.presentation.screens.ToggleSwitch
 import com.draw2form.ai.presentation.screens.UIComponent
 
 @Composable
-fun DynamicUI(element: UIComponent, onImageClick: () -> Unit) {
+fun DynamicUI(element: UIComponent) {
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         element.label?.let {
@@ -22,10 +22,9 @@ fun DynamicUI(element: UIComponent, onImageClick: () -> Unit) {
         }
         element.image?.let {
             FormAsyncImage(
-                url = "https://placekitten.com/1000/500?image=12",
+                url = it.url ?: "https://placekitten.com/1000/500?image=12",
                 modifier = Modifier
                     .fillMaxSize(),
-                onClick = onImageClick
             )
         }
         element.textField?.let {

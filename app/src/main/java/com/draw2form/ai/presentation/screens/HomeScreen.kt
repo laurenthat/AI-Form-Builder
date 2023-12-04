@@ -129,7 +129,6 @@ fun HomeScreen(
                 },
                 cameraText = "Camera",
                 galleryText = "Gallery"
-
             )
             if (showProcessButton) {
                 Button(

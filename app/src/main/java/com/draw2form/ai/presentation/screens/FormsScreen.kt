@@ -1,6 +1,5 @@
 package com.draw2form.ai.presentation.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -143,11 +142,10 @@ fun Label(label: String) {
 
 @Composable
 fun FormAsyncImage(
-    url: String, modifier: Modifier, onClick: () -> Unit
+    url: String, modifier: Modifier
 ) {
     val imageModifier = Modifier
         .fillMaxSize()
-        .clickable { onClick() }
     AsyncImage(
         model = url,
         contentDescription = "profile photo",
