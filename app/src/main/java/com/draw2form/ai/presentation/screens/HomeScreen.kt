@@ -30,7 +30,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -126,10 +125,8 @@ fun createMultipartBody(imageAbsolutePath: String): MultipartBody.Part {
 @Composable
 fun UserProfileScreenTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
-    canEdit: Boolean,
     canGoBack: Boolean,
     onBackClick: (() -> Unit)?,
-    onEditClick: (() -> Unit)?
 ) {
     MediumTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -157,21 +154,6 @@ fun UserProfileScreenTopBar(
                     )
                 }
 
-            }
-        },
-        actions = {
-            if (canEdit) {
-                IconButton(
-                    modifier = Modifier,
-                    onClick = { onEditClick?.let { it() } }
-                ) {
-                    Icon(
-                        Icons.Filled.Edit,
-                        contentDescription = "Edit",
-                        modifier = Modifier
-                            .padding(horizontal = 3.dp)
-                    )
-                }
             }
         },
         scrollBehavior = scrollBehavior
@@ -292,8 +274,6 @@ fun UploadCard(
 @Composable
 fun HomeScreen(
     user: User,
-    canEdit: Boolean,
-    onEditClick: (() -> Unit)? = null,
     canGoBack: Boolean,
     onSuccessUpload: ((form: ApiForm) -> Unit)? = null,
     onBackClick: (() -> Unit)? = null,
@@ -382,8 +362,6 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             UserProfileScreenTopBar(
-                canEdit = canEdit,
-                onEditClick = onEditClick,
                 canGoBack = canGoBack,
                 onBackClick = onBackClick,
                 scrollBehavior = scrollBehavior
@@ -399,7 +377,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
-          
+
             ) {
             ProfileCard(user = user)
             //Spacer(modifier = Modifier.height(10.dp))
@@ -688,8 +666,6 @@ fun ProfileScreenPreview() {
         }
     HomeScreen(
         user.value,
-        canEdit = true,
-        onEditClick = {},
         canGoBack = false,
         onBackClick = null,
         onFormClick = {}
