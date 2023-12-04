@@ -23,7 +23,6 @@ import com.draw2form.ai.presentation.components.NoInternetConnectionBarComponent
 import com.draw2form.ai.presentation.screens.LoadingScreen
 import com.draw2form.ai.presentation.screens.LoginScreen
 import com.draw2form.ai.presentation.screens.PublishedFormScreen
-import com.draw2form.ai.presentation.screens.UIComponent
 import com.draw2form.ai.presentation.screens.WelcomeScreen
 import com.draw2form.ai.user.UserViewModel
 import com.google.gson.Gson
@@ -96,13 +95,12 @@ fun MainScreen(
 
     } else if (scannedForm.value != null) {
 
-        val uiComponents: List<UIComponent>? = scannedForm.value
-        PublishedFormScreen(scannedFormState = scannedForm.value!!,
+        PublishedFormScreen(scannedFormState = scannedForm.value!!.second,
             onInteraction = { updatedList ->
                 userViewModel.onScannedFormUpdated(updatedList)
             },
-            onSubmitClicked = { formId, formSubmission ->
-                userViewModel.submitForm(formId, formSubmission)
+            onSubmitClicked = { formSubmission ->
+                userViewModel.submitForm(scannedForm.value!!.first.id, formSubmission)
             }
         )
 

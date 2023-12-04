@@ -210,7 +210,7 @@ interface ApiService {
         @Header("Authorization") authorization: String?,
         @Path("formId") formId: String,
         @Body request: NewFormSubmissionRequestBody
-    ): Result<Boolean>
+    ): Result<ApiFormSubmission>
 
 
 }

@@ -40,7 +40,7 @@ class UserViewModel(
     private val _apiUserForms: MutableStateFlow<List<ApiForm>> = MutableStateFlow(emptyList())
     val apiUserForms: StateFlow<List<ApiForm>> get() = _apiUserForms.asStateFlow()
 
-    val scannedForm: MutableStateFlow<List<UIComponent>?> = MutableStateFlow(null)
+    val scannedForm: MutableStateFlow<Pair<ApiForm, List<UIComponent>>?> = MutableStateFlow(null)
 
 
     private val _apiUiElements: MutableStateFlow<List<UIComponent>?> = MutableStateFlow(null)
@@ -48,7 +48,11 @@ class UserViewModel(
 
 
     fun onScannedFormUpdated(updatedList: List<UIComponent>) {
-        scannedForm.value = updatedList
+        scannedForm.value?.let {
+            scannedForm.value = it.copy(
+                second = updatedList
+            )
+        }
     }
 
 
@@ -274,7 +278,7 @@ class UserViewModel(
                     id
                 )
                     .onSuccess {
-                        scannedForm.value = convertApiFormToUIComponents(it)
+                        scannedForm.value = Pair(it, convertApiFormToUIComponents(it))
                         Timber.d(it.toString())
                     }.onFailure {
                         println(it)
@@ -284,6 +288,7 @@ class UserViewModel(
     }
 
     fun submitForm(formId: String, formBody: NewFormSubmissionRequestBody) {
+        Timber.d("Form Id: $formId, formBody: $formBody")
         viewModelScope.launch {
 
             val authorization = dataStore.getAuthorizationHeaderValue.first()
@@ -294,6 +299,7 @@ class UserViewModel(
                     formBody,
                 )
                     .onSuccess {
+
                         Timber.d(it.toString())
                     }.onFailure {
                         println(it)

@@ -23,7 +23,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.draw2form.ai.api.ApiFormTextFieldResponse
 import com.draw2form.ai.api.NewFormSubmissionCheckboxResponse
 import com.draw2form.ai.api.NewFormSubmissionRequestBody
 import com.draw2form.ai.api.NewFormSubmissionTextFieldResponse
@@ -34,7 +33,7 @@ import timber.log.Timber
 fun PublishedFormScreen(
     scannedFormState: List<UIComponent>,
     onInteraction: (List<UIComponent>) -> Unit,
-    onSubmitClicked: (id: String, formSubmission: NewFormSubmissionRequestBody) -> Unit
+    onSubmitClicked: (formSubmission: NewFormSubmissionRequestBody) -> Unit
 ) {
     Timber.d("Scanned form state: $scannedFormState")
 
@@ -44,19 +43,36 @@ fun PublishedFormScreen(
             .padding(10.dp)
     ) {
         itemsIndexed(scannedFormState) { index, uiComponent ->
-            Timber.d("Scanned form state: $scannedFormState")
+            // Timber.d("Scanned form state: $scannedFormState")
 
             FormInteractionUI(
                 element = uiComponent,
-                onInteraction = { updatedComponent ->
+                onElementUpdated = { updatedComponent ->
                     val listCopy = scannedFormState.toMutableList()
                     listCopy[index] = updatedComponent
                     onInteraction(listCopy)
                     Timber.d("updated Component: $updatedComponent")
                 },
-                scannedFormState,
-                onSubmitClicked = { formId, formSubmission ->
-                    onSubmitClicked(formId, formSubmission)
+                onSubmitClicked = {
+                    val checkboxResponse = scannedFormState.mapNotNull { it.checkboxResponse }.map {
+                        NewFormSubmissionCheckboxResponse(it.checkboxId, it.value)
+                    }
+                    val textFieldResponse =
+                        scannedFormState.mapNotNull { it.textFieldResponse }.map {
+                            NewFormSubmissionTextFieldResponse(it.textFieldId, it.value)
+                        }
+                    val toggleSwitchResponse =
+                        scannedFormState.mapNotNull { it.toggleSwitchResponse }.map {
+                            NewFormSubmissionToggleSwitchResponse(it.toggleSwitchId, it.value)
+                        }
+
+                    val newFormSubmissionRequestBody = NewFormSubmissionRequestBody(
+                        textFieldResponse, checkboxResponse, toggleSwitchResponse
+                    )
+
+                    onSubmitClicked(
+                        newFormSubmissionRequestBody
+                    )
                 }
             )
         }
@@ -67,27 +83,9 @@ fun PublishedFormScreen(
 @Composable
 fun FormInteractionUI(
     element: UIComponent,
-    onInteraction: (UIComponent) -> Unit,
-    storedComponents: List<UIComponent>,
-    onSubmitClicked: (id: String, formSubmission: NewFormSubmissionRequestBody) -> Unit
+    onElementUpdated: (UIComponent) -> Unit,
+    onSubmitClicked: () -> Unit
 ) {
-    Timber.d("Stored Components:$storedComponents")
-
-    val textFieldRes: ApiFormTextFieldResponse? = storedComponents
-        .mapNotNull { it.textFieldResponse }
-        .firstOrNull()
-    val tfId = storedComponents.firstNotNullOfOrNull { it.textFieldResponse?.id ?: "" }
-    val tfVal = storedComponents.firstNotNullOfOrNull { it.textFieldResponse?.value ?: "" }
-
-    val cbId = storedComponents.firstNotNullOfOrNull { it.checkboxResponse?.id ?: "" }
-    val cbVal = storedComponents.firstNotNullOfOrNull { it.checkboxResponse?.value ?: true }
-
-    val tsId = storedComponents.firstNotNullOfOrNull { it.toggleSwitchResponse?.id ?: "" }
-    val tsVal = storedComponents.firstNotNullOfOrNull { it.toggleSwitchResponse?.value ?: true }
-
-
-
-    Timber.d("Values: $tfId: $tfVal, for checkbox: $cbVal, for toggleSwitch: $tsVal")
 
     Card(
         modifier = Modifier
@@ -114,8 +112,7 @@ fun FormInteractionUI(
                     label = apiField.label,
                     value = element.textFieldResponse?.value ?: "",
                     onValueChange = { text ->
-                        Timber.d("Form interaction textField: $text")
-                        onInteraction(
+                        onElementUpdated(
                             element.copy(
                                 textFieldResponse = element.textFieldResponse?.copy(
                                     value = text
@@ -131,9 +128,8 @@ fun FormInteractionUI(
                     label = it.label,
                     isChecked = element.checkboxResponse?.value ?: true,
                     onCheckedChange = { isChecked ->
-                        Timber.d("FormInteractionUI Checkbox Interaction: $isChecked")
 
-                        onInteraction(
+                        onElementUpdated(
                             element.copy(
                                 checkboxResponse = element.checkboxResponse?.copy(
                                     value = isChecked
@@ -149,9 +145,7 @@ fun FormInteractionUI(
                     label = it.label,
                     isChecked = element.toggleSwitchResponse?.value ?: true,
                     onCheckedChange = { isChecked ->
-                        Timber.d("FormInteractionUI ToggleSwitch Interaction: $isChecked")
-
-                        onInteraction(
+                        onElementUpdated(
                             element.copy(
                                 toggleSwitchResponse = element.toggleSwitchResponse?.copy(
                                     value = isChecked
@@ -162,48 +156,17 @@ fun FormInteractionUI(
                 )
             }
 
-            element.button?.let { it ->
+            element.button?.let {
                 Timber.d("Inside the button block ${element.button}")
 
                 DynamicFormButtonComponent(
                     label = it.label,
                     onClick = {
-                        Timber.d("Inside the button block in DynamicButtonComp")
-                        Timber.d("Inside the button block in DynamicButtonComp $element")
-                        element.label.let {
-                            Timber.d("label inside Dynamic Button: ${element.label} ")
-                            val formSubmission = NewFormSubmissionRequestBody(
-                                textFieldResponses = listOf(
-                                    NewFormSubmissionTextFieldResponse(
-                                        id = textFieldRes?.id ?: "",
-                                        value = textFieldRes?.value ?: ""
-                                    )
-                                ),
-                                checkboxResponse = listOf(
-                                    NewFormSubmissionCheckboxResponse(
-                                        id = cbId ?: "",
-                                        value = cbVal ?: true
-                                    )
-                                ),
-                                toggleSwitchResponses = listOf(
-                                    NewFormSubmissionToggleSwitchResponse(
-                                        id = tsId ?: "",
-                                        value = tsVal ?: true
-
-                                    )
-                                )
-
-                            )
-
-                            //Timber.d("${it.label} button clicked")
-                            Timber.d("Submitted Form id: ${element.label?.formId}")
-                            Timber.d("Submitted form response: $formSubmission")
-                            it?.formId?.let { it1 -> onSubmitClicked(it1, formSubmission) }
-
-
-                        }
+                        onSubmitClicked()
 
                     }
+
+
                 )
             }
         }
