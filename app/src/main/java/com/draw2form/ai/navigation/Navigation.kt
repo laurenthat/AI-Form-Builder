@@ -24,6 +24,7 @@ import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
 import com.draw2form.ai.presentation.screens.ShareFormScreen
+import com.draw2form.ai.presentation.screens.UIComponent
 import com.draw2form.ai.presentation.screens.editform.FormEditScreen
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
@@ -128,6 +129,90 @@ fun Navigation(
                     it.button?.let { button ->
                         userViewModel.updateFormButton(button = button)
                     }
+                },
+                onUIComponentDelete = { deletedItem ->
+                    when (deletedItem) {
+                        is UIComponent -> {
+                            when {
+                                deletedItem.label != null -> userViewModel.deleteFormLabel(
+                                    deletedItem.label
+                                )
+
+                                deletedItem.textField != null -> userViewModel.deleteFormTextField(
+                                    deletedItem.textField
+                                )
+
+                                deletedItem.checkbox != null -> userViewModel.deleteFormCheckbox(
+                                    deletedItem.checkbox
+                                )
+
+                                deletedItem.toggleSwitch != null -> userViewModel.deleteFormToggleSwitch(
+                                    deletedItem.toggleSwitch
+                                )
+
+                                deletedItem.button != null -> userViewModel.deleteFormButton(
+                                    deletedItem.button
+                                )
+
+                                deletedItem.image != null -> userViewModel.deleteFormImage(
+                                    deletedItem.image
+                                )
+                            }
+                        }
+                    }
+                },
+                onAddUIComponent = { uiComponent ->
+                    uiComponent.label?.let { formLabel ->
+                        userViewModel.postFormLabel(
+                            label = formLabel.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.textField?.let { formTextField ->
+                        userViewModel.postFormTextField(
+                            textField = formTextField.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.checkbox?.let { formCheckbox ->
+                        userViewModel.postFormCheckbox(
+                            checkbox = formCheckbox.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.toggleSwitch?.let { formToggleSwitch ->
+                        userViewModel.postFormToggleSwitch(
+                            toggleSwitch = formToggleSwitch.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+
+                    uiComponent.button?.let { formButton ->
+                        userViewModel.postFormButton(
+                            button = formButton.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+
+                    }
+
+                    uiComponent.image?.let { formImage ->
+                        userViewModel.postFormImage(
+                            image = formImage.copy(
+                                formId = formId ?: ""
+                            )
+                        )
+                    }
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
