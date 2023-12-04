@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -28,6 +29,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -57,9 +60,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.application.AppViewModelProvider
+import com.draw2form.ai.presentation.icons.Forms
 import com.draw2form.ai.presentation.ui.theme.LinkUpTheme
 import com.draw2form.ai.user.UserViewModel
-
+import kotlinx.datetime.Instant.Companion.parse
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,6 +101,7 @@ fun FormsListScreen(
     val userForms = userViewModel.apiUserForms.collectAsState(emptyList())
     var forms = userForms.value
 
+
     LaunchedEffect(true) {
         userViewModel.getUserForms()
     }
@@ -111,6 +118,7 @@ fun FormsListScreen(
         showClearIcon = true
     }
 
+
     val filteredForms = if (searchQuery.isEmpty()) {
         forms
     } else {
@@ -118,6 +126,7 @@ fun FormsListScreen(
             form.name.contains(searchQuery, ignoreCase = true)
         }
     }
+
 
     Scaffold(
         topBar = {
@@ -180,12 +189,14 @@ fun FormsListScreen(
 
             LazyColumn(
                 modifier
-                    .padding(start = 10.dp, end = 10.dp)
+                    .padding(start = 5.dp, end = 5.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 itemsIndexed(
-                    items = filteredForms,
+                    items = filteredForms.sortedBy {
+                        parse(it.createdAt).epochSeconds
+                    }.reversed(),
                     key = { _, item -> item.id }) { index, form ->
 
                     val state = rememberDismissState(
@@ -236,7 +247,11 @@ fun FormsListScreen(
 
 
 @Composable
-fun FormListItem(form: ApiForm, onFormClick: () -> Unit) {
+fun FormListItem(
+    form: ApiForm,
+    onFormClick: () -> Unit,
+) {
+
 
     ListItem(
         modifier = Modifier.clickable(
@@ -244,40 +259,51 @@ fun FormListItem(form: ApiForm, onFormClick: () -> Unit) {
                 onFormClick()
             }
         ),
-        headlineContent = { },
-
-        supportingContent = { },
-        leadingContent = {
-            Column(
+        headlineContent = {
+            Text(
+                text = form.name,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-            ) {
-                Text(
-                    text = form.name,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(10.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                /*Text(
-                    text = "Date: ${form.date}", textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(10.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )*/
-                Text(
-                    text = form.status, textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(10.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+                    .padding(bottom = 8.dp)
+            )
+        },
+        supportingContent = {
+            Text(
+                text = run {
+                    val date =
+                        parse(form.createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
+                    "${date.date} ${date.time.hour}:${date.time.minute}"
 
+                },
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelMedium
+            )
+        },
+        leadingContent = {
+            Icon(
+                imageVector = Icons.Filled.Forms,
+                contentDescription = "Form",
+                modifier = Modifier
+                    .size(50.dp),
+            )
+        },
+        trailingContent = {
+            SuggestionChip(
+                onClick = { },
+                shape = RoundedCornerShape(15.dp),
+                border = SuggestionChipDefaults.suggestionChipBorder(Color.Transparent),
+                label = { Text(text = form.status, fontSize = 12.sp, color = Color.Black) },
+                colors = SuggestionChipDefaults.suggestionChipColors(
+                    containerColor =
+                    if (form.status == "DRAFT") Color(
+                        255, 247, 147
+                    ) else Color(182, 253, 192)
+                ),
+                modifier = Modifier
+
+
+            )
         }
 
     )
@@ -285,6 +311,7 @@ fun FormListItem(form: ApiForm, onFormClick: () -> Unit) {
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(10.dp)
             .width(1.dp),
     )
 

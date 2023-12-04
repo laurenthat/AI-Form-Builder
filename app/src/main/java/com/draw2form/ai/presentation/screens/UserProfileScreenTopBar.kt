@@ -23,10 +23,8 @@ import com.draw2form.ai.R
 @Composable
 fun UserProfileScreenTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
-    canEdit: Boolean,
     canGoBack: Boolean,
     onBackClick: (() -> Unit)?,
-    onEditClick: (() -> Unit)?
 ) {
     MediumTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -54,21 +52,6 @@ fun UserProfileScreenTopBar(
                     )
                 }
 
-            }
-        },
-        actions = {
-            if (canEdit) {
-                IconButton(
-                    modifier = Modifier,
-                    onClick = { onEditClick?.let { it() } }
-                ) {
-                    Icon(
-                        Icons.Filled.Edit,
-                        contentDescription = "Edit",
-                        modifier = Modifier
-                            .padding(horizontal = 3.dp)
-                    )
-                }
             }
         },
         scrollBehavior = scrollBehavior

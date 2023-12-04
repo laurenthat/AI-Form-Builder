@@ -228,8 +228,6 @@ fun Navigation(
         composable("home") {
             HomeScreen(
                 user,
-                canEdit = true,
-                onEditClick = { navController.navigate("profile/edit") },
                 canGoBack = false,
                 onSuccessUpload = {
                     navController.navigate("forms/${it.id}/loading")

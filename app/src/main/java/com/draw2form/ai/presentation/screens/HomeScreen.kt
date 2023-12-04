@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -45,8 +47,6 @@ import java.util.UUID
 @Composable
 fun HomeScreen(
     user: User,
-    canEdit: Boolean,
-    onEditClick: (() -> Unit)? = null,
     canGoBack: Boolean,
     onSuccessUpload: ((form: ApiForm) -> Unit)? = null,
     onBackClick: (() -> Unit)? = null,
@@ -70,8 +70,6 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             UserProfileScreenTopBar(
-                canEdit = canEdit,
-                onEditClick = onEditClick,
                 canGoBack = canGoBack,
                 onBackClick = onBackClick,
                 scrollBehavior = scrollBehavior
@@ -195,8 +193,6 @@ fun ProfileScreenPreview() {
         }
     HomeScreen(
         user.value,
-        canEdit = true,
-        onEditClick = {},
         canGoBack = false,
         onBackClick = null,
         onFormClick = {}

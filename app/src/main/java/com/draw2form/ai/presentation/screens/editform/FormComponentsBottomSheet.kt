@@ -1,6 +1,5 @@
 package com.draw2form.ai.presentation.screens.editform
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,18 +26,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiFormButton
 import com.draw2form.ai.api.ApiFormCheckbox
 import com.draw2form.ai.api.ApiFormImage
 import com.draw2form.ai.api.ApiFormLabel
 import com.draw2form.ai.api.ApiFormTextField
 import com.draw2form.ai.api.ApiFormToggleSwitch
+import com.draw2form.ai.presentation.icons.Button
+import com.draw2form.ai.presentation.icons.CheckBox
+import com.draw2form.ai.presentation.icons.Image
+import com.draw2form.ai.presentation.icons.Label
+import com.draw2form.ai.presentation.icons.TextField
+import com.draw2form.ai.presentation.icons.ToggleSwitch
 import com.draw2form.ai.presentation.screens.UIComponent
 import timber.log.Timber
 
@@ -51,12 +54,12 @@ fun FormComponentsBottomSheet(onAdd: (UIComponent) -> Unit) {
     }
 
     val componentList = listOf(
-        Component(painterResource(R.drawable.text_field), "Text Field"),
-        Component(painterResource(R.drawable.toggle_switch), "Toggle Switch"),
-        Component(painterResource(R.drawable.check_box), "Check Box"),
-        Component(painterResource(R.drawable.button), "Button"),
-        Component(painterResource(R.drawable.label), "Label"),
-        Component(painterResource(R.drawable.image), "Image"),
+        Component(Icons.Filled.TextField, "Text Field"),
+        Component(Icons.Filled.ToggleSwitch, "Toggle Switch"),
+        Component(Icons.Filled.CheckBox, "Check Box"),
+        Component(Icons.Filled.Button, "Button"),
+        Component(Icons.Filled.Label, "Label"),
+        Component(Icons.Filled.Image, "Image"),
     )
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -125,13 +128,13 @@ private fun ComponentLazyColumn(
 }
 
 data class Component(
-    val componentImage: Painter,
+    val componentImage: ImageVector,
     val text: String,
 )
 
 @Composable
 private fun ComponentItem(
-    componentImage: Painter,
+    componentImage: ImageVector,
     text: String,
     onAdd: (UIComponent) -> Unit,
 ) {
@@ -231,11 +234,10 @@ private fun ComponentItem(
                 }
             }
     ) {
-        Image(
-            painter = componentImage,
+        Icon(
+            imageVector = componentImage,
             contentDescription = text,
-            modifier = Modifier
-                .size(80.dp)
+            modifier = Modifier.size(100.dp)
         )
         Text(
             text = text,
