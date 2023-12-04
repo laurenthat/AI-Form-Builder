@@ -100,7 +100,9 @@ fun MainScreen(
                 userViewModel.onScannedFormUpdated(updatedList)
             },
             onSubmitClicked = { formSubmission ->
-                userViewModel.submitForm(scannedForm.value!!.first.id, formSubmission)
+                userViewModel.submitForm(scannedForm.value!!.first.id, formSubmission) { onResult ->
+                    navController.navigate("scanResult/${onResult}")
+                }
             }
         )
 

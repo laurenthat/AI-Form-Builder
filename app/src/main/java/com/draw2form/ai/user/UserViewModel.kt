@@ -280,8 +280,10 @@ class UserViewModel(
                 )
                     .onSuccess {
                         onSuccess(it)
-                        Timber.d(it.toString())
+                        Timber.d("Success result: $it")
+
                     }.onFailure {
+                        Timber.d("Failed result: $it")
                         println(it)
                     }
             }
@@ -307,7 +309,11 @@ class UserViewModel(
         }
     }
 
-    fun submitForm(formId: String, formBody: NewFormSubmissionRequestBody) {
+    fun submitForm(
+        formId: String,
+        formBody: NewFormSubmissionRequestBody,
+        onResult: (Boolean) -> Unit
+    ) {
         Timber.d("Form Id: $formId, formBody: $formBody")
         viewModelScope.launch {
 
@@ -319,9 +325,11 @@ class UserViewModel(
                     formBody,
                 )
                     .onSuccess {
-
-                        Timber.d(it.toString())
+                        onResult(true)
+                        Timber.d("Success result: $it")
                     }.onFailure {
+                        onResult(false)
+                        Timber.d("Success result: $it")
                         println(it)
                     }
             }
