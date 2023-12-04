@@ -690,6 +690,27 @@ class UserViewModel(
         }
     }
 
+    fun updateFormImage(image: ApiFormImage, file: MultipartBody.Part) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.updateFormImage(
+                    authorization,
+                    formId = image.formId,
+                    id = image.id,
+                    image = file
+                )
+                    .onSuccess {
+                        getFormDetails(image.formId)
+                    }
+                    .onFailure {
+                        Timber.d(it)
+                    }
+            }
+
+        }
+    }
+
     fun postFormLabel(label: ApiFormLabel) {
         viewModelScope.launch {
             val authorization = dataStore.getAuthorizationHeaderValue.first()

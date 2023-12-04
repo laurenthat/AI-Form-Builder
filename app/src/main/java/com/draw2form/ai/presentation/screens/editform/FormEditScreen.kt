@@ -54,8 +54,10 @@ import com.draw2form.ai.R
 import com.draw2form.ai.presentation.screens.Label
 import com.draw2form.ai.presentation.screens.TextField
 import com.draw2form.ai.presentation.screens.UIComponent
+import com.draw2form.ai.presentation.screens.UploadCard
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,6 +116,7 @@ fun FormEditScreen(
     onPublish: () -> Unit,
     modifier: Modifier = Modifier,
     onUIComponentUpdate: (UIComponent) -> Unit,
+    onImageUIComponentUpdate: (component: UIComponent, file: MultipartBody.Part) -> Unit,
     onUIComponentDelete: (UIComponent) -> Unit,
     onAddUIComponent: (UIComponent) -> Unit,
     onBackClick: () -> Unit,
@@ -150,8 +153,9 @@ fun FormEditScreen(
                 ) {
                     EditElementBottomSheet(bottomSheetUIComponent, onChange = {
                         bottomSheetUIComponent = it
+                    }, onImageSelected = { file ->
+                        onImageUIComponentUpdate(it, file)
                     })
-
                 }
             }
             FormComponentsBottomSheet(
@@ -164,8 +168,11 @@ fun FormEditScreen(
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { padding ->
-        Column(modifier = Modifier.padding(16.dp)) {
-
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .padding(top = 100.dp),
+        ) {
             LazyColumn(
                 modifier = modifier
                     .pointerInput(Unit) {
@@ -191,8 +198,8 @@ fun FormEditScreen(
                             onDragCancel = { dragDropListState.onDragInterrupted() }
                         )
                     }
-                    .fillMaxSize()
-                    .padding(top = 5.dp, start = 5.dp, end = 5.dp),
+                    .fillMaxSize(),
+//                    .padding(top = 5.dp, start = 5.dp, end = 5.dp),
                 state = dragDropListState.lazyListState
             ) {
                 itemsIndexed(items, key = { index, item ->
@@ -262,7 +269,8 @@ fun FormEditScreen(
 @Composable
 fun EditElementBottomSheet(
     uiComponent: UIComponent,
-    onChange: (updatedUIComponent: UIComponent) -> Unit
+    onChange: (updatedUIComponent: UIComponent) -> Unit,
+    onImageSelected: (body: MultipartBody.Part) -> Unit
 ) {
     //
     Column {
@@ -333,6 +341,20 @@ fun EditElementBottomSheet(
                     )
                     onChange(updatedUIComponent)
                 })
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+
+        uiComponent.image?.let { buttonComponent ->
+            Column {
+                UploadCard(
+                    cameraText = "Camera",
+                    galleryText = "Gallery",
+                    onBitmapReady = {},
+                    onMultipartBodyReady = {
+                        onImageSelected(it)
+                    }
+                )
                 Spacer(modifier = Modifier.height(100.dp))
             }
         }
