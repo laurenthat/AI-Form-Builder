@@ -1,7 +1,9 @@
 package com.draw2form.ai.presentation.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -140,11 +142,16 @@ fun Label(label: String) {
 }
 
 @Composable
-fun FormAsyncImage(url: String, modifier: Modifier) {
+fun FormAsyncImage(
+    url: String, modifier: Modifier, onClick: () -> Unit
+) {
+    val imageModifier = Modifier
+        .fillMaxSize()
+        .clickable { onClick() }
     AsyncImage(
         model = url,
         contentDescription = "profile photo",
-        modifier = Modifier,
+        modifier = imageModifier,
         contentScale = ContentScale.Crop
     )
 }

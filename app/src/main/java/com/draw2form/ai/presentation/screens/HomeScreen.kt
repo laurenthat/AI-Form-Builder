@@ -1,50 +1,28 @@
 package com.draw2form.ai.presentation.screens
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,239 +32,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.application.AppViewModelProvider
-import com.draw2form.ai.presentation.ui.theme.ErrorColor
-import com.draw2form.ai.presentation.ui.theme.SuccessColor
 import com.draw2form.ai.upload.FileUtils
 import com.draw2form.ai.user.User
 import com.draw2form.ai.user.UserViewModel
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import com.draw2form.ai.util.createImageFile
+import com.draw2form.ai.util.createMultipartBody
+import com.draw2form.ai.util.loadBitmap
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import timber.log.Timber
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Objects
 import java.util.UUID
 
-
 const val MY_PACKAGE = "com.draw2form.ai"
-
-fun Context.createImageFile(): File {
-
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val imageFileName = "draw2form_" + timeStamp + "_"
-    val image = File.createTempFile(
-        imageFileName,
-        ".jpg",
-        externalCacheDir
-    )
-    return image
-
-}
-
-private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
-    return if (Build.VERSION.SDK_INT < 28) {
-        MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-    } else {
-        val source = ImageDecoder.createSource(context.contentResolver, uri)
-        ImageDecoder.decodeBitmap(source)
-    }
-}
-
-fun createMultipartBody(imageAbsolutePath: String): MultipartBody.Part {
-
-    val file = File(imageAbsolutePath)
-    val mediaType = "multipart/form-data".toMediaTypeOrNull()
-
-    val requestBody = file.asRequestBody(mediaType)
-    return MultipartBody.Part.createFormData(name = "image", file.name, requestBody)
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UserProfileScreenTopBar(
-    scrollBehavior: TopAppBarScrollBehavior,
-    canEdit: Boolean,
-    canGoBack: Boolean,
-    onBackClick: (() -> Unit)?,
-    onEditClick: (() -> Unit)?
-) {
-    MediumTopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Text(
-                stringResource(R.string.home_screen),
-                style = MaterialTheme.typography.labelLarge,
-                fontSize = 20.sp
-            )
-        },
-        navigationIcon = {
-            if (canGoBack) {
-                IconButton(
-                    modifier = Modifier,
-                    onClick = { onBackClick?.let { it() } }
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        modifier = Modifier
-                            .padding(horizontal = 3.dp)
-                    )
-                }
-
-            }
-        },
-        actions = {
-            if (canEdit) {
-                IconButton(
-                    modifier = Modifier,
-                    onClick = { onEditClick?.let { it() } }
-                ) {
-                    Icon(
-                        Icons.Filled.Edit,
-                        contentDescription = "Edit",
-                        modifier = Modifier
-                            .padding(horizontal = 3.dp)
-                    )
-                }
-            }
-        },
-        scrollBehavior = scrollBehavior
-    )
-}
-
-@Composable
-fun ProfileCard(user: User) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(6.dp)
-    ) {
-        Column(modifier = Modifier.padding(15.dp)) {
-            Text(
-                text = "Hello, " + user.name,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-            Text(
-                text = "Welcome to AI Form Builder",
-                fontSize = 16.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        AsyncImage(
-            model = user.picture,
-            contentDescription = "profile photo",
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(50.dp))
-        )
-    }
-}
-
-@Composable
-fun UploadCard(
-    onCameraClick: () -> Unit,
-    onGalleryClick: () -> Unit,
-    cameraText: String,
-    galleryText: String
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .height(140.dp),
-        elevation = CardDefaults.cardElevation(),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                verticalAlignment = Alignment.Top // Align items at the top
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.icon_upload),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(34.dp)
-                        .clip(CircleShape)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column(modifier = Modifier.padding(bottom = 16.dp, top = 8.dp)) {
-                    Text(text = "Upload your image", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = onCameraClick,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Text(text = cameraText, modifier = Modifier.padding(2.dp))
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Button(
-                    onClick = onGalleryClick,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Text(text = galleryText, modifier = Modifier.padding(2.dp))
-                }
-            }
-
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -399,7 +168,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
-          
+
             ) {
             ProfileCard(user = user)
             //Spacer(modifier = Modifier.height(10.dp))
@@ -559,117 +328,6 @@ fun HomeScreen(
         }
     }
 }
-
-
-@Composable
-private fun CategorizedLazyRow(
-    forms: List<ApiForm>,
-    modifier: Modifier = Modifier,
-    onFormClick: (ApiForm) -> Unit,
-) {
-    val sortedForms = forms.sortedBy { it.name }
-
-    LazyRow(
-        modifier = modifier
-    ) {
-        items(sortedForms) { form ->
-            MyFormItem(form, onFormClick = {
-                onFormClick(form)
-            })
-        }
-    }
-}
-
-@Composable
-fun MyFormItem(form: ApiForm, onFormClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-
-    ) {
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(10.dp, 12.dp, 20.dp, 12.dp)
-            ) {
-
-                Text(
-                    text = form.name,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Row(
-                    modifier = Modifier.padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Status: ",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(end = 10.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = form.status,
-                        color = when (form.status.uppercase()) {
-                            "PUBLISHED" -> SuccessColor
-                            else -> ErrorColor
-                        },
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-            Button(
-                onClick = { onFormClick() },
-                modifier = Modifier
-                    .height(35.dp)
-                    .width(90.dp)
-                    .padding(end = 10.dp)
-            ) {
-                Text(text = "Open", fontSize = 10.sp, modifier = Modifier.fillMaxSize())
-            }
-        }
-    }
-
-}
-
-
-@Composable
-fun NoDraftCard() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        elevation = CardDefaults.cardElevation()
-    ) {
-
-        // Show Lottie animation for empty draft
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Image(
-                painter = painterResource(R.drawable.empty_draft),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(90.dp)
-                    .width(100.dp)
-            )
-            Text("No drafts found", fontSize = 16.sp)
-        }
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable

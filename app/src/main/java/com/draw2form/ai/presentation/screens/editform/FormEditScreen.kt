@@ -164,8 +164,11 @@ fun FormEditScreen(
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { padding ->
-        Column(modifier = Modifier.padding(16.dp)) {
-
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .padding(top = 100.dp),
+        ) {
             LazyColumn(
                 modifier = modifier
                     .pointerInput(Unit) {
@@ -191,8 +194,8 @@ fun FormEditScreen(
                             onDragCancel = { dragDropListState.onDragInterrupted() }
                         )
                     }
-                    .fillMaxSize()
-                    .padding(top = 5.dp, start = 5.dp, end = 5.dp),
+                    .fillMaxSize(),
+//                    .padding(top = 5.dp, start = 5.dp, end = 5.dp),
                 state = dragDropListState.lazyListState
             ) {
                 itemsIndexed(items, key = { index, item ->
@@ -247,7 +250,7 @@ fun FormEditScreen(
                                     )
                                 }
                             }
-                            DynamicUI(element = item)
+                            DynamicUI(element = item, onImageClick = {})
                         }
                     }
                     Spacer(modifier = Modifier.height(1.dp))
