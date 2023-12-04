@@ -155,6 +155,15 @@ interface ApiService {
         @Path("formId") formId: String,
     ): Result<ApiFormImage>
 
+    @Multipart
+    @PATCH("/api/forms/{formId}/fields/image/{id}")
+    suspend fun updateFormImage(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("formId") formId: String,
+        @Part image: MultipartBody.Part
+    ): Result<ApiFormImage>
+
 
     @Multipart
     @POST("api/forms")
@@ -211,6 +220,15 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Path("id") id: String
     ): Result<ApiForm>
+
+    @POST("/api/forms/{formId}/submit")
+    @Headers("Content-Type: application/json")
+    suspend fun submitFormApi(
+        @Header("Authorization") authorization: String?,
+        @Path("formId") formId: String,
+        @Body request: NewFormSubmissionRequestBody
+    ): Result<ApiFormSubmission>
+
 
     // Create new form components
     @POST("/api/forms/{formId}/fields/label")

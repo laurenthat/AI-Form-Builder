@@ -213,6 +213,11 @@ fun Navigation(
                 },
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onImageUIComponentUpdate = { component, file ->
+                    component.image?.let { image ->
+                        userViewModel.updateFormImage(image, file)
+                    }
                 }
             )
         }

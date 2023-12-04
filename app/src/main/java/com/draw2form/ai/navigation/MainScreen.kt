@@ -94,10 +94,15 @@ fun MainScreen(
         LoadingScreen()
 
     } else if (scannedForm.value != null) {
-        PublishedFormScreen(scannedFormState = scannedForm.value!!,
+
+        PublishedFormScreen(scannedFormState = scannedForm.value!!.second,
             onInteraction = { updatedList ->
                 userViewModel.onScannedFormUpdated(updatedList)
-            })
+            },
+            onSubmitClicked = { formSubmission ->
+                userViewModel.submitForm(scannedForm.value!!.first.id, formSubmission)
+            }
+        )
 
 
     } else if (welcomeScreenSeen.value == false) {
