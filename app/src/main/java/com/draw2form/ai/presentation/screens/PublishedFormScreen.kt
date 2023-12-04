@@ -23,12 +23,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.draw2form.ai.api.NewFormSubmissionCheckboxResponse
+import com.draw2form.ai.api.NewFormSubmissionRequestBody
+import com.draw2form.ai.api.NewFormSubmissionTextFieldResponse
+import com.draw2form.ai.api.NewFormSubmissionToggleSwitchResponse
 import timber.log.Timber
 
 @Composable
 fun PublishedFormScreen(
     scannedFormState: List<UIComponent>,
-    onInteraction: (List<UIComponent>) -> Unit
+    onInteraction: (List<UIComponent>) -> Unit,
+    onSubmitClicked: (formSubmission: NewFormSubmissionRequestBody) -> Unit
 ) {
     Timber.d("Scanned form state: $scannedFormState")
 
@@ -38,15 +43,38 @@ fun PublishedFormScreen(
             .padding(10.dp)
     ) {
         itemsIndexed(scannedFormState) { index, uiComponent ->
-            Timber.d("Scanned form state: $scannedFormState")
+            // Timber.d("Scanned form state: $scannedFormState")
+
             FormInteractionUI(
-                element = uiComponent
-            ) { updatedComponent ->
-                val listCopy = scannedFormState.toMutableList()
-                listCopy[index] = updatedComponent
-                onInteraction(listCopy)
-                Timber.d("updated Component: $updatedComponent")
-            }
+                element = uiComponent,
+                onElementUpdated = { updatedComponent ->
+                    val listCopy = scannedFormState.toMutableList()
+                    listCopy[index] = updatedComponent
+                    onInteraction(listCopy)
+                    Timber.d("updated Component: $updatedComponent")
+                },
+                onSubmitClicked = {
+                    val checkboxResponse = scannedFormState.mapNotNull { it.checkboxResponse }.map {
+                        NewFormSubmissionCheckboxResponse(it.checkboxId, it.value)
+                    }
+                    val textFieldResponse =
+                        scannedFormState.mapNotNull { it.textFieldResponse }.map {
+                            NewFormSubmissionTextFieldResponse(it.textFieldId, it.value)
+                        }
+                    val toggleSwitchResponse =
+                        scannedFormState.mapNotNull { it.toggleSwitchResponse }.map {
+                            NewFormSubmissionToggleSwitchResponse(it.toggleSwitchId, it.value)
+                        }
+
+                    val newFormSubmissionRequestBody = NewFormSubmissionRequestBody(
+                        textFieldResponse, checkboxResponse, toggleSwitchResponse
+                    )
+
+                    onSubmitClicked(
+                        newFormSubmissionRequestBody
+                    )
+                }
+            )
         }
     }
 }
@@ -55,8 +83,10 @@ fun PublishedFormScreen(
 @Composable
 fun FormInteractionUI(
     element: UIComponent,
-    onInteraction: (UIComponent) -> Unit
+    onElementUpdated: (UIComponent) -> Unit,
+    onSubmitClicked: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,8 +112,7 @@ fun FormInteractionUI(
                     label = apiField.label,
                     value = element.textFieldResponse?.value ?: "",
                     onValueChange = { text ->
-                        Timber.d("Form interaction textField: $text")
-                        onInteraction(
+                        onElementUpdated(
                             element.copy(
                                 textFieldResponse = element.textFieldResponse?.copy(
                                     value = text
@@ -99,9 +128,8 @@ fun FormInteractionUI(
                     label = it.label,
                     isChecked = element.checkboxResponse?.value ?: true,
                     onCheckedChange = { isChecked ->
-                        Timber.d("FormInteractionUI Checkbox Interaction: $isChecked")
 
-                        onInteraction(
+                        onElementUpdated(
                             element.copy(
                                 checkboxResponse = element.checkboxResponse?.copy(
                                     value = isChecked
@@ -117,9 +145,7 @@ fun FormInteractionUI(
                     label = it.label,
                     isChecked = element.toggleSwitchResponse?.value ?: true,
                     onCheckedChange = { isChecked ->
-                        Timber.d("FormInteractionUI ToggleSwitch Interaction: $isChecked")
-
-                        onInteraction(
+                        onElementUpdated(
                             element.copy(
                                 toggleSwitchResponse = element.toggleSwitchResponse?.copy(
                                     value = isChecked
@@ -131,11 +157,16 @@ fun FormInteractionUI(
             }
 
             element.button?.let {
+                Timber.d("Inside the button block ${element.button}")
+
                 DynamicFormButtonComponent(
                     label = it.label,
                     onClick = {
-                        Timber.d("${it.label} button clicked")
+                        onSubmitClicked()
+
                     }
+
+
                 )
             }
         }
@@ -219,7 +250,10 @@ fun ToggleSwitchComponent(label: String, isChecked: Boolean, onCheckedChange: (B
 @Composable
 fun DynamicFormButtonComponent(label: String, onClick: () -> Unit) {
     Button(
-        onClick = onClick,
+        onClick = {
+            Timber.d("Button clicked")
+            onClick()
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)

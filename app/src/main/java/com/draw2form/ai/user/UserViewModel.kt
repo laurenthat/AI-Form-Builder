@@ -14,6 +14,7 @@ import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiFormToggleSwitchResponse
 import com.draw2form.ai.api.ApiService
 import com.draw2form.ai.api.ApiUploadedFileState
+import com.draw2form.ai.api.NewFormSubmissionRequestBody
 import com.draw2form.ai.api.toUser
 import com.draw2form.ai.datasource.DataStore
 import com.draw2form.ai.presentation.screens.UIComponent
@@ -40,7 +41,7 @@ class UserViewModel(
     private val _apiUserForms: MutableStateFlow<List<ApiForm>> = MutableStateFlow(emptyList())
     val apiUserForms: StateFlow<List<ApiForm>> get() = _apiUserForms.asStateFlow()
 
-    val scannedForm: MutableStateFlow<List<UIComponent>?> = MutableStateFlow(null)
+    val scannedForm: MutableStateFlow<Pair<ApiForm, List<UIComponent>>?> = MutableStateFlow(null)
 
 
     private val _apiUiElements: MutableStateFlow<List<UIComponent>?> = MutableStateFlow(null)
@@ -48,7 +49,11 @@ class UserViewModel(
 
 
     fun onScannedFormUpdated(updatedList: List<UIComponent>) {
-        scannedForm.value = updatedList
+        scannedForm.value?.let {
+            scannedForm.value = it.copy(
+                second = updatedList
+            )
+        }
     }
 
 
@@ -293,13 +298,35 @@ class UserViewModel(
                     id
                 )
                     .onSuccess {
-                        scannedForm.value = convertApiFormToUIComponents(it)
+                        scannedForm.value = Pair(it, convertApiFormToUIComponents(it))
                         Timber.d(it.toString())
                     }.onFailure {
                         println(it)
                     }
             }
         }
+    }
+
+    fun submitForm(formId: String, formBody: NewFormSubmissionRequestBody) {
+        Timber.d("Form Id: $formId, formBody: $formBody")
+        viewModelScope.launch {
+
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.submitFormApi(
+                    authorization,
+                    formId,
+                    formBody,
+                )
+                    .onSuccess {
+
+                        Timber.d(it.toString())
+                    }.onFailure {
+                        println(it)
+                    }
+            }
+        }
+
     }
 
     fun updateFormTextField(textField: ApiFormTextField) {
@@ -684,6 +711,7 @@ class UserViewModel(
 
         }
     }
+
 }
 
 

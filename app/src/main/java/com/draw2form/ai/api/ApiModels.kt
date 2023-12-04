@@ -33,10 +33,8 @@ data class ApiForm(
 
 data class ApiFormSubmission(
     val id: String,
-    val name: String,
-    val status: String,
     val owner: ApiUser?,
-    val ownerId: String,
+    val ownerId: String?,
     val form: ApiForm?,
     val formId: String,
     val textFieldResponses: List<ApiFormTextFieldResponse>?,
@@ -170,6 +168,27 @@ data class ApiFormShare(
 
 data class ApiFormId(
     val formId: String?
+)
+
+data class NewFormSubmissionTextFieldResponse(
+    val id: String,
+    var value: String
+)
+
+data class NewFormSubmissionCheckboxResponse(
+    val id: String,
+    var value: Boolean
+)
+
+data class NewFormSubmissionToggleSwitchResponse(
+    val id: String,
+    var value: Boolean
+)
+
+data class NewFormSubmissionRequestBody(
+    val textFieldResponses: List<NewFormSubmissionTextFieldResponse>,
+    val checkboxResponses: List<NewFormSubmissionCheckboxResponse>,
+    val toggleSwitchResponses: List<NewFormSubmissionToggleSwitchResponse>
 )
 
 

@@ -212,6 +212,15 @@ interface ApiService {
         @Path("id") id: String
     ): Result<ApiForm>
 
+    @POST("/api/forms/{formId}/submit")
+    @Headers("Content-Type: application/json")
+    suspend fun submitFormApi(
+        @Header("Authorization") authorization: String?,
+        @Path("formId") formId: String,
+        @Body request: NewFormSubmissionRequestBody
+    ): Result<ApiFormSubmission>
+
+
     // Create new form components
     @POST("/api/forms/{formId}/fields/label")
     @Headers("Content-Type: application/json")
