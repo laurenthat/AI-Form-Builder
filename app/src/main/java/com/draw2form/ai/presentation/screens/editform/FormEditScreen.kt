@@ -166,12 +166,11 @@ fun FormEditScreen(
         },
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .padding(top = 100.dp),
+                .padding(top = padding.calculateTopPadding())
         ) {
             LazyColumn(
                 modifier = modifier
@@ -199,7 +198,6 @@ fun FormEditScreen(
                         )
                     }
                     .fillMaxSize(),
-//                    .padding(top = 5.dp, start = 5.dp, end = 5.dp),
                 state = dragDropListState.lazyListState
             ) {
                 itemsIndexed(items, key = { index, item ->
@@ -234,6 +232,7 @@ fun FormEditScreen(
                                     .padding(0.dp)
                             )
                             Column(modifier = Modifier.fillMaxHeight()) {
+                                Text(text = item.order().toString())
                                 IconButton(
                                     onClick = { editSheetOpen = item },
                                 ) {
@@ -261,8 +260,6 @@ fun FormEditScreen(
                 }
             }
         }
-
-
     }
 }
 
