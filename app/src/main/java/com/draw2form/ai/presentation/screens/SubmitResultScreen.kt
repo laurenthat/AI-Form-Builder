@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -85,11 +84,17 @@ fun SubmitResultScreen(submitResult: Boolean, onForwardClick: () -> Unit) {
                 Button(
                     onClick = { onForwardClick() },
                     modifier = Modifier
-                        .height(55.dp)
-                        .width(550.dp)
-                        .padding(end = 10.dp)
+                        .height(60.dp)
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
                 ) {
-                    Text(text = "Continue", fontSize = 16.sp, modifier = Modifier.fillMaxSize())
+                    Text(
+                        text = "Continue",
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        textAlign = TextAlign.Center
+                    )
                 }
 
 
