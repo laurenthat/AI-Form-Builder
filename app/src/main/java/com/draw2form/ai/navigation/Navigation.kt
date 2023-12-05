@@ -24,6 +24,7 @@ import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
 import com.draw2form.ai.presentation.screens.ShareFormScreen
+import com.draw2form.ai.presentation.screens.SubmitResultScreen
 import com.draw2form.ai.presentation.screens.UIComponent
 import com.draw2form.ai.presentation.screens.editform.FormEditScreen
 import com.draw2form.ai.user.User
@@ -85,6 +86,18 @@ fun Navigation(
         }
 
         composable(
+            route = "scanResult/{submitResult}",
+            arguments = listOf(navArgument("submitResult") { type = NavType.BoolType }),
+        ) {
+            SubmitResultScreen(
+                it.arguments?.getBoolean("submitResult") ?: false,
+                onForwardClick = {
+                    navController.navigate("home")
+                }
+            )
+        }
+
+        composable(
             "forms/{formId}/edit",
             arguments = listOf(navArgument("formId") { type = NavType.StringType }),
         ) { backStackEntry ->
@@ -107,7 +120,6 @@ fun Navigation(
                         if (formId != null) {
                             userViewModel.publishForm(formId) {
                                 navController.navigate("forms/${formId}/publish")
-
                             }
                         }
                     }

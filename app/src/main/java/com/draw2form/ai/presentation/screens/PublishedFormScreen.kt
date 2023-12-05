@@ -35,23 +35,18 @@ fun PublishedFormScreen(
     onInteraction: (List<UIComponent>) -> Unit,
     onSubmitClicked: (formSubmission: NewFormSubmissionRequestBody) -> Unit
 ) {
-    Timber.d("Scanned form state: $scannedFormState")
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(10.dp)
     ) {
         itemsIndexed(scannedFormState) { index, uiComponent ->
-            // Timber.d("Scanned form state: $scannedFormState")
-
             FormInteractionUI(
                 element = uiComponent,
                 onElementUpdated = { updatedComponent ->
                     val listCopy = scannedFormState.toMutableList()
                     listCopy[index] = updatedComponent
                     onInteraction(listCopy)
-                    Timber.d("updated Component: $updatedComponent")
                 },
                 onSubmitClicked = {
                     val checkboxResponse = scannedFormState.mapNotNull { it.checkboxResponse }.map {
@@ -157,8 +152,6 @@ fun FormInteractionUI(
             }
 
             element.button?.let {
-                Timber.d("Inside the button block ${element.button}")
-
                 DynamicFormButtonComponent(
                     label = it.label,
                     onClick = {
