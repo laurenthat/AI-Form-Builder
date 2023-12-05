@@ -24,6 +24,7 @@ import com.draw2form.ai.presentation.screens.InstructionsScreen
 import com.draw2form.ai.presentation.screens.ProcessingScreen
 import com.draw2form.ai.presentation.screens.SettingsScreen
 import com.draw2form.ai.presentation.screens.ShareFormScreen
+import com.draw2form.ai.presentation.screens.SubmittedFormsScreen
 import com.draw2form.ai.presentation.screens.UIComponent
 import com.draw2form.ai.presentation.screens.editform.FormEditScreen
 import com.draw2form.ai.user.User
@@ -68,9 +69,31 @@ fun Navigation(
 
         composable("forms") {
             FormsListScreen {
-                navController.navigate("forms/${it.id}/edit")
+                if (it.status == "DRAFT")
+                    navController.navigate("forms/${it.id}/edit")
+                else {
+                    navController.navigate("forms/${it.id}")
+                }
+
             }
         }
+
+        composable(
+            "forms/{formId}",
+            arguments = listOf(navArgument("formId") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val formId = backStackEntry.arguments?.getString("formId")
+
+            LaunchedEffect(true) {
+                formId?.let {
+                    userViewModel.getSubmittedForms(it)
+                }
+            }
+            SubmittedFormsScreen(userViewModel = userViewModel)
+
+        }
+
+
 
         composable(
             "forms/{formId}/publish",

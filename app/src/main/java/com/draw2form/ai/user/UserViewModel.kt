@@ -8,6 +8,7 @@ import com.draw2form.ai.api.ApiFormCheckbox
 import com.draw2form.ai.api.ApiFormCheckboxResponse
 import com.draw2form.ai.api.ApiFormImage
 import com.draw2form.ai.api.ApiFormLabel
+import com.draw2form.ai.api.ApiFormSubmission
 import com.draw2form.ai.api.ApiFormTextField
 import com.draw2form.ai.api.ApiFormTextFieldResponse
 import com.draw2form.ai.api.ApiFormToggleSwitch
@@ -39,7 +40,15 @@ class UserViewModel(
         MutableStateFlow(null)
     val apiUploadedFileState: StateFlow<ApiUploadedFileState?> get() = _apiUploadedFileState.asStateFlow()
     private val _apiUserForms: MutableStateFlow<List<ApiForm>> = MutableStateFlow(emptyList())
+
+    private val _submittedForms: MutableStateFlow<List<ApiFormSubmission>> = MutableStateFlow(
+        emptyList()
+    )
+
+    val apiSubmittedForms: StateFlow<List<ApiFormSubmission>> = _submittedForms.asStateFlow()
+
     val apiUserForms: StateFlow<List<ApiForm>> get() = _apiUserForms.asStateFlow()
+
 
     val scannedForm: MutableStateFlow<Pair<ApiForm, List<UIComponent>>?> = MutableStateFlow(null)
 
@@ -228,6 +237,21 @@ class UserViewModel(
                         Timber.d(it)
                     }
             }
+        }
+    }
+
+    fun getSubmittedForms(id: String) {
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.getFormDetails(authorization, id)
+                    .onSuccess { form ->
+                        _submittedForms.value = form.formSubmissions ?: emptyList()
+                    }.onFailure {
+                        println(it)
+                    }
+            }
+
         }
     }
 
