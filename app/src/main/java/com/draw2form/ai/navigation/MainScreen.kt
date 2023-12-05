@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -23,6 +24,7 @@ import com.draw2form.ai.presentation.components.NoInternetConnectionBarComponent
 import com.draw2form.ai.presentation.screens.LoadingScreen
 import com.draw2form.ai.presentation.screens.LoginScreen
 import com.draw2form.ai.presentation.screens.PublishedFormScreen
+import com.draw2form.ai.presentation.screens.SubmitResultScreen
 import com.draw2form.ai.presentation.screens.WelcomeScreen
 import com.draw2form.ai.user.UserViewModel
 import com.google.gson.Gson
@@ -42,8 +44,11 @@ fun MainScreen(
     val navController = rememberNavController()
     val loggedInUser = userViewModel.getLoggedInUserProfile.collectAsState(initial = null)
     val scannedForm = userViewModel.scannedForm.collectAsState(initial = null)
+    val scannedFormResult = remember { mutableStateOf<Boolean?>(null) }
+
     val welcomeScreenSeen = userViewModel.welcomeScreenSeen.collectAsState(initial = null)
     val composableScope = rememberCoroutineScope()
+
 
     // show loading screen at first if there is an intent
     val isLoading =
@@ -94,15 +99,27 @@ fun MainScreen(
         LoadingScreen()
 
     } else if (scannedForm.value != null) {
-
-        PublishedFormScreen(scannedFormState = scannedForm.value!!.second,
-            onInteraction = { updatedList ->
-                userViewModel.onScannedFormUpdated(updatedList)
-            },
-            onSubmitClicked = { formSubmission ->
-                userViewModel.submitForm(scannedForm.value!!.first.id, formSubmission)
+        if (scannedFormResult.value == null) {
+            PublishedFormScreen(scannedFormState = scannedForm.value!!.second,
+                onInteraction = { updatedList ->
+                    userViewModel.onScannedFormUpdated(updatedList)
+                },
+                onSubmitClicked = { formSubmission ->
+                    userViewModel.submitForm(
+                        scannedForm.value!!.first.id,
+                        formSubmission
+                    ) { succeeded ->
+                        Timber.d("on Result Main screen: $succeeded")
+                        scannedFormResult.value = succeeded
+                    }
+                }
+            )
+        } else {
+            SubmitResultScreen(submitResult = scannedFormResult.value!!) {
+                scannedFormResult.value = null
+                userViewModel.scannedForm.value = null
             }
-        )
+        }
 
 
     } else if (welcomeScreenSeen.value == false) {

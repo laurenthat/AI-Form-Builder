@@ -280,8 +280,10 @@ class UserViewModel(
                 )
                     .onSuccess {
                         onSuccess(it)
-                        Timber.d(it.toString())
+                        Timber.d("Success result: $it")
+
                     }.onFailure {
+                        Timber.d("Failed result: $it")
                         println(it)
                     }
             }
@@ -307,24 +309,29 @@ class UserViewModel(
         }
     }
 
-    fun submitForm(formId: String, formBody: NewFormSubmissionRequestBody) {
+    fun submitForm(
+        formId: String,
+        formBody: NewFormSubmissionRequestBody,
+        onResult: (Boolean) -> Unit
+    ) {
         Timber.d("Form Id: $formId, formBody: $formBody")
         viewModelScope.launch {
 
             val authorization = dataStore.getAuthorizationHeaderValue.first()
-            authorization?.let {
-                apiService.submitFormApi(
-                    authorization,
-                    formId,
-                    formBody,
-                )
-                    .onSuccess {
 
-                        Timber.d(it.toString())
-                    }.onFailure {
-                        println(it)
-                    }
-            }
+            apiService.submitFormApi(
+                authorization,
+                formId,
+                formBody,
+            )
+                .onSuccess {
+                    onResult(true)
+                    Timber.d("Success result: $it")
+                }.onFailure {
+                    onResult(false)
+                    Timber.d("Success result: $it")
+                    println(it)
+                }
         }
 
     }
