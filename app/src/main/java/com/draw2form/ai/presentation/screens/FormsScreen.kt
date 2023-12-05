@@ -31,6 +31,7 @@ import com.draw2form.ai.api.ApiFormTextField
 import com.draw2form.ai.api.ApiFormTextFieldResponse
 import com.draw2form.ai.api.ApiFormToggleSwitch
 import com.draw2form.ai.api.ApiFormToggleSwitchResponse
+import com.draw2form.ai.models.Resources
 import org.json.JSONArray
 
 
@@ -85,6 +86,26 @@ data class UIComponent(
             ?: 0
     }
 
+    fun formId(): String {
+        return textField?.formId
+            ?: label?.formId
+            ?: checkbox?.formId
+            ?: toggleSwitch?.formId
+            ?: button?.formId
+            ?: image?.formId
+            ?: ""
+    }
+
+    fun id(): String {
+        return textField?.id
+            ?: label?.id
+            ?: checkbox?.id
+            ?: toggleSwitch?.id
+            ?: button?.id
+            ?: image?.id
+            ?: ""
+    }
+
 
     fun updateOrder(order: Int): UIComponent {
         this.textField?.let {
@@ -126,7 +147,32 @@ data class UIComponent(
 
     }
 
+    fun resourceType(): Resources {
+        this.textField?.let {
+            return Resources.FormTextField
+        }
+        this.label?.let {
+            return Resources.FormLabel
 
+        }
+        this.checkbox?.let {
+            return Resources.FormCheckbox
+
+        }
+        this.toggleSwitch?.let {
+            return Resources.FormToggleSwitch
+
+        }
+        this.button?.let {
+            return Resources.FormButton
+
+        }
+        this.image?.let {
+            return Resources.FormImage
+
+        }
+        throw Exception("Bad UIComponent Resource not allowed")
+    }
 }
 
 @Composable
@@ -182,7 +228,6 @@ fun Checkbox(label: String) {
         Checkbox(
             checked = remember { mutableStateOf(true).value },
             onCheckedChange = { /*TODO*/ },
-//            modifier = Modifier.padding(8.dp)
         )
     }
 

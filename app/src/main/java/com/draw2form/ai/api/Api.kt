@@ -1,5 +1,6 @@
 package com.draw2form.ai.api
 
+import com.draw2form.ai.models.UpdateFieldOrderResponseItem
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -286,5 +287,16 @@ interface ApiService {
         @Path("formId") formId: String,
         @Body newFormTextField: ApiFormTextField
     ): Result<ApiFormTextField>
+
+
+    @PATCH("api/forms/{formId}/fields/{fieldType}/{fieldId}/order/{direction}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateFieldOrder(
+        @Header("Authorization") authorization: String,
+        @Path("formId") formId: String,
+        @Path("fieldType") fieldType: String,
+        @Path("fieldId") fieldId: String,
+        @Path("direction") direction: String,
+    ): Result<List<UpdateFieldOrderResponseItem>>
 
 }

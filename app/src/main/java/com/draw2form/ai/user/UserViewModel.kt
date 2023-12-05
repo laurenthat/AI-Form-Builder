@@ -18,6 +18,7 @@ import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.api.NewFormSubmissionRequestBody
 import com.draw2form.ai.api.toUser
 import com.draw2form.ai.datasource.DataStore
+import com.draw2form.ai.models.Direction
 import com.draw2form.ai.presentation.screens.UIComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -304,8 +305,10 @@ class UserViewModel(
                 )
                     .onSuccess {
                         onSuccess(it)
-                        Timber.d(it.toString())
+                        Timber.d("Success result: $it")
+
                     }.onFailure {
+                        Timber.d("Failed result: $it")
                         println(it)
                     }
             }
@@ -331,24 +334,29 @@ class UserViewModel(
         }
     }
 
-    fun submitForm(formId: String, formBody: NewFormSubmissionRequestBody) {
+    fun submitForm(
+        formId: String,
+        formBody: NewFormSubmissionRequestBody,
+        onResult: (Boolean) -> Unit
+    ) {
         Timber.d("Form Id: $formId, formBody: $formBody")
         viewModelScope.launch {
 
             val authorization = dataStore.getAuthorizationHeaderValue.first()
-            authorization?.let {
-                apiService.submitFormApi(
-                    authorization,
-                    formId,
-                    formBody,
-                )
-                    .onSuccess {
 
-                        Timber.d(it.toString())
-                    }.onFailure {
-                        println(it)
-                    }
-            }
+            apiService.submitFormApi(
+                authorization,
+                formId,
+                formBody,
+            )
+                .onSuccess {
+                    onResult(true)
+                    Timber.d("Success result: $it")
+                }.onFailure {
+                    onResult(false)
+                    Timber.d("Success result: $it")
+                    println(it)
+                }
         }
 
     }
@@ -570,32 +578,34 @@ class UserViewModel(
     }
 
     fun swapUIComponents(list: List<UIComponent>, first: Int, second: Int) {
+        print("First: $first second: $second")
+
         val newList = list.toMutableList()
-        newList[first] = newList[first].updateOrder(second)
-        newList[second] = newList[second].updateOrder(first)
+        newList[first] = list[first].updateOrder(second)
+        newList[second] = list[second].updateOrder(first)
         newList.sortBy {
             it.order()
         }
         _apiUiElements.value = newList
 
-        listOf(newList[first], newList[second]).forEach {
-            it.label?.let { formLabel ->
-                updateFormLabel(formLabel = formLabel)
-            }
-            it.textField?.let { textField ->
-                updateFormTextField(textField = textField)
-            }
-            it.checkbox?.let { checkbox ->
-                updateFormCheckbox(checkbox = checkbox)
-            }
-            it.toggleSwitch?.let { toggleSwitch ->
-                updateFormToggleSwitch(toggleSwitch = toggleSwitch)
-            }
-            it.button?.let { button ->
-                updateFormButton(button = button)
+        val bottomOne = listOf(first, second).max()
+
+        viewModelScope.launch {
+            val authorization = dataStore.getAuthorizationHeaderValue.first()
+            authorization?.let {
+                apiService.updateFieldOrder(
+                    it,
+                    formId = list[bottomOne].formId(),
+                    fieldType = list[bottomOne].resourceType().value,
+                    fieldId = list[bottomOne].id(),
+                    direction = Direction.Up.value
+                ).onSuccess {
+                    Timber.d(it.toString())
+                }.onFailure {
+                    Timber.d(it)
+                }
             }
         }
-
     }
 
     fun addUiComponents(newUIComponent: UIComponent) {

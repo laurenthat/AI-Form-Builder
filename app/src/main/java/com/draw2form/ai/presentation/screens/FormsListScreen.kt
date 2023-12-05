@@ -1,5 +1,6 @@
 package com.draw2form.ai.presentation.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -297,7 +298,7 @@ fun FormListItem(
             SuggestionChip(
                 onClick = { },
                 shape = RoundedCornerShape(15.dp),
-                border = SuggestionChipDefaults.suggestionChipBorder(Color.Transparent),
+                border = BorderStroke(0.dp, Color.Transparent),
                 label = { Text(text = form.status, fontSize = 12.sp, color = Color.Black) },
                 colors = SuggestionChipDefaults.suggestionChipColors(
                     containerColor =
