@@ -91,7 +91,7 @@ dependencies {
 
 
     //Material
-    implementation("androidx.compose.material3:material3-android:1.2.0-alpha09")
+    implementation("androidx.compose.material3:material3-android:1.2.0-alpha12")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
 
     //ViewModel

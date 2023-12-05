@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,74 +36,38 @@ import com.draw2form.ai.presentation.ui.theme.LinkUpTheme
 @Composable
 fun ImageProcessStatus(state: String, label: String) {
 
+    ListItem(
+        modifier = Modifier.padding(10.dp),
+        headlineContent = {
+            Text(text = label, textAlign = TextAlign.End, fontSize = 16.sp)
+        },
+        leadingContent = {
+            ProcessingLottieAnimation(state)
+        }
+    )
+}
+
+@Composable
+fun ProcessingLottieAnimation(state: String) {
     val successComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_success))
     val loadingComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_loading))
     val errorComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_error))
 
-
-    when (state) {
-        "loading" ->
-            Row(
-                modifier = Modifier
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LottieAnimation(
-                    composition = loadingComposition,
-                    iterations = LottieConstants.IterateForever,
-                    modifier = Modifier.size(50.dp)
-
-                )
-                Text(text = label, textAlign = TextAlign.Center, fontSize = 16.sp)
-
-            }
-
-        "success" ->
-            Row(
-                modifier = Modifier
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LottieAnimation(
-                    composition = successComposition,
-                    iterations = 1,
-                    modifier = Modifier.size(50.dp)
-                )
-                Text(text = label, textAlign = TextAlign.Center, fontSize = 16.sp)
-
-
-            }
-
-        "error" ->
-            Row(
-                modifier = Modifier
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LottieAnimation(
-                    composition = errorComposition,
-                    iterations = 1,
-                    modifier = Modifier.size(50.dp)
-                )
-                Text(
-                    text = label,
-                    textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-            }
-
-    }
-
-}
-
-@Composable
-fun ViewInterface(onClick: () -> Unit) {
-
+    LottieAnimation(
+        composition = when(state) {
+            "success" -> successComposition
+            "error" -> errorComposition
+            "loading" -> loadingComposition
+            else -> loadingComposition
+        },
+        iterations = when(state) {
+            "success" -> 1
+            "error" -> 1
+            "loading" -> 100
+            else -> 100
+        },
+        modifier = Modifier.size(50.dp)
+    )
 }
 
 @Composable
@@ -121,14 +89,14 @@ fun ProcessingScreen(state: ApiUploadedFileState, onEditForm: () -> Unit) {
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp),
+                    .fillMaxSize(),
+//                    .padding(top = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ImageProcessStatus(state.objectRecognition, "Object Recognition")
                 ImageProcessStatus(state.textRecognition, "Text Recognition")
                 ImageProcessStatus(state.formGeneration, "Form Generation")
-
+                Spacer(modifier = Modifier.height(50.dp))
                 Button(
                     enabled = state.formGeneration == "success"
                             && state.textRecognition == "success"
@@ -136,15 +104,15 @@ fun ProcessingScreen(state: ApiUploadedFileState, onEditForm: () -> Unit) {
                     onClick = {
                         onEditForm()
                     }
-
                 ) {
                     Text(text = "View Form")
                 }
                 Text(
                     "Image processing might take 5-15 seconds. Please wait patiently.",
-                    modifier = Modifier.padding(top = 18.dp)
-                )
+                    modifier = Modifier.padding(top = 50.dp),
+                    textAlign = TextAlign.Center
 
+                )
             }
         }
     }
