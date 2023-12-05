@@ -318,21 +318,20 @@ class UserViewModel(
         viewModelScope.launch {
 
             val authorization = dataStore.getAuthorizationHeaderValue.first()
-            authorization?.let {
-                apiService.submitFormApi(
-                    authorization,
-                    formId,
-                    formBody,
-                )
-                    .onSuccess {
-                        onResult(true)
-                        Timber.d("Success result: $it")
-                    }.onFailure {
-                        onResult(false)
-                        Timber.d("Success result: $it")
-                        println(it)
-                    }
-            }
+
+            apiService.submitFormApi(
+                authorization,
+                formId,
+                formBody,
+            )
+                .onSuccess {
+                    onResult(true)
+                    Timber.d("Success result: $it")
+                }.onFailure {
+                    onResult(false)
+                    Timber.d("Success result: $it")
+                    println(it)
+                }
         }
 
     }
