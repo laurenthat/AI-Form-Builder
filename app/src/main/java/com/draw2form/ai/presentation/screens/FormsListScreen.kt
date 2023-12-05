@@ -235,7 +235,12 @@ fun FormsListScreen(
                             }
                         },
                         dismissContent = {
-                            FormListItem(form, onFormClick = { onFormClick(form) })
+                            FormListItem(
+                                form,
+                                onFormClick = {
+                                    if (form.status == "DRAFT") onFormClick(form)
+                                    else onFormClick(form)
+                                })
                         },
                         directions = setOf(DismissDirection.EndToStart)
                     )
