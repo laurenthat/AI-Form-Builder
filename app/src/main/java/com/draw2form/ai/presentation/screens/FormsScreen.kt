@@ -182,7 +182,6 @@ fun Checkbox(label: String) {
         Checkbox(
             checked = remember { mutableStateOf(true).value },
             onCheckedChange = { /*TODO*/ },
-//            modifier = Modifier.padding(8.dp)
         )
     }
 

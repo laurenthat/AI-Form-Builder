@@ -31,12 +31,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -222,17 +220,16 @@ fun FormEditScreen(
                             .fillMaxWidth()
                             .padding(5.dp)
                     ) {
-                        Row {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(id = R.drawable.drag_indicator),
                                 contentDescription = null,
                                 tint = Color.LightGray,
                                 modifier = Modifier
                                     .align(Alignment.CenterVertically)
-                                    .padding(0.dp)
                             )
                             Column(modifier = Modifier.fillMaxHeight()) {
-                                Text(text = item.order().toString())
+//                                Text(text = item.order().toString())
                                 IconButton(
                                     onClick = { editSheetOpen = item },
                                 ) {
@@ -358,14 +355,6 @@ fun EditElementBottomSheet(
 
     }
 }
-
-fun <T> stateSaver() = Saver<MutableState<T>, Any>(
-    save = { state -> state.value ?: "null" },
-    restore = { value ->
-        @Suppress("UNCHECKED_CAST")
-        mutableStateOf((if (value == "null") null else value) as T)
-    }
-)
 
 @Preview(showBackground = true)
 @Composable
