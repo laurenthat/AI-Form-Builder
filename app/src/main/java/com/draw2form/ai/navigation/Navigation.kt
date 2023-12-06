@@ -48,6 +48,7 @@ fun Navigation(
 
     val scope = rememberCoroutineScope()
 
+
     NavHost(
         navController,
         modifier = modifier,
@@ -92,8 +93,25 @@ fun Navigation(
                     userViewModel.getSubmittedForms(it)
                 }
             }
-            SubmittedFormsScreen(userViewModel = userViewModel)
 
+            SubmittedFormsScreen(
+                userViewModel = userViewModel,
+                canShare = true,
+                canGoBack = true,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onShareClick = {
+                    composableScope.launch {
+                        if (formId != null) {
+                            userViewModel.publishForm(formId) {
+                                navController.navigate("forms/${formId}/publish")
+                            }
+                        }
+                    }
+
+                }
+            )
         }
 
 

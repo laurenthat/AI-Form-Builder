@@ -39,7 +39,9 @@ data class ApiFormSubmission(
     val formId: String,
     val textFieldResponses: List<ApiFormTextFieldResponse>?,
     val checkboxResponse: List<ApiFormCheckboxResponse>?,
-    val toggleSwitchResponses: List<ApiFormToggleSwitchResponse>?
+    val toggleSwitchResponses: List<ApiFormToggleSwitchResponse>?,
+    val createdAt: String,
+    val updatedAt: String
 )
 
 data class ApiFormTextField(
