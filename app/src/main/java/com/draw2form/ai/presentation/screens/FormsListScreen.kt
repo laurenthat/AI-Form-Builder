@@ -83,7 +83,8 @@ fun FormsListScreenTopBar(
                 stringResource(R.string.my_forms),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                style = MaterialTheme.typography.labelLarge,
             )
         },
         scrollBehavior = scrollBehavior

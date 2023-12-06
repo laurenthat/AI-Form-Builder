@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
@@ -26,15 +29,17 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.draw2form.ai.api.ApiForm
-import com.draw2form.ai.api.ApiUser
+import coil.compose.AsyncImage
+import com.draw2form.ai.api.ApiFormSubmission
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.presentation.ui.theme.LinkUpTheme
 import com.draw2form.ai.user.UserViewModel
@@ -47,20 +52,56 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun SubmittedFormsScreenTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
-) {
+    canGoBack: Boolean,
+    canShare: Boolean,
+    onBackClick: () -> Unit,
+    onShareClick: () -> Unit,
+
+    ) {
     MediumTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
+        ), title = {
             Text(
-                text = "Form Name",
+                text = "Name form",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                fontSize = 20.sp
+                fontSize = 20.sp,
             )
+        }, navigationIcon = {
+            if (canGoBack) {
+                IconButton(
+                    modifier = Modifier,
+                    onClick = { onBackClick() }
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier
+                            .padding(horizontal = 3.dp)
+                    )
+                }
+
+            }
         },
+
+        actions = {
+            if (canShare) {
+                IconButton(
+                    modifier = Modifier,
+                    onClick = { onShareClick() }
+                ) {
+                    Icon(
+                        Icons.Filled.Share,
+                        contentDescription = "Share",
+                        modifier = Modifier
+                            .padding(horizontal = 3.dp)
+                    )
+                }
+            }
+        },
+
         scrollBehavior = scrollBehavior
     )
 }
@@ -70,6 +111,10 @@ fun SubmittedFormsScreenTopBar(
 fun SubmittedFormsScreen(
     modifier: Modifier = Modifier,
     userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    canShare: Boolean,
+    canGoBack: Boolean,
+    onBackClick: () -> Unit,
+    onShareClick: () -> Unit,
 ) {
 
     val submittedFormList = userViewModel.apiSubmittedForms.collectAsState(emptyList())
@@ -79,7 +124,14 @@ fun SubmittedFormsScreen(
 
     Scaffold(
         topBar = {
-            SubmittedFormsScreenTopBar(scrollBehavior = scrollBehavior)
+            SubmittedFormsScreenTopBar(
+                scrollBehavior = scrollBehavior,
+                canShare = canShare,
+                canGoBack = canGoBack,
+                onBackClick = onBackClick,
+                onShareClick = onShareClick
+
+            )
         },
         modifier = Modifier
             .fillMaxSize()
@@ -97,41 +149,32 @@ fun SubmittedFormsScreen(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 itemsIndexed(submittedForms) { index, item ->
-                    Text(text = item.owner?.name ?: "")
+                    FormSubmittedListItem(formSubmission = item)
                 }
-
-
             }
         }
     }
 }
 
-
 @Composable
-fun SubmittedFormListItem(
-    user: ApiUser,
-    form: ApiForm,
+fun FormSubmittedListItem(
+    formSubmission: ApiFormSubmission,
 ) {
-
-
     ListItem(
-        modifier = Modifier.clickable(
-            onClick = {}
-        ),
+        modifier = Modifier.clickable(onClick = {}),
         headlineContent = {
             Text(
-                text = user.name,
+                text = formSubmission.owner?.name ?: "",
                 textAlign = TextAlign.Start,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             )
         },
         supportingContent = {
             Text(
                 text = run {
                     val date =
-                        Instant.parse(form.createdAt)
+                        Instant.parse(formSubmission.createdAt)
                             .toLocalDateTime(TimeZone.currentSystemDefault())
                     "${date.date} ${date.time.hour}:${date.time.minute}"
 
@@ -139,17 +182,20 @@ fun SubmittedFormListItem(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelMedium
             )
+
+
         },
         leadingContent = {
-            Icon(
-                imageVector = Icons.Filled.AccountCircle,
-                contentDescription = "User",
+            AsyncImage(
+                model = formSubmission.owner?.picture,
+                contentScale = ContentScale.Crop,
+                contentDescription = "User picture",
                 modifier = Modifier
-                    .size(50.dp),
+                    .clip(RoundedCornerShape(10.dp))
+                    .size(48.dp),
             )
         },
-
-        )
+    )
     HorizontalDivider(
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
@@ -158,13 +204,17 @@ fun SubmittedFormListItem(
             .width(1.dp),
     )
 
-
 }
 
 @Composable
 @Preview(showBackground = true)
 fun PublishFormScreenPreview() {
     LinkUpTheme {
-        SubmittedFormsScreen()
+        SubmittedFormsScreen(
+            canShare = true,
+            canGoBack = true,
+            onShareClick = {},
+            onBackClick = {}
+        )
     }
 }
