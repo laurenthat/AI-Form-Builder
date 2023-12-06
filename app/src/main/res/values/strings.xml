@@ -73,4 +73,27 @@
     <string name="no">NO</string>
 
 
+    <string name="wireframe_upload_instructions">Wireframe Upload Instructions</string>
+    <string name="follow_instructions">Follow these instructions to ensure accurate wireframe recognition:</string>
+    <string name="instruction_1">Capture the entire wireframe or hand-drawn sketch within the frame.</string>
+    <string name="instruction_2">Ensure good lighting to minimize shadows and enhance visibility.</string>
+    <string name="instruction_3">Use a clear camera or scanner for better image quality.</string>
+    <string name="instruction_4">Refer the sample images below</string>
+    <string name="image_samples">Image Samples</string>
+    <string name="instruction_for_app_use">Instructions for App use</string>
+
+    <string name="your_forms">Your Forms</string>
+    <string name="upload_new_sketch">Upload New Sketch</string>
+
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="process">Process</string>
+    <string name="image_preview">Image Preview</string>
+    <string name="welcome_message">Welcome to AI Form Builder</string>
+    <string name="hello">Hello</string>
+
+    <string name="status">Status</string>
+    <string name="draft">Draft</string>
+    <string name="published">Published</string>
+
 </resources>

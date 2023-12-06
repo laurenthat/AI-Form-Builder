@@ -13,6 +13,10 @@ val Pink40 = Color(0xFF7D5260)
 val YellowApp = Color(0xffffd600)
 val BottomBarColor = Color(0xFFF7F7F7)
 
+val TransparentColor = Color(0xFFEBE6E6)
+
 val SuccessColor = Color(0xFF28682A)
 
 val ErrorColor = Color(0xFFF44336)
+
+val DarkColor = Color(0xFF242121)

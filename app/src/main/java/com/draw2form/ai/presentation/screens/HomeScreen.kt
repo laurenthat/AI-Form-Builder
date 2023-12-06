@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -29,11 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.draw2form.ai.R
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.user.User
@@ -50,7 +50,8 @@ fun HomeScreen(
     canGoBack: Boolean,
     onSuccessUpload: ((form: ApiForm) -> Unit)? = null,
     onBackClick: (() -> Unit)? = null,
-    onFormClick: (ApiForm) -> Unit
+    onFormClick: (ApiForm) -> Unit,
+    onShareClick: (id: String) -> Unit
 ) {
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
@@ -88,10 +89,9 @@ fun HomeScreen(
 
             ) {
             ProfileCard(user = user)
-            //Spacer(modifier = Modifier.height(10.dp))
             HorizontalDivider(modifier = Modifier.fillMaxWidth())
             Text(
-                text = "Your Drafts",
+                text = stringResource(R.string.your_forms),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 10.dp, start = 16.dp, end = 10.dp)
@@ -103,7 +103,7 @@ fun HomeScreen(
                 CategorizedLazyRow(
                     forms = forms, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp), onFormClick
+                        .padding(4.dp), onFormClick, onShareClick
                 )
             }
 
@@ -112,7 +112,7 @@ fun HomeScreen(
             }
 
             Text(
-                text = "Upload New sketch",
+                text = stringResource(R.string.upload_new_sketch),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
@@ -125,8 +125,8 @@ fun HomeScreen(
                     fileToUpload = it
                     showProcessButton = true
                 },
-                cameraText = "Camera",
-                galleryText = "Gallery"
+                cameraText = stringResource(R.string.camera),
+                galleryText = stringResource(R.string.gallery),
             )
             if (showProcessButton) {
                 Button(
@@ -150,7 +150,7 @@ fun HomeScreen(
                         .padding(start = 16.dp, top = 8.dp, end = 16.dp)
                         .fillMaxWidth(),
                 ) {
-                    Text("Process")
+                    Text(stringResource(R.string.process))
                 }
             }
             bitmap?.let { btm ->
@@ -160,7 +160,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(12.dp)
                 ) {
                     Text(
-                        text = "Image Preview",
+                        text = stringResource(R.string.image_preview),
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
@@ -195,7 +195,8 @@ fun ProfileScreenPreview() {
         user.value,
         canGoBack = false,
         onBackClick = null,
-        onFormClick = {}
+        onFormClick = {},
+        onShareClick = {}
     )
 }
 

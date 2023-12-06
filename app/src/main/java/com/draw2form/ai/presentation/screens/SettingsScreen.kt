@@ -32,7 +32,6 @@ import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.user.UserViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -55,7 +54,7 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(onClick = onInstButtonClicked) {
-                Text("Instructions for App use")
+                Text(stringResource(R.string.instruction_for_app_use))
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = { showConfirmationDialog = true }) {

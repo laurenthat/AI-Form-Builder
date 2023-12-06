@@ -6,7 +6,7 @@
     <string name="Message">Message</string>
     <string name="Heart">Heart</string>
     <string name="Person">Person</string>
-    <string name="instructions">Instructions</string>
+    <string name="instructions">Ohjeet</string>
 
     <!-- Miscellaneous Strings -->
 
@@ -44,7 +44,6 @@
 
     <!-- Contact List String -->
     <string name="my_forms">" Minun lomakkeet"</string>
-    <string name="my_contacts">Yhteystietoni</string>
     <string name="empty_contact_list">Yhteystietoluettelo on tyhjä.</string>
 
     <!-- Receive Related String -->
@@ -70,4 +69,30 @@
     <string name="yes">KYLLÄ</string>
     <string name="no">EI</string>
     <string name="home_screen">Koti Sivu</string>
+
+    <string name="wireframe_upload_instructions">Ohjeet langattoman kehyksen lähettämiseen</string>
+    <string name="follow_instructions">Seuraa näitä ohjeita tarkan langattoman kehyksen tunnistamiseksi:</string>
+    <string name="instruction_1">Tallenna koko langaton kehys tai käsin piirretty luonnos kehyksen sisällä.</string>
+    <string name="instruction_2">Varmista hyvä valaistus varjojen minimoimiseksi ja näkyvyyden parantamiseksi.</string>
+    <string name="instruction_3">Käytä selkeää kameraa tai skanneria paremman kuvan laadun saavuttamiseksi.</string>
+    <string name="instruction_4">Katso alla olevia esimerkkikuvia</string>
+    <string name="image_samples">Kuvanäytteet</string>
+    <string name="instruction_for_app_use">Ohjeet sovelluksen käyttöön</string>
+
+    <string name="your_forms">Sinun Lomakeet</string>
+    <string name="upload_new_sketch">Lataa uusi luonnos</string>
+
+
+    <string name="camera">Kamera</string>
+    <string name="gallery">Galleria</string>
+    <string name="process">Prosessi</string>
+    <string name="image_preview">Kuvan esikatselu</string>
+
+    <string name="welcome_message">Welcome to AI Form Builder</string>
+    <string name="hello">Hei</string>
+
+    <string name="status">Tila</string>
+    <string name="draft">Luonnos</string>
+    <string name="published">Julkaistu</string>
+
 </resources>

@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.draw2form.ai.R
 import com.draw2form.ai.user.User
 
 @Composable
@@ -31,12 +33,12 @@ fun ProfileCard(user: User) {
     ) {
         Column(modifier = Modifier.padding(15.dp)) {
             Text(
-                text = "Hello, " + user.name,
+                text = stringResource(R.string.hello) + ", " + user.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
             Text(
-                text = "Welcome to AI Form Builder",
+                text = stringResource(R.string.welcome_message),
                 fontSize = 16.sp
             )
         }

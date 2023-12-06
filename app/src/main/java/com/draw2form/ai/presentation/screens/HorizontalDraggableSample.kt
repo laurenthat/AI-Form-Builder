@@ -78,7 +78,7 @@ fun HorizontalDraggableSample(
         modifier
     ) {
         Image(
-            painter = painterResource(id = R.drawable.instagram),
+            painter = painterResource(id = R.drawable.googleforms),
             modifier = Modifier
                 .size(contentSize)
                 .offset {

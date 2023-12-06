@@ -65,7 +65,9 @@ fun Navigation(
             )
         }
         composable("instructions") {
-            InstructionsScreen()
+            InstructionsScreen(onBackClick = {
+                navController.popBackStack()
+            })
         }
 
         composable("forms") {
@@ -270,7 +272,11 @@ fun Navigation(
                 onBackClick = null,
                 onFormClick = {
                     navController.navigate("forms/${it.id}/edit")
+                },
+                onShareClick = {
+                    navController.navigate("forms/${it}/publish")
                 }
+
 
             )
         }
