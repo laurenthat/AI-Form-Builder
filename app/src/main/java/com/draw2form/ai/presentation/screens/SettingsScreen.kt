@@ -14,6 +14,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.user.UserViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -39,11 +41,12 @@ fun SettingsScreen(
 ) {
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val composableScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
 
     Scaffold(
         topBar = {
-            SettingsScreenTopBar()
+            SettingsScreenTopBar(scrollBehavior = scrollBehavior)
         }
     ) { padding ->
         Column(
@@ -78,8 +81,8 @@ fun SettingsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreenTopBar() {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+fun SettingsScreenTopBar(scrollBehavior: TopAppBarScrollBehavior) {
+    //val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     MediumTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
