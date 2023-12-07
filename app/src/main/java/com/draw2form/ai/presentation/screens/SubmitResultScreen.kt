@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -85,14 +86,11 @@ fun SubmitResultScreen(submitResult: Boolean, onForwardClick: () -> Unit) {
                     onClick = { onForwardClick() },
                     modifier = Modifier
                         .height(60.dp)
-                        .fillMaxWidth()
                         .padding(top = 20.dp)
                 ) {
                     Text(
                         text = "Continue",
-                        fontSize = 18.sp,
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        fontSize = 16.sp,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -139,6 +137,14 @@ fun SubmitResultScreen(submitResult: Boolean, onForwardClick: () -> Unit) {
 
             }
         }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun SubmitResultScreenPreview(){
+    SubmitResultScreen(submitResult = true) {
+        
     }
 }
 
