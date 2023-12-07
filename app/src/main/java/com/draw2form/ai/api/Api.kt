@@ -180,6 +180,7 @@ interface ApiService {
         @Path("id") id: String
     ): Result<ApiForm>
 
+
     // Upload GET Request
     @GET("api/forms/{id}/status")
     @Headers("Content-Type: application/json")

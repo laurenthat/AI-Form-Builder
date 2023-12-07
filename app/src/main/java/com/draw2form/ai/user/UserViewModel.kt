@@ -45,6 +45,9 @@ class UserViewModel(
     private val _submittedForms: MutableStateFlow<List<ApiFormSubmission>> = MutableStateFlow(
         emptyList()
     )
+    private val _selectedForm: MutableStateFlow<ApiForm?> = MutableStateFlow(null)
+
+    val selectedForm: StateFlow<ApiForm?> get() = _selectedForm.asStateFlow()
 
     val apiSubmittedForms: StateFlow<List<ApiFormSubmission>> = _submittedForms.asStateFlow()
 
@@ -248,6 +251,7 @@ class UserViewModel(
                 apiService.getFormDetails(authorization, id)
                     .onSuccess { form ->
                         _submittedForms.value = form.formSubmissions ?: emptyList()
+                        _selectedForm.value = form
                     }.onFailure {
                         println(it)
                     }
