@@ -15,7 +15,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.draw2form.ai.api.ApiUploadedFileState
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
 import com.draw2form.ai.presentation.screens.FormsListScreen
@@ -324,9 +323,7 @@ fun Navigation(
 
                         counter++
                         if (
-                            apiUploadedFileState.value?.formGeneration == "success" &&
-                            apiUploadedFileState.value?.objectRecognition == "success" &&
-                            apiUploadedFileState.value?.textRecognition == "success"
+                            apiUploadedFileState.value?.failed() == true
                         ) {
                             break
                         }
@@ -338,16 +335,15 @@ fun Navigation(
             }
 
             ProcessingScreen(
-                apiUploadedFileState.value ?: ApiUploadedFileState(
-                    "loading",
-                    "loading",
-                    "loading"
-                )
-            ) {
-                formId?.let {
-                    navController.navigate("forms/${it}/edit")
-                }
-            }
+                state = apiUploadedFileState.value,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onEditForm = {
+                    formId?.let {
+                        navController.navigate("forms/${it}/edit")
+                    }
+                })
         }
 
 

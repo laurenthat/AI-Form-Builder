@@ -155,10 +155,75 @@ data class GetUploadFileDetails(
 )
 
 data class ApiUploadedFileState(
-    val objectRecognition: String,
-    val textRecognition: String,
-    val formGeneration: String,
-)
+    val ObjectDetectionResponseReceived: String,
+    val TextDetectionResponseReceived: String,
+    val PredictionsUnified: String,
+    val UnifiedPredictionCoordinatesRounded: String,
+    val UnifiedPredictionsLeveledInYAxis: String,
+    val ChatGPT4ImageDescribed: String,
+    val ChatGPT3P5JsonGenerated: String,
+    val FormComponentsCreated: String,
+
+    ) {
+
+
+    fun items(): List<Pair<String, String>> {
+        return listOf(
+            Pair(ObjectDetectionResponseReceived, "Object Detection Response Received"),
+            Pair(TextDetectionResponseReceived, "Text Detection Response Received"),
+            Pair(PredictionsUnified, "Predictions Unified"),
+            Pair(UnifiedPredictionCoordinatesRounded, "Unified Prediction Coordinates Rounded"),
+            Pair(UnifiedPredictionsLeveledInYAxis, "Unified Predictions Leveled In Y Axis"),
+            Pair(ChatGPT4ImageDescribed, "ChatGPT 4 Image Described"),
+            Pair(ChatGPT3P5JsonGenerated, "ChatGPT 3.5 Json Generated"),
+            Pair(FormComponentsCreated, "Form Components Created"),
+        )
+    }
+
+    fun failed(): Boolean {
+        if (ObjectDetectionResponseReceived == "error") {
+            return true
+        }
+        if (TextDetectionResponseReceived == "error") {
+            return true
+        }
+        if (PredictionsUnified == "error") {
+            return true
+        }
+        if (UnifiedPredictionCoordinatesRounded == "error") {
+            return true
+        }
+        if (UnifiedPredictionsLeveledInYAxis == "error") {
+            return true
+        }
+        if (ChatGPT4ImageDescribed == "error") {
+            return true
+        }
+        if (ChatGPT3P5JsonGenerated == "error") {
+            return true
+        }
+        if (FormComponentsCreated == "error") {
+            return true
+        }
+        return false
+    }
+
+    fun succeeded(): Boolean {
+        if (
+            ObjectDetectionResponseReceived == "success"
+            && TextDetectionResponseReceived == "success"
+            && PredictionsUnified == "success"
+            && UnifiedPredictionCoordinatesRounded == "success"
+            && UnifiedPredictionsLeveledInYAxis == "success"
+            && ChatGPT4ImageDescribed == "success"
+            && ChatGPT3P5JsonGenerated == "success"
+            && FormComponentsCreated == "success"
+        ) {
+            return true
+        }
+        return false
+    }
+}
 
 data class ApiFormShare(
     val id: String,
