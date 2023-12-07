@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,8 +12,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -130,49 +134,60 @@ fun HomeScreen(
                 galleryText = stringResource(R.string.gallery),
             )
             if (showProcessButton) {
-                Button(
-                    onClick = {
-                        Timber.d("process button clicked")
-                        if (fileToUpload == null) {
-                            Timber.d("process button clicked but captured file is null.")
-                        }
-
-                        fileToUpload?.let {
-                            Timber.d("Launch effect called: $it")
-                            userViewModel.uploadFormImage(it) {
-                                onSuccessUpload?.let { method ->
-                                    method(it)
-                                }
-                            }
-                            Timber.d("File send to Api")
-                        }
-                    },
+                Card(
                     modifier = Modifier
-                        .padding(start = 16.dp, top = 8.dp, end = 16.dp)
-                        .align(alignment = Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(16.dp),
+                    elevation = CardDefaults.cardElevation(10.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Text(stringResource(R.string.process))
-                }
-            }
-            bitmap?.let { btm ->
-                Column(
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.image_preview),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                    Image(
-                        bitmap = btm.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.size(400.dp)
-                    )
-                }
+                    Button(
+                        onClick = {
+                            Timber.d("process button clicked")
+                            if (fileToUpload == null) {
+                                Timber.d("process button clicked but captured file is null.")
+                            }
 
+                            fileToUpload?.let {
+                                Timber.d("Launch effect called: $it")
+                                userViewModel.uploadFormImage(it) {
+                                    onSuccessUpload?.let { method ->
+                                        method(it)
+                                    }
+                                }
+                                Timber.d("File send to Api")
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(start = 16.dp, top = 8.dp, end = 16.dp)
+                            .align(alignment = Alignment.CenterHorizontally)
+                    ) {
+                        Text(stringResource(R.string.process))
+                    }
+                    bitmap?.let { btm ->
+                        Column(
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(12.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.image_preview),
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                            Image(
+                                bitmap = btm.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier.size(400.dp)
+                            )
+                        }
+
+                    }
+                }
             }
+
+
         }
     }
 }
