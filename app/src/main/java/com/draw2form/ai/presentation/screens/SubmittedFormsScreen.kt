@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -34,14 +35,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.api.ApiFormSubmission
 import com.draw2form.ai.application.AppViewModelProvider
-import com.draw2form.ai.presentation.ui.theme.LinkUpTheme
 import com.draw2form.ai.user.UserViewModel
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -56,15 +56,16 @@ fun SubmittedFormsScreenTopBar(
     canShare: Boolean,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    form: ApiForm
 
-    ) {
+) {
     MediumTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
         ), title = {
             Text(
-                text = "Name form",
+                text = form.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 20.sp,
@@ -115,12 +116,16 @@ fun SubmittedFormsScreen(
     canGoBack: Boolean,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    form: ApiForm
 ) {
 
     val submittedFormList = userViewModel.apiSubmittedForms.collectAsState(emptyList())
     val submittedForms = submittedFormList.value
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    val responses = submittedForms.count().toString()
+
 
     Scaffold(
         topBar = {
@@ -129,7 +134,8 @@ fun SubmittedFormsScreen(
                 canShare = canShare,
                 canGoBack = canGoBack,
                 onBackClick = onBackClick,
-                onShareClick = onShareClick
+                onShareClick = onShareClick,
+                form = form
 
             )
         },
@@ -142,6 +148,17 @@ fun SubmittedFormsScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            Column {
+                Text(
+                    text = "Responses: $responses",
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(20.dp)
+
+                )
+            }
             LazyColumn(
                 modifier
                     .padding(start = 5.dp, end = 5.dp)
@@ -164,10 +181,11 @@ fun FormSubmittedListItem(
         modifier = Modifier.clickable(onClick = {}),
         headlineContent = {
             Text(
-                text = formSubmission.owner?.name ?: "",
+                text = formSubmission.owner?.name ?: "Anonymous",
                 textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
             )
         },
         supportingContent = {
@@ -186,14 +204,23 @@ fun FormSubmittedListItem(
 
         },
         leadingContent = {
-            AsyncImage(
-                model = formSubmission.owner?.picture,
-                contentScale = ContentScale.Crop,
-                contentDescription = "User picture",
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .size(48.dp),
-            )
+            if (formSubmission.owner?.picture == null)
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(50.dp)
+                )
+            else
+                AsyncImage(
+                    model = formSubmission.owner.picture,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = "User picture",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .size(48.dp),
+                )
+
         },
     )
     HorizontalDivider(
@@ -206,15 +233,3 @@ fun FormSubmittedListItem(
 
 }
 
-@Composable
-@Preview(showBackground = true)
-fun PublishFormScreenPreview() {
-    LinkUpTheme {
-        SubmittedFormsScreen(
-            canShare = true,
-            canGoBack = true,
-            onShareClick = {},
-            onBackClick = {}
-        )
-    }
-}

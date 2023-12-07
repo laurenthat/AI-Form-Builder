@@ -10,11 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -65,14 +64,14 @@ fun FormComponentsBottomSheet(onAdd: (UIComponent) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
     ) {
 
-        FloatingActionButton(
+        ExtendedFloatingActionButton(
             onClick = { isSheetOpen = true },
-            shape = CircleShape,
             modifier = Modifier
                 .padding(16.dp)
                 .align(Alignment.BottomEnd)
         ) {
             Icon(Icons.Filled.Add, "Floating action button.")
+            Text(text = "Add new")
         }
 
     }

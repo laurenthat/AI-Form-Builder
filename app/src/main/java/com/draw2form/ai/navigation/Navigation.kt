@@ -48,6 +48,8 @@ fun Navigation(
 
     val scope = rememberCoroutineScope()
 
+    val selectedForm by userViewModel.selectedForm.collectAsState()
+
 
     NavHost(
         navController,
@@ -94,24 +96,28 @@ fun Navigation(
                 }
             }
 
-            SubmittedFormsScreen(
-                userViewModel = userViewModel,
-                canShare = true,
-                canGoBack = true,
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onShareClick = {
-                    composableScope.launch {
-                        if (formId != null) {
-                            userViewModel.publishForm(formId) {
-                                navController.navigate("forms/${formId}/publish")
+
+            selectedForm?.let {
+                SubmittedFormsScreen(
+                    userViewModel = userViewModel,
+                    canShare = true,
+                    canGoBack = true,
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onShareClick = {
+                        composableScope.launch {
+                            if (formId != null) {
+                                userViewModel.publishForm(formId) {
+                                    navController.navigate("forms/${formId}/publish")
+                                }
                             }
                         }
-                    }
 
-                }
-            )
+                    },
+                    form = it
+                )
+            }
         }
 
 
