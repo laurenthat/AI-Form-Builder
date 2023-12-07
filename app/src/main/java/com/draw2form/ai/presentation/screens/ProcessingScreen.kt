@@ -142,57 +142,5 @@ fun ProcessingScreen(state: ApiUploadedFileState?, onEditForm: () -> Unit, onBac
 
         }
     }
-
-
-    // val waitComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.please_wait))
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(20.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//
-//        Text("Processing your image", fontSize = 20.sp)
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(16.dp)
-//                .border(2.dp, Color.Gray, shape = RectangleShape)
-//
-//        ) {
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize(),
-////                    .padding(top = 20.dp),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                state?.let {
-//                    ImageProcessStatus(state.ObjectDetectionResponseReceived, "Object Detection Response Received")
-//                    ImageProcessStatus(state.TextDetectionResponseReceived, "Text Detection Response Received")
-//                    ImageProcessStatus(state.PredictionsUnified, "Predictions Unified")
-//                    ImageProcessStatus(state.UnifiedPredictionCoordinatesRounded, "Unified Prediction Coordinates Rounded")
-//                    ImageProcessStatus(state.UnifiedPredictionsLeveledInYAxis, "Unified Predictions Leveled In Y Axis")
-//                    ImageProcessStatus(state.ChatGPT4ImageDescribed, "ChatGPT 4 Image Described")
-//                    ImageProcessStatus(state.ChatGPT3P5JsonGenerated, "ChatGPT 3.5 Json Generated")
-//                    ImageProcessStatus(state.FormComponentsCreated, "Form Components Created")
-//                    Spacer(modifier = Modifier.height(50.dp))
-//                    Button(
-//                        enabled = state.succeeded(),
-//                        onClick = {
-//                            onEditForm()
-//                        }
-//                    ) {
-//                        Text(text = "View Form")
-//                    }
-//                }
-//
-//                Text(
-//                    "Image processing might take 5-15 seconds. Please wait patiently.",
-//                    modifier = Modifier.padding(top = 50.dp),
-//                    textAlign = TextAlign.Center
-//                )
-//            }
-//        }
-//    }
 }
 
