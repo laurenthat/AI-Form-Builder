@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -129,7 +130,8 @@ fun UploadCard(
             .fillMaxWidth()
             .padding(16.dp)
             .height(140.dp),
-        elevation = CardDefaults.cardElevation(),
+        elevation = CardDefaults.cardElevation(10.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Column(
             modifier = Modifier
@@ -140,7 +142,8 @@ fun UploadCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
-                verticalAlignment = Alignment.Top // Align items at the top
+                verticalAlignment = Alignment.Top, // Align items at the top
+                horizontalArrangement = Arrangement.Center
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.icon_upload),

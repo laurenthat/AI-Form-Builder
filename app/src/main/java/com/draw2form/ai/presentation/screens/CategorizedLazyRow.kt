@@ -11,7 +11,7 @@ fun CategorizedLazyRow(
     forms: List<ApiForm>,
     modifier: Modifier = Modifier,
     onFormClick: (ApiForm) -> Unit,
-    onShareButtonClick: (id:String) -> Unit
+    onShareButtonClick: (id: String) -> Unit
 ) {
     val sortedForms = forms.sortedBy { it.name }
 
@@ -21,7 +21,7 @@ fun CategorizedLazyRow(
         items(sortedForms) { form ->
             MyFormItem(form, onFormClick = {
                 onFormClick(form)
-            } ){ onShareButtonClick(form.id) }
+            }) { onShareButtonClick(form.id) }
         }
     }
 }
