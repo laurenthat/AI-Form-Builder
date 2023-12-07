@@ -124,7 +124,7 @@ fun FormEditScreen(
     var overScrollJob by remember { mutableStateOf<Job?>(null) }
     val dragDropListState = rememberDragDropListState(onMove = onMove)
     val sheetState = rememberModalBottomSheetState()
-    var editSheetOpen by rememberSaveable {
+    var editSheetOpen by remember {
         mutableStateOf<UIComponent?>(null)
     }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -153,6 +153,7 @@ fun FormEditScreen(
                         bottomSheetUIComponent = it
                     }, onImageSelected = { file ->
                         onImageUIComponentUpdate(it, file)
+                        editSheetOpen = null
                     })
                 }
             }
