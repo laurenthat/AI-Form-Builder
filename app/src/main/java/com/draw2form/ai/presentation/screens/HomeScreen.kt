@@ -115,7 +115,8 @@ fun HomeScreen(
                 text = stringResource(R.string.upload_new_sketch),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                modifier = Modifier
+                    .padding(top = 10.dp, start = 10.dp, end = 10.dp)
             )
             UploadCard(
                 onBitmapReady = {
@@ -148,7 +149,7 @@ fun HomeScreen(
                     },
                     modifier = Modifier
                         .padding(start = 16.dp, top = 8.dp, end = 16.dp)
-                        .fillMaxWidth(),
+                        .align(alignment = Alignment.CenterHorizontally)
                 ) {
                     Text(stringResource(R.string.process))
                 }
