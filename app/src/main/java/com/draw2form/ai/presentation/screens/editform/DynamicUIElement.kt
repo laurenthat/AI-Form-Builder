@@ -22,7 +22,7 @@ fun DynamicUI(element: UIComponent) {
         }
         element.image?.let {
             FormAsyncImage(
-                url = it.url ?: "https://placekitten.com/1000/500?image=12",
+                url = it.url ?: "https://picsum.photos/id/20/1000/500",
                 modifier = Modifier
                     .fillMaxSize(),
             )
