@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.draw2form.ai.application.AppViewModelProvider
 import com.draw2form.ai.application.connectivity.InternetConnectionState
+import com.draw2form.ai.presentation.screens.FormSubmissionDetailsScreen
 import com.draw2form.ai.presentation.screens.FormsListScreen
 import com.draw2form.ai.presentation.screens.HomeScreen
 import com.draw2form.ai.presentation.screens.InstructionsScreen
@@ -104,6 +105,9 @@ fun Navigation(
                     onBackClick = {
                         navController.popBackStack()
                     },
+                    onPreviewClick = {
+                        navController.navigate("forms/${formId}/preview")
+                    },
                     onShareClick = {
                         composableScope.launch {
                             if (formId != null) {
@@ -115,11 +119,69 @@ fun Navigation(
 
                     },
                     form = it
-                )
+                ) { submissionId ->
+                    navController.navigate("forms/${formId}/submissions/${submissionId}")
+                }
             }
         }
 
 
+        composable(
+            "forms/{formId}/submissions/{submissionId}",
+            arguments = listOf(
+                navArgument("formId") { type = NavType.StringType },
+                navArgument("submissionId") { type = NavType.StringType },
+            ),
+        ) { backStackEntry ->
+            val formId = backStackEntry.arguments?.getString("formId")
+            val submissionId = backStackEntry.arguments?.getString("submissionId")
+
+            LaunchedEffect(true) {
+                formId?.let {
+                    userViewModel.getSubmittedForms(it)
+                }
+            }
+
+            selectedForm?.let { form ->
+                val submission = form.formSubmissions?.find { submission -> submission.id == submissionId }
+                submission?.let { submission ->
+                    FormSubmissionDetailsScreen(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        label = "Form Submission",
+                        form = form,
+                        submissionId = submission.id
+                    )
+                }
+            }
+        }
+
+        composable(
+            "forms/{formId}/preview",
+            arguments = listOf(
+                navArgument("formId") { type = NavType.StringType },
+            ),
+        ) { backStackEntry ->
+            val formId = backStackEntry.arguments?.getString("formId")
+
+            LaunchedEffect(true) {
+                formId?.let {
+                    userViewModel.getSubmittedForms(it)
+                }
+            }
+
+            selectedForm?.let { form ->
+                FormSubmissionDetailsScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    label = "Form Preview",
+                    form = form,
+                    submissionId = null
+                )
+            }
+        }
 
         composable(
             "forms/{formId}/publish",

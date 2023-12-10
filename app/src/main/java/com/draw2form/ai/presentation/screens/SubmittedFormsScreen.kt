@@ -3,6 +3,7 @@ package com.draw2form.ai.presentation.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,6 +44,7 @@ import coil.compose.AsyncImage
 import com.draw2form.ai.api.ApiForm
 import com.draw2form.ai.api.ApiFormSubmission
 import com.draw2form.ai.application.AppViewModelProvider
+import com.draw2form.ai.presentation.icons.Eye
 import com.draw2form.ai.user.UserViewModel
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -56,6 +59,7 @@ fun SubmittedFormsScreenTopBar(
     canShare: Boolean,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    onPreviewClick: () -> Unit,
     form: ApiForm
 
 ) {
@@ -88,18 +92,34 @@ fun SubmittedFormsScreenTopBar(
         },
 
         actions = {
-            if (canShare) {
+            Row {
                 IconButton(
                     modifier = Modifier,
-                    onClick = { onShareClick() }
+                    onClick = { onPreviewClick() }
                 ) {
                     Icon(
-                        Icons.Filled.Share,
-                        contentDescription = "Share",
+                        Icons.Filled.Eye,
+                        contentDescription = "Preview",
                         modifier = Modifier
                             .padding(horizontal = 3.dp)
                     )
                 }
+
+                if (canShare) {
+                    IconButton(
+                        modifier = Modifier,
+                        onClick = { onShareClick() }
+                    ) {
+                        Icon(
+                            Icons.Filled.Share,
+                            contentDescription = "Share",
+                            modifier = Modifier
+                                .padding(horizontal = 3.dp)
+                        )
+                    }
+
+                }
+
             }
         },
 
@@ -116,7 +136,9 @@ fun SubmittedFormsScreen(
     canGoBack: Boolean,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
-    form: ApiForm
+    onPreviewClick: () -> Unit,
+    form: ApiForm,
+    onClick: (id: String) -> Unit
 ) {
 
     val submittedFormList = userViewModel.apiSubmittedForms.collectAsState(emptyList())
@@ -135,6 +157,7 @@ fun SubmittedFormsScreen(
                 canGoBack = canGoBack,
                 onBackClick = onBackClick,
                 onShareClick = onShareClick,
+                onPreviewClick = onPreviewClick,
                 form = form
 
             )
@@ -166,7 +189,9 @@ fun SubmittedFormsScreen(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 itemsIndexed(submittedForms) { index, item ->
-                    FormSubmittedListItem(formSubmission = item)
+                    FormSubmittedListItem(formSubmission = item) {
+                        onClick(item.id)
+                    }
                 }
             }
         }
@@ -176,9 +201,10 @@ fun SubmittedFormsScreen(
 @Composable
 fun FormSubmittedListItem(
     formSubmission: ApiFormSubmission,
+    onClick: () -> Unit
 ) {
     ListItem(
-        modifier = Modifier.clickable(onClick = {}),
+        modifier = Modifier.clickable(onClick = {onClick()}),
         headlineContent = {
             Text(
                 text = formSubmission.owner?.name ?: "Anonymous",
