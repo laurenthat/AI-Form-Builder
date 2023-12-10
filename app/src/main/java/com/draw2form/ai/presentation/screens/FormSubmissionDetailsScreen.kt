@@ -92,6 +92,7 @@ fun FormSubmissionDetailsScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            val labels = form.labels?.map { UIComponent(label = it) } ?: listOf()
             val images = form.images?.map { UIComponent(image = it) } ?: listOf()
             val buttons = form.buttons?.map { UIComponent(button = it) } ?: listOf()
             val checkboxes = form.checkboxes?.map {
@@ -109,6 +110,7 @@ fun FormSubmissionDetailsScreen(
             } ?: listOf()
 
             val uiComponents = mutableListOf<UIComponent>()
+            uiComponents.addAll(labels)
             uiComponents.addAll(images)
             uiComponents.addAll(buttons)
             uiComponents.addAll(checkboxes)

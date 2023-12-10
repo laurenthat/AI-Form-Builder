@@ -48,8 +48,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.draw2form.ai.R
-import com.draw2form.ai.presentation.screens.Label
-import com.draw2form.ai.presentation.screens.TextField
+import com.draw2form.ai.presentation.screens.FormLabel
+import com.draw2form.ai.presentation.screens.FormTextField
 import com.draw2form.ai.presentation.screens.UIComponent
 import com.draw2form.ai.presentation.screens.UploadCard
 import kotlinx.coroutines.Job
@@ -269,9 +269,9 @@ fun EditElementBottomSheet(
     Column {
         uiComponent.label?.let { labelComponent ->
             Column {
-                Label(labelComponent.label)
+                FormLabel(labelComponent.label)
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(label = "Label", value = labelComponent.label, onChange = {
+                FormTextField(label = "Label", value = labelComponent.label, onChange = {
                     var updatedUIComponent = uiComponent.copy(
                         label = labelComponent.copy(label = it)
                     )
@@ -284,9 +284,9 @@ fun EditElementBottomSheet(
 
         uiComponent.textField?.let { textFieldComponent ->
             Column {
-                Label(textFieldComponent.label)
+                FormLabel(textFieldComponent.label)
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(label = "Label", value = textFieldComponent.label, onChange = {
+                FormTextField(label = "Label", value = textFieldComponent.label, onChange = {
                     var updatedUIComponent = uiComponent.copy(
                         textField = textFieldComponent.copy(label = it)
                     )
@@ -298,9 +298,9 @@ fun EditElementBottomSheet(
 
         uiComponent.checkbox?.let { checkboxComponent ->
             Column {
-                Label(checkboxComponent.label)
+                FormLabel(checkboxComponent.label)
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(label = "Label", value = checkboxComponent.label, onChange = {
+                FormTextField(label = "Label", value = checkboxComponent.label, onChange = {
                     var updatedUIComponent = uiComponent.copy(
                         checkbox = checkboxComponent.copy(label = it)
                     )
@@ -312,9 +312,9 @@ fun EditElementBottomSheet(
 
         uiComponent.toggleSwitch?.let { toggleSwitchComponent ->
             Column {
-                Label(toggleSwitchComponent.label)
+                FormLabel(toggleSwitchComponent.label)
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(label = "Label", value = toggleSwitchComponent.label, onChange = {
+                FormTextField(label = "Label", value = toggleSwitchComponent.label, onChange = {
                     var updatedUIComponent = uiComponent.copy(
                         toggleSwitch = toggleSwitchComponent.copy(label = it)
                     )
@@ -326,9 +326,9 @@ fun EditElementBottomSheet(
 
         uiComponent.button?.let { buttonComponent ->
             Column {
-                Label(buttonComponent.label)
+                FormLabel(buttonComponent.label)
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(label = "Label", value = buttonComponent.label, onChange = {
+                FormTextField(label = "Label", value = buttonComponent.label, onChange = {
                     var updatedUIComponent = uiComponent.copy(
                         button = buttonComponent.copy(label = it)
                     )

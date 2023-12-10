@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.draw2form.ai.presentation.screens.Checkbox
-import com.draw2form.ai.presentation.screens.DynamicFormButton
 import com.draw2form.ai.presentation.screens.FormAsyncImage
-import com.draw2form.ai.presentation.screens.Label
-import com.draw2form.ai.presentation.screens.TextField
-import com.draw2form.ai.presentation.screens.ToggleSwitch
+import com.draw2form.ai.presentation.screens.FormButton
+import com.draw2form.ai.presentation.screens.FormCheckbox
+import com.draw2form.ai.presentation.screens.FormLabel
+import com.draw2form.ai.presentation.screens.FormTextField
+import com.draw2form.ai.presentation.screens.FormToggleSwitch
 import com.draw2form.ai.presentation.screens.UIComponent
 
 @Composable
@@ -18,7 +18,7 @@ fun DynamicUI(element: UIComponent) {
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         element.label?.let {
-            Label(it.label)
+            FormLabel(it.label)
         }
         element.image?.let {
             FormAsyncImage(
@@ -28,18 +28,18 @@ fun DynamicUI(element: UIComponent) {
             )
         }
         element.textField?.let {
-            TextField(it.label, "", {})
+            FormTextField(it.label, "", {})
         }
         element.checkbox?.let {
-            Checkbox(it.label)
+            FormCheckbox(it.label)
         }
 
         element.toggleSwitch?.let {
-            ToggleSwitch(it.label)
+            FormToggleSwitch(it.label)
         }
 
         element.button?.let {
-            DynamicFormButton(it.label)
+            FormButton(it.label)
         }
     }
 }
