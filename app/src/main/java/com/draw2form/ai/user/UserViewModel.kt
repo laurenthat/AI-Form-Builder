@@ -250,7 +250,8 @@ class UserViewModel(
             authorization?.let {
                 apiService.getFormDetails(authorization, id)
                     .onSuccess { form ->
-                        _submittedForms.value = form.formSubmissions ?: emptyList()
+                        val list = (form.formSubmissions ?: emptyList())
+                        _submittedForms.value = list.sortedBy { parse(it.createdAt).epochSeconds }.reversed()
                         _selectedForm.value = form
                     }.onFailure {
                         println(it)
