@@ -145,7 +145,7 @@ data class UIComponent(
 }
 
 @Composable
-fun Label(label: String) {
+fun FormLabel(label: String) {
     Text(
         text = label,
         modifier = Modifier
@@ -170,7 +170,7 @@ fun FormAsyncImage(
 }
 
 @Composable
-fun TextField(label: String, value: String, onChange: (String) -> Unit) {
+fun FormTextField(label: String, value: String, onChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = {
@@ -185,7 +185,7 @@ fun TextField(label: String, value: String, onChange: (String) -> Unit) {
 }
 
 @Composable
-fun Checkbox(label: String) {
+fun FormCheckbox(label: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,7 +203,7 @@ fun Checkbox(label: String) {
 }
 
 @Composable
-fun ToggleSwitch(label: String) {
+fun FormToggleSwitch(label: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -220,7 +220,7 @@ fun ToggleSwitch(label: String) {
 }
 
 @Composable
-fun DynamicFormButton(label: String) {
+fun FormButton(label: String) {
     Button(
         onClick = { /*TODO*/ },
         modifier = Modifier
