@@ -97,7 +97,7 @@ fun FormInteractionUI(
 
             element.image?.let {
                 FormAsyncImageComponent(
-                    url = "https://picsum.photos/id/20/1000/500",
+                    url = it.url ?: "https://picsum.photos/id/20/1000/500",
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -106,6 +106,7 @@ fun FormInteractionUI(
                 TextFieldComponent(
                     label = apiField.label,
                     value = element.textFieldResponse?.value ?: "",
+                    readonly = false,
                     onValueChange = { text ->
                         onElementUpdated(
                             element.copy(
@@ -121,7 +122,8 @@ fun FormInteractionUI(
             element.checkbox?.let {
                 CheckboxComponent(
                     label = it.label,
-                    isChecked = element.checkboxResponse?.value ?: true,
+                    isChecked = element.checkboxResponse?.value ?: false,
+                    enabled = true,
                     onCheckedChange = { isChecked ->
 
                         onElementUpdated(
@@ -138,7 +140,8 @@ fun FormInteractionUI(
             element.toggleSwitch?.let {
                 ToggleSwitchComponent(
                     label = it.label,
-                    isChecked = element.toggleSwitchResponse?.value ?: true,
+                    isChecked = element.toggleSwitchResponse?.value ?: false,
+                    enabled = true,
                     onCheckedChange = { isChecked ->
                         onElementUpdated(
                             element.copy(
@@ -154,6 +157,7 @@ fun FormInteractionUI(
             element.button?.let {
                 DynamicFormButtonComponent(
                     label = it.label,
+                    enabled = true,
                     onClick = {
                         onSubmitClicked()
 
@@ -188,22 +192,23 @@ fun FormAsyncImageComponent(url: String, modifier: Modifier) {
 }
 
 @Composable
-fun TextFieldComponent(label: String, value: String, onValueChange: (String) -> Unit) {
+fun TextFieldComponent(label: String, value: String, readonly: Boolean, onValueChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = {
             onValueChange(it)
         },
-        label = { Text(label) },
+        placeholder = { Text(text = label) },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        readOnly = readonly
     )
 }
 
 @Composable
-fun CheckboxComponent(label: String, isChecked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun CheckboxComponent(label: String, isChecked: Boolean, enabled: Boolean, onCheckedChange: (Boolean) -> Unit) {
 
     Row(
         modifier = Modifier
@@ -218,13 +223,14 @@ fun CheckboxComponent(label: String, isChecked: Boolean, onCheckedChange: (Boole
             onCheckedChange = {
                 onCheckedChange(it)
             },
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
+            enabled = enabled
         )
     }
 }
 
 @Composable
-fun ToggleSwitchComponent(label: String, isChecked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun ToggleSwitchComponent(label: String, isChecked: Boolean, enabled: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,13 +241,14 @@ fun ToggleSwitchComponent(label: String, isChecked: Boolean, onCheckedChange: (B
         Text(label)
         Switch(
             checked = isChecked,
+            enabled = enabled,
             onCheckedChange = onCheckedChange,
         )
     }
 }
 
 @Composable
-fun DynamicFormButtonComponent(label: String, onClick: () -> Unit) {
+fun DynamicFormButtonComponent(label: String, enabled: Boolean, onClick: () -> Unit) {
     Button(
         onClick = {
             Timber.d("Button clicked")
@@ -249,7 +256,8 @@ fun DynamicFormButtonComponent(label: String, onClick: () -> Unit) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        enabled = enabled
     ) {
         Text(text = label, modifier = Modifier.padding(8.dp))
     }

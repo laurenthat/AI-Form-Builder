@@ -173,6 +173,8 @@ data class UIComponent(
         }
         throw Exception("Bad UIComponent Resource not allowed")
     }
+
+    
 }
 
 @Composable
