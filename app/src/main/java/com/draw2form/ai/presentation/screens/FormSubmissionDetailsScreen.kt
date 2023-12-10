@@ -95,7 +95,7 @@ fun FormSubmissionDetailsScreen(
             val images = form.images?.map { UIComponent(image = it) } ?: listOf()
             val buttons = form.buttons?.map { UIComponent(button = it) } ?: listOf()
             val checkboxes = form.checkboxes?.map {
-                val response = submission?.checkboxResponse?.find { res -> res.checkboxId == it.id }
+                val response = submission?.checkboxResponses?.find { res -> res.checkboxId == it.id }
                 UIComponent(checkbox = it, checkboxResponse = response)
             } ?: listOf()
             val textFields = form.textFields?.map {

@@ -1,6 +1,5 @@
 package com.draw2form.ai.api
 
-import com.draw2form.ai.presentation.screens.UIElement
 import com.draw2form.ai.user.User
 import java.util.UUID
 
@@ -38,7 +37,7 @@ data class ApiFormSubmission(
     val form: ApiForm?,
     val formId: String,
     val textFieldResponses: List<ApiFormTextFieldResponse>?,
-    val checkboxResponse: List<ApiFormCheckboxResponse>?,
+    val checkboxResponses: List<ApiFormCheckboxResponse>?,
     val toggleSwitchResponses: List<ApiFormToggleSwitchResponse>?,
     val createdAt: String,
     val updatedAt: String
@@ -49,9 +48,9 @@ data class ApiFormTextField(
     val form: ApiForm?,
     val formId: String,
     val label: String,
-    override val order: Int,
+    val order: Int,
     val responses: List<ApiFormTextFieldResponse>?
-) : UIElement
+)
 
 data class ApiFormTextFieldResponse(
     val id: String,
@@ -67,9 +66,9 @@ data class ApiFormCheckbox(
     val label: String,
     val form: ApiForm?,
     val formId: String,
-    override val order: Int,
+    val order: Int,
     val responses: List<ApiFormCheckboxResponse>?
-) : UIElement
+)
 
 data class ApiFormCheckboxResponse(
     val id: String,
@@ -85,9 +84,9 @@ data class ApiFormToggleSwitch(
     val label: String,
     val form: ApiForm?,
     val formId: String,
-    override val order: Int,
+    val order: Int,
     val responses: List<ApiFormToggleSwitchResponse>?
-) : UIElement
+)
 
 data class ApiFormToggleSwitchResponse(
     val id: String,
@@ -102,26 +101,26 @@ data class ApiFormImage(
     val id: String,
     val form: ApiForm?,
     val formId: String,
-    override val order: Int,
+    val order: Int,
     val url: String?
-) : UIElement
+)
 
 data class ApiFormButton(
     val id: String,
     val label: String,
     val form: ApiForm?,
     val formId: String,
-    override val order: Int,
+    val order: Int,
     val type: String
-) : UIElement
+)
 
 data class ApiFormLabel(
     val id: String,
     val form: ApiForm?,
     val formId: String,
-    override val order: Int,
+    val order: Int,
     val label: String
-) : UIElement
+)
 
 data class ApiImageEvent(
     val id: String,
