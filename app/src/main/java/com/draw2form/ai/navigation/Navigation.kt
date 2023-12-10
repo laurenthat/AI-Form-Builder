@@ -89,10 +89,22 @@ fun Navigation(
             arguments = listOf(navArgument("formId") { type = NavType.StringType }),
         ) { backStackEntry ->
             val formId = backStackEntry.arguments?.getString("formId")
+            var counter by remember { mutableStateOf(0) }
 
             LaunchedEffect(true) {
                 formId?.let {
                     userViewModel.getSubmittedForms(it)
+
+                    while (true) {
+                        // Update every 2 second (2000 milliseconds)
+                        delay(2000)
+                        userViewModel.getSubmittedForms(formId)
+                        counter++
+
+                        if (counter > 100) {
+                            break
+                        }
+                    }
                 }
             }
 

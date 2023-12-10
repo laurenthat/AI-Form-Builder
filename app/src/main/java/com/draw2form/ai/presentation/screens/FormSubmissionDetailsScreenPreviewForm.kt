@@ -22,7 +22,7 @@ fun FormSubmissionDetailsScreenPreviewFormComponent(
             .fillMaxWidth()
             .padding(8.dp),
         colors = CardColors(Color.White, Color.Black, Color.Transparent, Color.Transparent),
-        ) {
+    ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             element.label?.let {
