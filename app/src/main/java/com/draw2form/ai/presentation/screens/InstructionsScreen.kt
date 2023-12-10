@@ -159,9 +159,10 @@ fun InstructionsScreen(onBackClick: () -> Unit) {
                     val imageResources = listOf(
                         R.drawable.sample_image_1,
                         R.drawable.sample_image_2,
-                        R.drawable.sample_image_1,
-                        R.drawable.sample_image_2,
-                        R.drawable.sample_image_1
+                        R.drawable.sample_image_3,
+                        R.drawable.sample_image_4,
+                        R.drawable.sample_image_5,
+                        R.drawable.sample_image_6
                     )
 
                     items(imageResources) { imageResource ->
