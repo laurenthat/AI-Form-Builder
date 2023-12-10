@@ -40,28 +40,4 @@ fun NoDraftCard() {
             Text("No drafts found", fontSize = 16.sp)
         }
     )
-
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(16.dp),
-//        elevation = CardDefaults.cardElevation()
-//    ) {
-//
-//        // Show Lottie animation for empty draft
-//        Row(
-//            modifier = Modifier.fillMaxWidth(),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//
-//            Image(
-//                painter = painterResource(R.drawable.empty_draft),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .height(90.dp)
-//                    .width(100.dp)
-//            )
-//            Text("No drafts found", fontSize = 16.sp)
-//        }
-//    }
 }

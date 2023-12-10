@@ -97,7 +97,7 @@ fun FormInteractionUI(
 
             element.image?.let {
                 FormAsyncImageComponent(
-                    url = "https://placekitten.com/1000/500?image=12",
+                    url = "https://picsum.photos/id/20/1000/500",
                     modifier = Modifier.fillMaxSize()
                 )
             }
