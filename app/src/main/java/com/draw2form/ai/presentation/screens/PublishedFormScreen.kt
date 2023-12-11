@@ -192,13 +192,18 @@ fun FormAsyncImageComponent(url: String, modifier: Modifier) {
 }
 
 @Composable
-fun TextFieldComponent(label: String, value: String, readonly: Boolean, onValueChange: (String) -> Unit) {
+fun TextFieldComponent(
+    label: String,
+    value: String,
+    readonly: Boolean,
+    onValueChange: (String) -> Unit
+) {
     OutlinedTextField(
         value = value,
         onValueChange = {
             onValueChange(it)
         },
-        placeholder = { Text(text = label) },
+        placeholder = { Text(text = label, color = Color.Black) },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
         modifier = Modifier
             .fillMaxWidth()
@@ -208,7 +213,12 @@ fun TextFieldComponent(label: String, value: String, readonly: Boolean, onValueC
 }
 
 @Composable
-fun CheckboxComponent(label: String, isChecked: Boolean, enabled: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun CheckboxComponent(
+    label: String,
+    isChecked: Boolean,
+    enabled: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
 
     Row(
         modifier = Modifier
@@ -230,7 +240,12 @@ fun CheckboxComponent(label: String, isChecked: Boolean, enabled: Boolean, onChe
 }
 
 @Composable
-fun ToggleSwitchComponent(label: String, isChecked: Boolean, enabled: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun ToggleSwitchComponent(
+    label: String,
+    isChecked: Boolean,
+    enabled: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
