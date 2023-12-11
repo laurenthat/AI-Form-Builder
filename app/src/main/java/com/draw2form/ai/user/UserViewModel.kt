@@ -127,7 +127,7 @@ class UserViewModel(
         uiElements.addAll(checkboxes.map {
             UIComponent(
                 checkbox = it,
-                checkboxResponse = ApiFormCheckboxResponse("", null, "", null, it.id, true)
+                checkboxResponse = ApiFormCheckboxResponse("", null, "", null, it.id, false)
             )
         })
         uiElements.addAll(textFields.map {
@@ -139,7 +139,7 @@ class UserViewModel(
         uiElements.addAll(toggleSwitches.map {
             UIComponent(
                 toggleSwitch = it,
-                toggleSwitchResponse = ApiFormToggleSwitchResponse("", null, "", null, it.id, true)
+                toggleSwitchResponse = ApiFormToggleSwitchResponse("", null, "", null, it.id, false)
             )
         })
         uiElements.addAll(buttons.map { UIComponent(button = it) })
@@ -251,7 +251,8 @@ class UserViewModel(
                 apiService.getFormDetails(authorization, id)
                     .onSuccess { form ->
                         val list = (form.formSubmissions ?: emptyList())
-                        _submittedForms.value = list.sortedBy { parse(it.createdAt).epochSeconds }.reversed()
+                        _submittedForms.value =
+                            list.sortedBy { parse(it.createdAt).epochSeconds }.reversed()
                         _selectedForm.value = form
                     }.onFailure {
                         println(it)
