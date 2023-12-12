@@ -163,6 +163,18 @@ Install [Android Studio](https://developer.android.com/studio?gclid=CjwKCAjw7p6a
 
 [app/release/app-release.apk](https://github.com/laurenthat-metropolia/AI-Form-Builder/tree/main/app/release)
 
+**Steps**
+-  Please use CHROME while browsing the application.
+-  Download the apk file
+- Press Download anyway (Ignore File might be harmful alert)
+- Open the downloaded file and click install
+- Unsafe app blocked Pop up window appears in screen
+- Press more details and install anyway
+- Open the app (default browser should be chrome)
+- Enjoy the application
+- Please be mindful that the form supports Label, TextFields, ToggleSwitches, Images, Checkbox and Button.
+
+
 #### Debug Version
 
 [app/debug/app-debug.apk](https://github.com/laurenthat-metropolia/AI-Form-Builder/tree/main/app/debug)
